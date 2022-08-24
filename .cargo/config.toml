@@ -1,0 +1,7 @@
+[build]
+target = "x86_64.json"
+
+[unstable]
+build-std-features = ["compiler-builtins-mem"]
+# recompile the list to our arch
+build-std = ["core", "compiler_builtins"]
