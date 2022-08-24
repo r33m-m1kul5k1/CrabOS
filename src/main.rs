@@ -4,8 +4,9 @@
 use core::panic::PanicInfo;
 
 #[no_mangle] // don't give a random unique name for `_start` function
-pub extern "C" fn _start() {
-    let _temp: u32 = 32;
+pub extern "C" fn _start() -> ! {
+    
+    loop {}
 }
 
 #[panic_handler]
