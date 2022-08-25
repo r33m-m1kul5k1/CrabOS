@@ -29,5 +29,7 @@ Tutorials
 
 Repositories
 
-- [byteOS](https://github.com/64/ByteOS) - paging
-- [arbel-os](https://github.com/arbel03/os) - segmentation
+- [byteOS](https://github.com/64/ByteOS)
+- [MonkOS](https://github.com/beevik/MonkOS)
+- [AlmeidaOS](https://github.com/PauloMigAlmeida/AlmeidaOS)
+- [arbel-os](https://github.com/arbel03/os)
