@@ -4,7 +4,7 @@
 
 ### init memory - 
 
-# psudo code
+#### psudo code
 
 ```C
 init kernel
@@ -21,7 +21,7 @@ void init_memory()
 ### process memory creation -
 
 
-# psudo code
+#### psudo code
 ```C
 void create_proccess() {
 
@@ -41,7 +41,7 @@ void create_proccess() {
 ### page faults - 
 
 
-# psudo code : 
+#### psudo code : 
 
 ```	c
 /*
