@@ -33,36 +33,56 @@ the boot sector. containing the `bootloader` and the disk `partition table`. `VB
 
 ***
 
-## Memory management
+## [Memory management](https://wiki.osdev.org/Brendan%27s_Memory_Management_Guide)
 
-### Address space
+### Physical Memory Manager - pmm
 
-virtual address space is converted to the physical address space through the `MMU`. The addresses on virtual address space are continuous and can only be accessed by the kernel. making the memory more secured and simple.
+**Algorithm**: buddy
 
-### Memory translation systems
+```Text
+                0   4   8   12  16  20  24  28  32  36
+                ###.#....#........#...###...########.... real memory pattern
 
-#### Segmentation
-
-##### real mode segmentation
-
-The physical address is `(segment * 0x10) + offset`. segments can overlap. x86 segments are `CS, DS, SS, ES, FS, GS`.
-The only way to change a `CS` register is by `Far jump/call`, `Far return/IRET`, `INT`.\
-
-##### protected mode segmentation
-
-The physical address is `GDT[selector] + offset`.
-
-```TEXT
-+-----------------------+---+-----+---+------+
-| Base address (32 bit) | G | BD  |   |  A   |
-+-----------------------+---+-----+---+------+
-| Limit (20 bits)       | P | DPL | S | Type |
-+-----------------------+---+-----+---+------+
+buddy[0]--->  ###.#.xx.#xxxxxxxx#.xx###.xx########xxxx 5  free 4K , 5-byte bitmap
+buddy[1]--->  # # # . # . x x . # . # # . # # # # x x  5  free 8K , 20-bits map
+buddy[2]--->  #   #   #   .   #   #   #   #   #   .    2  free 16K, 10-bits map
+buddy[3]--->  #       #       #       #       #        0  free 32K, 5-bits map
 ```
 
-for more info about the table click [this](https://en.wikipedia.org/wiki/Segment_descriptor#:~:text=In%20memory%20addressing%20for%20Intel,to%20in%20the%20logical%20address.)
+**Question** why not to use linked list?
 
-**NOTE**: C isn't compatible with segmentation.
+### Virtual Memory Manager (paging) - vmm
+
+**Functions**: map/unmap, create/destory pages, by calling the pmm
+
+### Heap Manager (Flat memory model)
+
+**Algorithm**: first fit & (bitmap | linked list)
+
+other implementations can be found [here](https://wiki.osdev.org/User:Pancakes/SimpleHeapImplementation)
+
+### process memory
+
+a process memory can be devided to
+
+```Text
++-------+
+| stack | - constant*
++-------+
+| heap  | - constant* 
++-------+
+| text  | - constant
++-------+
+```
+
+*can be enlarged by a pure page fault.
+
+## Terms
+
+- **Address space**: a range of memory can be virtual or physical.
+- **DMA**: direct memory access, is a feature of certain hardware to write directly to the main memory.
+
+### Memory translation/mapping systems
 
 #### Paging
 
@@ -94,8 +114,32 @@ occurs when
 
 ### Virtual memory
 
-is memory that is currently on disk. Rhis scheme enables a process to have "infinate" memory. By using a not so frequently used page. A good algorithm to decide which page to save to the swap file is `the working set`.\
+is memory that is currently on disk. This scheme enables a process to have "infinate" memory. By using a not so frequently used page. A good algorithm to decide which page to save to the swap file is `the working set`.\
 **NOTE:** this method can be implemented on entire segments instead of pages.
+
+#### Segmentation
+
+##### real mode segmentation
+
+The physical address is `(segment * 0x10) + offset`. segments can overlap. x86 segments are `CS, DS, SS, ES, FS, GS`.
+The only way to change a `CS` register is by `Far jump/call`, `Far return/IRET`, `INT`.\
+
+##### protected mode segmentation
+
+The physical address is `GDT[selector] + offset`.
+
+```TEXT
++-----------------------+---+-----+---+------+
+| Base address (32 bit) | G | BD  |   |  A   |
++-----------------------+---+-----+---+------+
+| Limit (20 bits)       | P | DPL | S | Type |
++-----------------------+---+-----+---+------+
+```
+
+for more info about the table click [this](https://en.wikipedia.org/wiki/Segment_descriptor#:~:text=In%20memory%20addressing%20for%20Intel,to%20in%20the%20logical%20address.)
+
+**NOTE**: C isn't compatible with segmentation.
+
 ***
 
 ## Rings

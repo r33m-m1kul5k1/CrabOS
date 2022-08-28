@@ -1,8 +1,6 @@
-# Analyzing the kernel
+# ByteOS
 
-## ByteOS
-
-### init memory - 
+## init memory
 
 in file : iso / boot / grub / grub.cfg
 
@@ -16,6 +14,7 @@ menuentry "Byte OS" {
 
 in file : kernel / mm / vmm.c
 
+```C
 extern struct page_table p4_table; // Initial kernel p4 table
 struct mmu_info kernel_mmu;
 
@@ -28,32 +27,37 @@ void vmm_init(void)
 	klog("vmm", "Kernel P4 at %p\n", kernel_mmu.p4);
 //	vmm_dump_tables();
 }
+```
 
 funcs:
 
+```C
 static inline kernaddr_t phys_to_kern(physaddr_t p)
 {
 	if (p == (physaddr_t)NULL)
 		return NULL;
 	return (kernaddr_t)(p + KERNEL_TEXT_BASE);
 }
+```
 
-# psudo code
+### psudo code
 
+```C
 init kernel
 init page_table
 
-void init_memory() 
+void init_memory()
 {
     kernel._page_table = page_table.get_physical_address()
 
 }
+```
 
-
-### process memory creation -
+## process memory creation -
 
 in file : kernel / proc / sched.c
 
+```C
 void sched_run_bsp(void)
 {
 	// Create the init task
@@ -68,9 +72,10 @@ void sched_run_bsp(void)
 	// TODO: Possible race condition here, if we get rescheduled before sched_yield happens
 	sched_yield();
 }
-
+```
 funcs:
 
+```C
 // Initialises the run queue for the current CPU
 void runq_init(struct task *initial_parent)
 {
@@ -165,10 +170,12 @@ void task_wakeup(struct task *t)
 	if (t->state != TASK_S_RUNNABLE) {
 		t->state = TASK_S_RUNNABLE;
 		sched_add(t);
-	}
+}
+```
 
-# psudo code
+## psudo code
 
+```C
 void create_proccess() {
 
     Task task 
@@ -182,7 +189,7 @@ void create_proccess() {
         schedule_and_run()
     }
 }
-
+```
 ### page faults - 
 
 ## MonkOS
