@@ -37,6 +37,7 @@ the boot sector. containing the `bootloader` and the disk `partition table`. `VB
 
 ### Physical Memory Manager - pmm
 
+**Function**: given a number of page frames return an array of addresses\
 **Algorithm**: buddy
 
 ```Text
