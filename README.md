@@ -11,7 +11,8 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 - [ ] UART for exceptions and unit testing
 - [ ] VGA buffer
 - [ ] interrupts & exceptions
-- [ ] memory management
+- [ ] memory map
+- [ ] allocating memory at runtime
 - [ ] processes and scheduling
 - [ ] syscall structure & userland
 - [ ] file system
