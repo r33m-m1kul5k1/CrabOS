@@ -18,7 +18,7 @@ the boot sector. containing the `bootloader` and the disk `partition table`. `VB
 
 1. BOIS (POST)
 2. MBR (Real mode to Protected mode switch), (Bootloader)
-3. VBR
+3. VBR - not really used anymore
 4. kernel init -> userland
 
 ## Kernel types
