@@ -2,8 +2,6 @@
 
 ## Booting Process
 
-***
-
 1. Power on.
 2. CPU will move to BIOS (Basic Input Output System) in ROM (Read Only Memory).
 3. BIOS will be executed (POST - Power On Self Test) : all the hardware will be tested.
@@ -21,3 +19,13 @@ Soft Booting - Restart.
 ### [Booting Process](https://www.youtube.com/watch?v=bDsTwHIqs2g)
 
 ***
+
+***
+
+## UART
+
+### [info](https://wiki.osdev.org/UART)
+
+
+***
+
