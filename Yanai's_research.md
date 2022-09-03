@@ -140,7 +140,8 @@ To print a character to the screen in VGA text mode, one has to write it to the 
 | Bit(s)  | Value   |
 |---------|---------|
 | abc     | def     |
-|---------|---------|
+| abc     | def     |
+| abc     | def     |
 | abc     | def     |
 
 ```Rust
