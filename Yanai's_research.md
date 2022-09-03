@@ -129,7 +129,19 @@ Note that the serial_println macro lives directly under the root namespace becau
 
 ***
 
-## VGA Buffer
+## VGA Buffer - VGA text mode
+
+The VGA text mode is a simple way to print text to the screen. This is an interface that makes its usage safe and simple by encapsulating all unsafety in a separate module. We also implement support for Rust’s formatting macros.
+
+### The VGA Text Buffer
+
+To print a character to the screen in VGA text mode, one has to write it to the text buffer of the VGA hardware. The VGA text buffer is a two-dimensional array with typically 25 rows and 80 columns, which is directly rendered to the screen. Each array entry describes a single screen character through the following format:
+
+| Bit(s)  | Value   |
+|---------|---------|
+| abc     | def     |
+|---------|---------|
+| abc     | def     |
 
 ```Rust
 ```
