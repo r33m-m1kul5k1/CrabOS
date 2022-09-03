@@ -334,11 +334,4 @@ pub fn print_something() {
 }
 ```
 
-```Rust
-```
-
-```Rust
-```
-
 ***
-
