@@ -1,45 +1,37 @@
-
-```Text
-    ▒▒▒▒▒▒▒▒        ▒▒▒▒▒▒▒▒    
-  ▒▒▒▒▒▒                ▒▒▒▒▒▒  
-  ▒▒▒▒▒▒▒▒▒▒        ▒▒▒▒▒▒▒▒▒▒  
-▒▒▒▒▒▒▒▒▒▒            ▒▒▒▒▒▒▒▒▒▒
-▒▒▒▒      ██        ██      ▒▒▒▒
-▒▒▒▒    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
-      ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒      
-  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
-▒▒▒▒    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    ▒▒▒▒
-      ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒      
-    ▒▒▒▒    ▒▒▒▒▒▒▒▒    ▒▒▒▒    
-```
-
 # CrabOS
 
 a monolithic kernel written in rust to x86 architecture, with a userland shell.
 
-## build & running process
+`(\/) (°,,,,°) (\/)`
+
+## Build & Run
 
 `cargo run`
 
-## Feature list
+## Feature
 
 - [ ] UART for exceptions and unit testing
 - [ ] VGA buffer
 - [ ] interrupts & exceptions
 - [ ] physical memory manager
 - [ ] virtual memory manager
-- [ ] heap managment **
+- [ ] heap management **
 - [ ] processes and scheduling
 - [ ] syscall structure & userland
 - [ ] file system
 - [ ] shell and some commands
 - [ ] maybe security stuff...
 
-## resources
+## Research
 
-[osdev](https://wiki.osdev.org/Main_Page)
+- [Memory Management](research/mm.md)
+- [Interrupts](research/interrupts.md)
+- [miscellaneous](research/miscellaneous.md)
+
+## Resources
+
+[osdev](https://wiki.osdev.org/Main_Page)\
+[intel's developer manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
 
 Tutorials
 
