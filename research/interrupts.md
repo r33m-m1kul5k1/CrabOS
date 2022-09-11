@@ -66,43 +66,51 @@ Mostly used for system calls.
 
 Every instruction the CPU looks at the PIC pin to check if it has an interrupt. if it does then save the state on the stack, and handle the interrupt. If the Status register Interrupt Flag is off the CPU will ignore the PIC.
 
-### Kernel code for handling keyboard interrupt
+### interrupt vs trap gate
 
-```Text
-push eax    ;; make sure you don't damage current state
-in al,60h   ;; read information from the keyboard
- 
-mov al,20h
-out 20h,al  ;; acknowledge the interrupt to the PIC
-pop eax     ;; restore state
-iret        ;; return to code executed before.
+interrupt gate -> all interrupts are ignored\
+trap gate -> the IF flag isn't touched.\
+
+## Switching Stacks
+
+when the stack hits the page guard, because the page guard isn't mapped to physical memory a page fault occurs. The CPU pushes to the interrupt stack frame which causes a second page fault. this causes a double fault which causes a triple fault for the same reason.
+
+The solution is to use an Interrupt Stack Table, for a reserve stack. This reserved stack index is saved in the Entry Options on the IDT.
+
+In order to store the IST we need the TSS for legacy reasons.
+
+### TSS - Task State Segment
+
+a table including pointers to:
+
+1. Privilege Stack Table [0-2] when 0 is kernel stack
+2. Interrupt Stack Table [0-6] total of 7 reserved stacks.
+3. IO map Base Address
+
+## GDT
+
+we need to use this table for loading the TSS structure and switching between kernel and user space (exceptions).
+
+```Rust
+lazy_static! {
+    pub static ref GDT: (GlobalDescriptorTable, Selectors) = {
+        let mut gdt = GlobalDescriptorTable::new();
+
+        let tss = gdt.add_entry(Descriptor::tss_segment(&TSS));
+        let code = gdt.add_entry(Descriptor::kernel_code_segment());
+        let data = gdt.add_entry(Descriptor::kernel_data_segment());
+        let user_code = gdt.add_entry(Descriptor::user_code_segment());
+        let user_data = gdt.add_entry(Descriptor::user_data_segment());
+
+        (gdt, Selectors { tss, code, data, user_code, user_data })
+    };
+}
 ```
 
-### ISR - interrupt service routines
+### Segment Selector
 
-to handle software interrupts:
+A reference to the Segment Descriptor that is saved into the appropriate segment register.
 
-```asm
-/* filename: isr_wrapper.s 
-isr_wrapper is a function pointer in the IDT
-*/
-.globl   isr_wrapper
-.align   4
- 
-isr_wrapper:
-    pushad
-    cld /* C code following the sysV ABI requires DF to be clear on function entry */
-    call interrupt_handler
-    popad
-    iret
-```
+### Segment Descriptor
 
-***
-
-### implementation structure
-
-IdtEntry - not using segments -> intel's manual & tutorial.
-
-idt initialize with the ISRs function pointers.
-
-ISRs - specific
+the segment entry in the GDT.
