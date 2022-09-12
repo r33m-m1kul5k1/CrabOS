@@ -54,6 +54,16 @@ The interrupt controller structure:
                        ------------
 ```
 
+### using IRQs
+
+- enabling IRQs (sti instruction)
+- signaling EOI using the PIC crate
+- disabling IRQs can solve deadlocks
+- hlt instruction halts the CPU till an interrupt occurs, more efficient than a endless loop
+- pc-keyboard scancode crate
+- port 0x60 -> for reading a scan code (you must)
+
+
 ***
 
 ### Software Interrupt
@@ -114,3 +124,4 @@ A reference to the Segment Descriptor that is saved into the appropriate segment
 ### Segment Descriptor
 
 the segment entry in the GDT.
+
