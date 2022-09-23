@@ -63,13 +63,11 @@ The interrupt controller structure:
 - pc-keyboard scancode crate
 - port 0x60 -> for reading a scan code (you must)
 
-
 ***
 
 ### Software Interrupt
 
-These interrupts are used to call the kernel attention.
-Mostly used for system calls.
+All interrupts that can be triggered by a software using the `int` instruction.
 ***
 
 ## CPU & Interrupts
@@ -79,7 +77,7 @@ Every instruction the CPU looks at the PIC pin to check if it has an interrupt. 
 ### interrupt vs trap gate
 
 interrupt gate -> all interrupts are ignored\
-trap gate -> the IF flag isn't touched.\
+trap gate -> the IF flag isn't touched.
 
 ## Switching Stacks
 
