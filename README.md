@@ -6,6 +6,9 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 
 ## Build & Run
 
+```bash
+rustup default nightly-x86_64-unknown-linux-gnu
+```
 `cargo run`
 
 ## Feature
