@@ -401,19 +401,29 @@ macro_rules! vec {
 }
 ```
 
-```rust
-use proc_macro; 
-
-#[some_attribute]
-pub fn some_name(input: TokenStream) -> TokenStream {
-}
-```
 
 ### macros types
 
 - Derive -  `#[derive(Debug + Copy + Display)]` - adds `impl` block for the associated struct / enum.
 - Attributes - `#[test]` - adds metadata about a item.
 - function like - `vec!` - acts like a function adds code straight to the line its in.
+
+### [`macro_rules!`](https://danielkeep.github.io/tlborm/book/mbe-macro-rules.html)
+
+each macro must be in the following format
+
+```rust
+macro_rules! name {
+    ($pattern) => {$expansion};
+}
+```
+a pattern can contain repetitions `$(...) sep rep`
+
+- sep can be `,;`
+- rep can be `*` which indicates zero or one, and `+` for one or more repetitions.
+
+to expand a pattern use the same format but instead 
+`($a:expr),*` do `(some code with $a)*`.
 
 ## conventions
 

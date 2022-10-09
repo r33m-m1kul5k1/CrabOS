@@ -2,15 +2,21 @@
 #![no_main]
 
 mod uart;
+mod logger;
 
 use bootloader::{ BootInfo, entry_point };
+use log::{ info, warn, error };
 use core::panic::PanicInfo;
-
 
 entry_point!(kmain);
 
 pub fn kmain(_boot_info: &'static BootInfo) -> ! {
-    uart::init_uart();
+
+    logger::init(log::LevelFilter::Warn);
+    info!("hello log");
+    warn!("warning");
+    error!("oops");
+    
     loop {}
 }
 

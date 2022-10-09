@@ -14,7 +14,7 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
    to check your `rustc` details run `rustc --version --verbose`
 3. cargo install `bootimage`, `modules` (optional)
 4. add `rustc` component `llvm-tools-preview`
-4. `cargo run`
+5. `cargo run`, to exit from qemu type ctrl + a x
 
 ## Feature
 
