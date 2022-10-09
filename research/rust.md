@@ -447,3 +447,42 @@ fn foobar() {
 
 }
 ```
+
+## *unit testing*
+
+running `cargo test -- --show-output` will run our `#[test]` functions with their output.
+
+### **unit testing** 
+test the private interface. in each file create a module for testing.
+
+```rust
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
+
+```
+the cfg attribute is telling the compiler to compile this code only when the *configuration* is `test` (`cargo test`). 
+
+### **integration testing**
+tests the public interface.
+you need a library (src/lib.rs) to implement integration tests.
+
+```
+├── Cargo.lock
+├── Cargo.toml
+├── src
+│   └── lib.rs
+└── tests
+    ├── common
+    │   └── mod.rs
+    └── integration_test.rs
+```
+
+

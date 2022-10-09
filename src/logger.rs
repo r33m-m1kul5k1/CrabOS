@@ -35,5 +35,3 @@ pub fn init(filter: LevelFilter) {
     log::set_logger(&LOGGER).unwrap();
     log::set_max_level(filter);
 }
-
-

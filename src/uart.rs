@@ -44,6 +44,4 @@ macro_rules! println {
     ($fmt:expr, $($arg:tt)+) => {
         crate::print!(concat!($fmt, "\n"), $($arg)+);
     }
-
-
 } 
