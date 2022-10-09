@@ -14,6 +14,7 @@ panic = "abort"
 
 [dependencies]
 bootloader = "0.9.8"
+uart_16550 = "0.2.0"
 
 [package.metadata.bootimage]
 run-command = ["qemu-system-x86_64", "-nographic", "-drive", "format=raw,file={}"]

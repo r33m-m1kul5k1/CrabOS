@@ -1,13 +1,19 @@
-#![no_std] 
-#![no_main] 
+#![no_std]
+#![no_main]
 
+mod uart;
+
+use bootloader::{ BootInfo, entry_point };
 use core::panic::PanicInfo;
 
-#[no_mangle] // don't give a random unique name for `_start` function
-pub extern "C" fn _start() -> ! {
-    
+
+entry_point!(kmain);
+
+pub fn kmain(_boot_info: &'static BootInfo) -> ! {
+    uart::init_uart();
     loop {}
 }
+
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {

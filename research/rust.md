@@ -414,3 +414,26 @@ pub fn some_name(input: TokenStream) -> TokenStream {
 - Derive -  `#[derive(Debug + Copy + Display)]` - adds `impl` block for the associated struct / enum.
 - Attributes - `#[test]` - adds metadata about a item.
 - function like - `vec!` - acts like a function adds code straight to the line its in.
+
+## conventions
+
+function docs should have the following sections if necessary
+```rust
+/// Returns an initialized serial port
+/// 
+/// # Arguments
+///  * `a`
+/// # Examples
+/// ```
+/// println!("this is an example");
+/// ```
+/// # Errors
+/// ...
+/// # Panics
+/// ...
+/// # Safety
+/// ...
+fn foobar() {
+
+}
+```

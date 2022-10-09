@@ -1,3 +1,0 @@
-# AlmediaOS
-
-analyze start.asm

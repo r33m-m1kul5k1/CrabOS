@@ -6,10 +6,15 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 
 ## Build & Run
 
-```bash
-rustup default nightly-x86_64-unknown-linux-gnu
-```
-`cargo run`
+1. install `rust` & `qemu-system-x86_64`
+2. change you `rustc` channel to nightly
+   ```bash
+   rustup default nightly-x86_64-unknown-linux-gnu
+   ```
+   to check your `rustc` details run `rustc --version --verbose`
+3. cargo install `bootimage`, `modules` (optional)
+4. add `rustc` component `llvm-tools-preview`
+4. `cargo run`
 
 ## Feature
 
@@ -18,7 +23,7 @@ rustup default nightly-x86_64-unknown-linux-gnu
 - [ ] interrupts & exceptions
 - [ ] physical memory manager
 - [ ] virtual memory manager
-- [ ] heap management **
+- [ ] kernel heap management
 - [ ] processes and scheduling
 - [ ] syscall structure & userland
 - [ ] file system
@@ -29,7 +34,8 @@ rustup default nightly-x86_64-unknown-linux-gnu
 
 - [Memory Management](research/mm.md)
 - [Interrupts](research/interrupts.md)
-- [miscellaneous](research/miscellaneous.md)
+- [Miscellaneous](research/miscellaneous.md)
+- [Rust](research/rust.md)
 
 ## Resources
 
