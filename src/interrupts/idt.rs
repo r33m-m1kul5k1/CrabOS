@@ -1,16 +1,22 @@
 /* Initializing the Interrupt Descriptor Table with the valid interrupts */
 
-use x86_64::structures::idt::{ InterruptDescriptorTable};
 use lazy_static::lazy_static;
+use x86_64::structures::idt::InterruptDescriptorTable;
 
-use crate::interrupts::service_routines::{ divide_error, double_fault, general_protection_fault };
+use super::gdt::{DOUBLE_FAULT_IST_INDEX, GENERAL_PROTECTION_FAULT_IST_INDEX};
+use super::service_routines::{double_fault, general_protection_fault};
 
 lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
-        idt.divide_error.set_handler_fn(divide_error);
-        idt.double_fault.set_handler_fn(double_fault);
-        idt.general_protection_fault.set_handler_fn(general_protection_fault);
+        unsafe {
+            idt.double_fault
+                .set_handler_fn(double_fault)
+                .set_stack_index(DOUBLE_FAULT_IST_INDEX);
+            idt.general_protection_fault
+                .set_handler_fn(general_protection_fault)
+                .set_stack_index(GENERAL_PROTECTION_FAULT_IST_INDEX);
+        }
         idt
-     };
+    };
 }
