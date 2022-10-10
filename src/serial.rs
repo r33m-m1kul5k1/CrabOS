@@ -29,7 +29,7 @@ pub fn _print(args: core::fmt::Arguments) {
 macro_rules! print {
     // tt -> token tree (() / [] / {})
     ($($arg:tt)*) => {
-        crate::uart::_print(format_args!($($arg)*));
+        crate::serial::_print(format_args!($($arg)*));
     };
 }
 

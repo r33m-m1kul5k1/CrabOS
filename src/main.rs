@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-mod uart;
+mod serial;
 mod logger;
 
 use bootloader::{ BootInfo, entry_point };
