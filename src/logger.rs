@@ -1,8 +1,11 @@
-/* this logger will help us debug / log our kernel */
+/* This logger will help us debug / log our kernel */
 
+// everyone that will import the logger will have direct access to the logging functions
+pub use log::{ error, warn, info, debug, trace };
 
 use crate::println;
 use log::{ Record, Level, Metadata, LevelFilter };
+
 
 static LOGGER: Logger = Logger;
 

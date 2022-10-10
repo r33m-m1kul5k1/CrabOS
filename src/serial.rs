@@ -1,5 +1,5 @@
 /* 
-the uart module goal is to implement`println!` macro with a static serial 
+The uart module goal is to implement`println!` macro with a static serial 
 that will be guarded using a spinlock. 
 */ 
 

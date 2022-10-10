@@ -486,3 +486,17 @@ you need a library (src/lib.rs) to implement integration tests.
 ```
 
 
+## *conditional compilation*
+
+to create a feature inside the `Cargo.toml`
+
+```toml
+[features]
+default = []
+# define a feature with a list (`[]`) of dependencies.
+my_feature = []
+```
+
+then to add the conditional compilation just add `#[cfg(feature = "my_feature")]`
+
+To enable a feature add it to the `default` feature.
