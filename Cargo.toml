@@ -16,4 +16,4 @@ panic = "abort"
 bootloader = "0.9.8"
 
 [package.metadata.bootimage]
-run-command = ["qemu-system-x86_64", "-nographic", "-drive", "format=raw,file={}"]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
