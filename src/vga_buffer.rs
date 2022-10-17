@@ -1,10 +1,11 @@
-
-
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
+const ADDRESS: usize = 0xb8000;
+
+use core::fmt;
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)] // By deriving the Copy, Clone, Debug, PartialEq, and Eq traits, we enable copy semantics for the type and make it printable and comparable.
 #[repr(u8)]
 pub enum Color {
     Black = 0,
@@ -77,9 +78,7 @@ impl Writer {
     }
 
     fn new_line(&mut self) {/* TODO */}
-}
 
-impl Writer {
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
@@ -93,12 +92,34 @@ impl Writer {
     }
 }
 
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
+pub fn _print(string: &str, foreground: Color, background: Color) {
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(foreground, background),
+        buffer: unsafe { &mut *(ADDRESS as *mut Buffer) },
+    };
+
+    writer.write_string(string);
+
+}
+
+// this function is only for testing!
 pub fn print_something() {
+    use core::fmt::Write;
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    writer.write_string("Hello World!");
+    writer.write_byte(b'H');
+    writer.write_string("ello! ");
+    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
 }
