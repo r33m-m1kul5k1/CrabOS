@@ -500,3 +500,14 @@ my_feature = []
 then to add the conditional compilation just add `#[cfg(feature = "my_feature")]`
 
 To enable a feature add it to the `default` feature.
+
+## *type layout*
+
+`repr(C)`
+
+1. the type expected to be used in a C type function.
+2. the type's fields expected to be reinterpret as different types.
+
+`repr(transparent)`
+
+1. used for one filed type, makes the type use its field representation.
