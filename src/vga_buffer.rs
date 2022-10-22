@@ -1,6 +1,9 @@
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 const ADDRESS: usize = 0xb8000;
+const PRINTABLE_ASCII: u8 = 0x20;
+const PRINTABLE_ASCII_CMP: u8 = 0x7e;
+const NOT_IN_ASCII_RANGE: u8 = 0xfe;
 
 use core::fmt;
 
@@ -56,7 +59,7 @@ pub struct Writer {
 }
 
 impl Writer {
-    pub fn write_byte(&mut self, byte: u8) {
+    fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
             byte => {
@@ -67,39 +70,49 @@ impl Writer {
                 let row = BUFFER_HEIGHT - 1;
                 let col = self.column_position;
 
-                let color_code = self.color_code;
                 self.buffer.chars[row][col] = ScreenChar {
                     ascii_character: byte,
-                    color_code,
+                    color_code: self.color_code,
                 };
                 self.column_position += 1;
             }
         }
     }
+    
+    fn new_line(&mut self) {
+        // only for the case that we need to print byte code, which is uneeded in our OS.
+    }
 
-    fn new_line(&mut self) {/* TODO */}
-
-    pub fn write_string(&mut self, s: &str) {
+    fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
                 // printable ASCII byte or newline
-                0x20..=0x7e | b'\n' => self.write_byte(byte),
+                PRINTABLE_ASCII..=PRINTABLE_ASCII_CMP | b'\n' => self.write_byte(byte),
                 // not part of printable ASCII range
-                _ => self.write_byte(0xfe),
+                _ => self.write_byte(NOT_IN_ASCII_RANGE),
             }
 
         }
     }
+
+    pub fn set_color_code(&mut self, color_code: ColorCode) {
+        self.color_code = color_code;
+    }
+    
 }
 
 impl fmt::Write for Writer {
+    
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
         Ok(())
     }
 }
 
-pub fn _print(string: &str, foreground: Color, background: Color) {
+  
+
+
+pub fn print(string: &str, foreground: Color, background: Color) {
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(foreground, background),
@@ -110,16 +123,3 @@ pub fn _print(string: &str, foreground: Color, background: Color) {
 
 }
 
-// this function is only for testing!
-pub fn print_something() {
-    use core::fmt::Write;
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
-
-    writer.write_byte(b'H');
-    writer.write_string("ello! ");
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
-}
