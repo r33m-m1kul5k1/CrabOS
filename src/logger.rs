@@ -1,4 +1,5 @@
-/* This logger will help us debug / log our kernel */
+//! this logger will help us debug / log our kernel 
+
 
 // everyone that will import the logger will have direct access to the logging functions
 pub use log::{debug, error, info, trace, warn};
