@@ -1,3 +1,0 @@
-# ArbelOS
-
-analyze boot.asm

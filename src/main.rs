@@ -1,13 +1,25 @@
-#![no_std] 
-#![no_main] 
+#![no_std]
+#![no_main]
 
+mod serial;
+mod logger;
+
+use bootloader::{ BootInfo, entry_point };
+use log::{ info, warn, error };
 use core::panic::PanicInfo;
 
-#[no_mangle] // don't give a random unique name for `_start` function
-pub extern "C" fn _start() -> ! {
+entry_point!(kmain);
+
+pub fn kmain(_boot_info: &'static BootInfo) -> ! {
+
+    logger::init(log::LevelFilter::Warn);
+    info!("hello log");
+    warn!("warning");
+    error!("oops");
     
     loop {}
 }
+
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {

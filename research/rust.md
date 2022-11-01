@@ -401,16 +401,88 @@ macro_rules! vec {
 }
 ```
 
-```rust
-use proc_macro; 
-
-#[some_attribute]
-pub fn some_name(input: TokenStream) -> TokenStream {
-}
-```
 
 ### macros types
 
 - Derive -  `#[derive(Debug + Copy + Display)]` - adds `impl` block for the associated struct / enum.
 - Attributes - `#[test]` - adds metadata about a item.
 - function like - `vec!` - acts like a function adds code straight to the line its in.
+
+### [`macro_rules!`](https://danielkeep.github.io/tlborm/book/mbe-macro-rules.html)
+
+each macro must be in the following format
+
+```rust
+macro_rules! name {
+    ($pattern) => {$expansion};
+}
+```
+a pattern can contain repetitions `$(...) sep rep`
+
+- sep can be `,;`
+- rep can be `*` which indicates zero or one, and `+` for one or more repetitions.
+
+to expand a pattern use the same format but instead 
+`($a:expr),*` do `(some code with $a)*`.
+
+## conventions
+
+function docs should have the following sections if necessary
+```rust
+/// Returns an initialized serial port
+/// 
+/// # Arguments
+///  * `a`
+/// # Examples
+/// ```
+/// println!("this is an example");
+/// ```
+/// # Errors
+/// ...
+/// # Panics
+/// ...
+/// # Safety
+/// ...
+fn foobar() {
+
+}
+```
+
+## *unit testing*
+
+running `cargo test -- --show-output` will run our `#[test]` functions with their output.
+
+### **unit testing** 
+test the private interface. in each file create a module for testing.
+
+```rust
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
+
+```
+the cfg attribute is telling the compiler to compile this code only when the *configuration* is `test` (`cargo test`). 
+
+### **integration testing**
+tests the public interface.
+you need a library (src/lib.rs) to implement integration tests.
+
+```
+├── Cargo.lock
+├── Cargo.toml
+├── src
+│   └── lib.rs
+└── tests
+    ├── common
+    │   └── mod.rs
+    └── integration_test.rs
+```
+
+
