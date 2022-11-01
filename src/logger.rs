@@ -1,8 +1,11 @@
 //! this logger will help us debug / log our kernel 
 
 
+// everyone that will import the logger will have direct access to the logging functions
+pub use log::{debug, error, info, trace, warn};
+
 use crate::println;
-use log::{ Record, Level, Metadata, LevelFilter };
+use log::{Level, LevelFilter, Metadata, Record};
 
 static LOGGER: Logger = Logger;
 
@@ -10,18 +13,12 @@ struct Logger;
 
 impl log::Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        metadata.level() <= Level::Info
+        metadata.level() <= Level::Trace
     }
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            println!(
-                "[{}] {}:{} - {}",
-                record.level(),
-                record.file().unwrap(),
-                record.line().unwrap(),
-                record.args()
-            );
+            println!("[{}] - {}", record.level(), record.args());
         }
     }
     fn flush(&self) {}
@@ -29,8 +26,8 @@ impl log::Log for Logger {
 
 /// initiate a logger static object
 /// # Arguments
-///  - `filter` the filter level of our logger
-/// 
+///  - `filter` the max level of our logger
+///
 /// ## Filter Levels
 /// 1. Error
 /// 2. Warn

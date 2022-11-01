@@ -16,8 +16,7 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 4. add `rustc` component `llvm-tools-preview`
 5. `cargo run`, to exit from qemu type ctrl + a x
 
-<<<<<<< Updated upstream
-=======
+
 ## Debug the kernel
 
 1. add the `-s -S` options to the qemu command.
@@ -26,7 +25,6 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 5. `tui enable`
 4. start debugging :)
 
->>>>>>> Stashed changes
 ## Feature
 
 - [ ] UART for exceptions and unit testing
