@@ -5,7 +5,19 @@ const PRINTABLE_ASCII: u8 = 0x20;
 const PRINTABLE_ASCII_CMP: u8 = 0x7e;
 const NOT_IN_ASCII_RANGE: u8 = 0xfe;
 
-use core::fmt;
+use core::fmt::{self, Arguments};
+use lazy_static::lazy_static;
+use spin::Mutex;
+
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(
+        Writer {
+            column_position: 0,
+            color_code: ColorCode::new(Color::White, Color::Black),
+            buffer: unsafe { &mut *(ADDRESS as *mut Buffer) },
+        }
+    );
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)] // By deriving the Copy, Clone, Debug, PartialEq, and Eq traits, we enable copy semantics for the type and make it printable and comparable.
@@ -95,8 +107,8 @@ impl Writer {
         }
     }
 
-    pub fn set_color_code(&mut self, color_code: ColorCode) {
-        self.color_code = color_code;
+    pub fn set_writer_theme(&mut self, foreground: Color, background: Color) {
+        self.color_code = ColorCode::new(foreground, background);
     }
     
 }
@@ -109,17 +121,21 @@ impl fmt::Write for Writer {
     }
 }
 
-  
 
 
-pub fn print(string: &str, foreground: Color, background: Color) {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(foreground, background),
-        buffer: unsafe { &mut *(ADDRESS as *mut Buffer) },
-    };
-
-    writer.write_string(string);
-
+pub fn _print(args: Arguments) {
+    
+    use core::fmt::Write;
+    WRITER.lock().write_fmt(args).unwrap();
 }
 
+#[macro_export]
+macro_rules! graphic_print {
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! graphic_println {
+    () => ($crate::graphic_print!("\n"));
+    ($($arg:tt)*) => ($crate::graphic_print!("{}\n", format_args!($($arg)*)));
+}
