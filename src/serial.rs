@@ -1,7 +1,5 @@
-/* 
-the uart module goal is to implement`println!` macro with a static serial 
-that will be guarded using a spinlock. 
-*/ 
+//! the uart module goal is to implement`println!` macro with a static serial that will be guarded using a spinlock. 
+
 
 use uart_16550::SerialPort;
 use spin::Mutex;

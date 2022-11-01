@@ -1,4 +1,4 @@
-/* this logger will help us debug / log our kernel */
+//! this logger will help us debug / log our kernel 
 
 
 use crate::println;
