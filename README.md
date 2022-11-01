@@ -21,6 +21,7 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 1. add the `-s -S` options to the qemu command.
 2. load the binary with gdb `gdb /path/to/CrabOS`
 3. run in gdb `target remote localhost:1234`
+5. `tui enable`
 4. start debugging :)
 
 ## Feature
