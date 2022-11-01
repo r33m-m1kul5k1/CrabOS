@@ -24,6 +24,7 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
     logger::info!("---Interrupt Descriptor Table");
     idt::IDT.load();
     
+    #[allow(unconditional_recursion)] 
     fn stack_overflow() {
         stack_overflow()
     }

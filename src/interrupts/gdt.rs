@@ -8,11 +8,15 @@ use x86_64::structures::tss::TaskStateSegment;
 use x86_64::VirtAddr;
 
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
-pub const GENERAL_PROTECTION_FAULT_IST_INDEX: u16 = 0;
+pub const GENERAL_PROTECTION_FAULT_IST_INDEX: u16 = 1;
 const PAGE_SIZE: usize = 4096;
 const STACK_SIZE: usize = PAGE_SIZE * 4;
 
+ 
 lazy_static! {
+    /// # Task State Segment
+    /// 
+    /// A Table with stacks for interrupts and for different Privilege Levels
     pub static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
         tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX as usize] = {
@@ -30,6 +34,8 @@ lazy_static! {
 }
 
 lazy_static! {
+    /// # Global Descriptor Table
+    /// 
     /// A Table with pointers to all the segments selectors
     pub static ref GDT: (GlobalDescriptorTable, Selectors) = {
         let mut gdt = GlobalDescriptorTable::new();
@@ -46,6 +52,7 @@ lazy_static! {
      };
 }
 
+// `GlobalDescriptorTable` table's is private, that is why we use the Selectors struct 
 pub struct Selectors {
     tss: SegmentSelector,
     code: SegmentSelector,

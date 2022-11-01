@@ -13,12 +13,13 @@ pub extern "x86-interrupt" fn double_fault(stack_frame: InterruptStackFrame, err
 }
 
 /// A general protection fault (#GP) can occur in various situations. Common causes include:
-/// Executing a privileged instruction while CPL > 0.
-/// Writing a 1 into any register field that is reserved, must be zero (MBZ).
-/// Attempting to execute an SSE instruction specifying an unaligned memory operand.
-/// Loading a non-canonical base address into the GDTR or IDTR.
-/// Using WRMSR to write a read-only MSR.
-/// Any long-mode consistency-check violation.
+/// 
+/// 1. Executing a privileged instruction while CPL > 0.
+/// 2. Writing a 1 into any register field that is reserved, must be zero (MBZ).
+/// 3. Attempting to execute an SSE instruction specifying an unaligned memory operand.
+/// 4. Loading a non-canonical base address into the GDTR or IDTR.
+/// 5. Using WRMSR to write a read-only MSR.
+/// 6. Any long-mode consistency-check violation.
 pub extern "x86-interrupt" fn general_protection_fault(
     stack_frame: InterruptStackFrame,
     error_code: u64,
