@@ -25,8 +25,7 @@ x86_64 = "0.14.10"
 version = "1.4.0"
 features = ["spin_no_std"]
 
-
-[package.metadata.bootimage]
-# -nographic -> output is in the serial
+# Running the OS
 # -s -S -> debug mode
-run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
+# logger -> -chardev stdio,id=char0,mux=on,logfile=./history.log,signal=off -serial chardev:char0 -mon chardev=char0
+# qemu-system-x86_64 -chardev stdio,id=char0,mux=on,logfile=history.log,signal=off -serial chardev:char0 -mon chardev=char0 -drive format=raw,file=target/x86_64/debug/bootimage-CrabOS.bin
