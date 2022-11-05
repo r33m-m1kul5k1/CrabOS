@@ -1,7 +1,9 @@
 #![no_std]
 #![no_main]
+#![allow(nonstandard_style)]
 #![feature(abi_x86_interrupt)]
 #![feature(stmt_expr_attributes)]
+
 
 mod interrupts;
 mod logger;
@@ -10,7 +12,7 @@ mod vga_buffer;
 
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
-use crate::vga_buffer::{Color, WRITER};
+use CrabOS::vga_buffer::{Color, WRITER};
 use interrupts::{gdt, idt};
 
 entry_point!(kmain);
@@ -51,7 +53,6 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
 
     loop {}
 }
-
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
