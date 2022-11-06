@@ -24,6 +24,9 @@ features = ["spin_no_std"]
 
 
 [package.metadata.bootimage]
-run-command = ["qemu-system-x86_64", "-nographic", "-drive", "format=raw,file={}"]
-test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04"]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
+test-args = [
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
+    "-display", "none"
+]
 test-success-exit-code = 33 # must be different from the default exit status

@@ -16,6 +16,10 @@ use CrabOS::{graphic_println, interrupts, logger, vga_buffer};
 entry_point!(kmain);
 
 pub fn kmain(_boot_info: &'static BootInfo) -> ! {
+    
+    #[cfg(test)]
+    test_main();
+
     WRITER
         .lock()
         .set_writer_theme(Color::LightRed, Color::Black);
@@ -50,8 +54,7 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
 
     logger::debug!("got to the kmain's end");
 
-    #[cfg(test)]
-    test_main();
+    
 
     loop {}
 }
