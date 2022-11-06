@@ -11,7 +11,7 @@ use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 use interrupts::{gdt, idt};
 use vga_buffer::{Color, WRITER};
-use CrabOS::{graphic_println, interrupts, logger, vga_buffer};
+use CrabOS::{graphic_println, interrupts, logger, vga_buffer, hlt_loop};
 
 entry_point!(kmain);
 
@@ -46,23 +46,13 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
     logger::info!("---Interrupt Descriptor Table");
     idt::IDT.load();
 
-    #[allow(unconditional_recursion)]
-    fn stack_overflow() {
-        stack_overflow()
-    }
-    stack_overflow();
-
-    logger::debug!("got to the kmain's end");
-
-    
-
-    loop {}
+    hlt_loop()
 }
 
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+    hlt_loop()
 }
 
 #[cfg(test)]

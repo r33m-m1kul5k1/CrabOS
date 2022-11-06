@@ -10,9 +10,9 @@
 use core::panic::PanicInfo;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
 pub mod interrupts;
+pub mod logger;
 pub mod serial;
 pub mod vga_buffer;
-pub mod logger;
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {
@@ -29,6 +29,11 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     }
 }
 
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
+}
 pub trait Testable {
     fn run(&self) -> ();
 }
@@ -44,11 +49,9 @@ where
     }
 }
 
-
-
 pub fn test_runner(tests: &[&dyn Testable]) {
     println!("Running {} tests", tests.len());
-    
+
     for test in tests {
         test.run();
     }
@@ -59,17 +62,22 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     println!("[failed]\n");
     println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    hlt_loop();
 }
 
-
+pub fn test_should_panic_handler(info: &PanicInfo) -> ! {
+    println!("[Success]\n");
+    println!("Panic info: {}\n", info);
+    exit_qemu(QemuExitCode::Success);
+    hlt_loop();
+}
 
 #[no_mangle]
 #[cfg(test)]
 pub extern "C" fn _start() -> ! {
     test_main();
 
-    loop {}
+    hlt_loop()
 }
 
 #[cfg(test)]
@@ -77,8 +85,3 @@ pub extern "C" fn _start() -> ! {
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
 }
-
-
-
-    
-

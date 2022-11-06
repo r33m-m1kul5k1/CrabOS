@@ -27,4 +27,5 @@ pub extern "x86-interrupt" fn general_protection_fault(
     logger::debug!("EXCEPTION: General Protection Fault");
     logger::debug!("Error code: {:#X?}", error_code);
     logger::debug!("Stack Frame: {:#X?}", stack_frame);
+    panic!();
 }
