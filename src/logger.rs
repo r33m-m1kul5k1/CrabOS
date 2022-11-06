@@ -3,8 +3,6 @@
 
 // everyone that will import the logger will have direct access to the logging functions
 pub use log::{debug, error, info, trace, warn};
-
-use crate::println;
 use log::{Level, LevelFilter, Metadata, Record};
 
 static LOGGER: Logger = Logger;
@@ -18,7 +16,7 @@ impl log::Log for Logger {
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            println!("[{}] - {}", record.level(), record.args());
+            //println!("[{}] - {}", record.level(), record.args());
         }
     }
     fn flush(&self) {}
