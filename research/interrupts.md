@@ -15,9 +15,10 @@ Signals generated internally by the CPU.
 Exceptions classified as:
 
 - Faults - an error that can be dealt with.
-- Traps - not necessarily an error (breakpoint).
+- Traps - for debugging.
 - Aborts - unrecoverable errors.
-  
+
+**all exceptions gate type is trap**
 ***
 
 ### IRQ (Hardware Interrupt)
@@ -67,17 +68,17 @@ The interrupt controller structure:
 
 ### Software Interrupt
 
-All interrupts that can be triggered by a software using the `int` instruction.
+All interrupts that can be triggered by a software using the `int` instruction. (traps)
 ***
 
 ## CPU & Interrupts
 
 Every instruction the CPU looks at the PIC pin to check if it has an interrupt. if it does then save the state on the stack, and handle the interrupt. If the Status register Interrupt Flag is off the CPU will ignore the PIC.
 
-### interrupt vs trap gate
+### Gate Types
 
-interrupt gate -> all interrupts are ignored\
-trap gate -> the IF flag isn't touched.
+Interrupt Gate -> return to the next instruction.\
+Trap Gate -> return to the currently executed instruction. (interrupt could occur)
 
 ## Switching Stacks
 

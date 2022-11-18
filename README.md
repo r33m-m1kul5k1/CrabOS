@@ -6,19 +6,33 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 
 ## Build & Run
 
-```bash
-rustup default nightly-x86_64-unknown-linux-gnu
-```
-`cargo run`
+1. install `rust` & `qemu-system-x86_64`
+2. change you `rustc` channel to nightly
+   ```bash
+   rustup default nightly-x86_64-unknown-linux-gnu
+   ```
+   to check your `rustc` details run `rustc --version --verbose`
+3. cargo install `bootimage`, `modules` (optional)
+4. add `rustc` component `llvm-tools-preview`
+5. `./run.sh`
+
+
+## Debug the kernel
+
+1. add the `-s -S` options to the qemu command.
+2. load the binary with gdb `gdb /path/to/CrabOS`
+3. run in gdb `target remote localhost:1234`
+5. `tui enable`
+4. start debugging :)
 
 ## Feature
 
-- [ ] UART for exceptions and unit testing
-- [ ] VGA buffer
-- [ ] interrupts & exceptions
+- [x] UART for exceptions and unit testing
+- [x] VGA buffer
+- [x] interrupts & exceptions
 - [ ] physical memory manager
 - [ ] virtual memory manager
-- [ ] heap management **
+- [ ] kernel heap management
 - [ ] processes and scheduling
 - [ ] syscall structure & userland
 - [ ] file system
@@ -29,7 +43,8 @@ rustup default nightly-x86_64-unknown-linux-gnu
 
 - [Memory Management](research/mm.md)
 - [Interrupts](research/interrupts.md)
-- [miscellaneous](research/miscellaneous.md)
+- [Miscellaneous](research/miscellaneous.md)
+- [Rust](research/rust.md)
 
 ## Resources
 
