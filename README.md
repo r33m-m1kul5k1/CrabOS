@@ -27,9 +27,9 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 
 ## Feature
 
-- [ ] UART for exceptions and unit testing
-- [ ] VGA buffer
-- [ ] interrupts & exceptions
+- [x] UART for exceptions and unit testing
+- [x] VGA buffer
+- [x] interrupts & exceptions
 - [ ] physical memory manager
 - [ ] virtual memory manager
 - [ ] kernel heap management
