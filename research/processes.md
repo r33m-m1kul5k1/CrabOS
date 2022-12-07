@@ -1,62 +1,10 @@
-# Shell
+# Process management
 
-- execute other user-space binaries
-- provide input output streams
+the flow of execution is as follows
 
-## flow of binary execution
-
-1. read a command from the user (name & arguments).
-2. run `exec` syscall to run the user program
-3. read input from the user to the binary
-4. read output from the binary to the display
-
-### requirements
-
-- `exec`
-- keyboard driver
-- vga driver
-
-#### A Basic shell
-
-```C
-void main(int argc, char* argv[]) // edit as appropriate for your kernel
-{
-    while (true) // you may want to provide a built-in "exit" command
-    {
-        char* command;
-        int proc;
-standard I/O streams
-        output_prompt();               // display a prompt
-        command = input_line();        // get a line of input, which will become the command to execute
-        proc = process_start(command); // start a process from the command
-        free(command);
- 
-        while (process_executing(proc))
-        {
-            if (input_line_waiting())
-            {
-                char* line;
-                line = input_line();                 // read input from user
-                process_send_input_line(proc, line); // send input to process
-                free(line);
-            }
-            if (process_output_line_waiting(proc))
-            {
-                char* output;
-                output = process_get_output_line(proc); // get output from process
-                output_line(output);                    // write output to user
-                free(output);
-            }
-        }
-    }
-}
-```
-
-### Bonus
-
-- string editing
-- working directory (fs)
-- IO redirection & piping
+1. spawning a process object with ID = 0
+2. call exec on this process
+3. for any new process run (fork & exec)
 
 ## Required System Calls
 
@@ -64,14 +12,16 @@ standard I/O streams
 
 replaces the calling process's memory with a new memory image loaded from an ELF format file.
 
-1. open the elf file to read
+1. open the elf file from it
 2. allocate pages for the process file
 3. load the file into memory
 4. update the stack with `argv`
+5. context switch
 
 ### fork
 
-creates a new process object, by forking itself.
+creates a new process object, that points to the same executing process, with the only different is the: \
+`pid, parent_id, child_id`
 
 ### exit
 
@@ -84,6 +34,7 @@ tells the kernel to release the process resources.
 ### open
 
 ### close
+
 
 ## [Elf format](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format)
 
