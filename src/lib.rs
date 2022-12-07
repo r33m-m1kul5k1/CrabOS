@@ -7,12 +7,14 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+
 use core::panic::PanicInfo;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
 pub mod interrupts;
-pub mod logger;
-pub mod serial;
-pub mod vga_buffer;
+pub mod memory;
+pub mod log;
+pub mod drivers;
+
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {

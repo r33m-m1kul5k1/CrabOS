@@ -1,6 +1,5 @@
 //! the uart module goal is to implement`println!` macro with a static serial that will be guarded using a spinlock. 
 
-
 use lazy_static::lazy_static;
 use spin::Mutex;
 use uart_16550::SerialPort;
@@ -24,7 +23,7 @@ pub fn _print(args: core::fmt::Arguments) {
 macro_rules! print {
     // tt -> token tree (() / [] / {})
     ($($arg:tt)*) => {
-        $crate::serial::_print(format_args!($($arg)*));
+        $crate::log::serial::_print(format_args!($($arg)*));
     };
 }
 

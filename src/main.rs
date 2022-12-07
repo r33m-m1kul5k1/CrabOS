@@ -9,9 +9,7 @@
 
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
-use interrupts::{gdt, idt};
-use vga_buffer::{Color, WRITER};
-use CrabOS::{graphic_println, interrupts, logger, vga_buffer, hlt_loop};
+use CrabOS::{graphic_println, interrupts::{gdt, idt}, log::logger, driver::vga::{Color, WRITER}, hlt_loop};
 
 entry_point!(kmain);
 
