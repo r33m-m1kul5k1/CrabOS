@@ -1,5 +1,14 @@
 # [Memory management](https://wiki.osdev.org/Brendan%27s_Memory_Management_Guide)
 
+## The architecture
+`kmain`
+
+1. frame distributer
+2. virtual memory mapper
+3. heap management with buddy
+4. full physical memory allocation (buddy manager)
+
+
 ## Physical Memory Manager - pmm
 
 **Function**: given a number of page frames return an array of addresses\
