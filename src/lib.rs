@@ -6,7 +6,7 @@
 #![test_runner(test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
-
+#![allow(nonstandard_style)] 
 
 use core::panic::PanicInfo;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
