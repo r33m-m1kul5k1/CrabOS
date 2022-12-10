@@ -47,12 +47,40 @@ impl FrameDistributer {
 
     /// gets an unused frame from the memory map
     fn get_unused_frame() -> PhysFrame<Size4KiB> {
-
+        let mut frame = unused_frames.next();
+        return frame;
     }
 
     /// gets an unused range of frames. note that this range must be in size of 4Kib * 2^x
     fn get_unused_range() -> PhysFrameRange<Size4KiB> {
+        
+        /*
+        let mut it = PrevPeekable::new(unused_frames);
+        let mut frame = it.next();
+        let mut temp = frame;
 
+        for frame in it {
+            for frame in it
+            if it.next().start_address() == (frame.start_address() + 4Kib) {
+
+            }
+        } */
+    
+        
+    }
+
+    fn get_unused_range_in_power2() -> PhysFrameRange<Size4KiB> {
+
+        let mut it = PrevPeekable::new(unused_frames); // 2 directions iterator
+        let mut range = get_unused_range();
+        let mut start = range.start.start_address();
+        let mut end = range.end.start_address();
+        it = range.end;
+        let num = end - start;
+        while (num & (num - 1)) != 0 { // while end is not a power of 2
+            end = it.prev();
+        }
+        start.range(self, end);
     }
 
 }
