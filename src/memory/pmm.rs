@@ -1,86 +1,79 @@
 //! this modules defines the physical memory managers (frame distributer & buddy)
 
-use bootloader::BootInfo::{ self, MemoryMap};
-use x86_64::structures::paging::{frame::PhysFrame, frame::PhysFrameRange, Size4KiB};
-use x86_64::addr::PhysAddr;
+use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
+use core::ops::RangeInclusive;
 
-const FRAME_SIZE: u32 = 4096;
-
+use crate::{print, println};
+const SIZE_4K: u32 = 4096;
+const INTEGER_SIZE: usize = 32;
 /// the `FrameDistributer` will distribute all the RAM frames to the different buddies
 /// # Fields
-/// - `unused_frames`, the list of physical free frames.
-/// - `next` points to the next free range
-struct FrameDistributer {
-    unused_frames: Iterator<Item = PhysFrame<Size4KiB>>,
-    next: usize,
+/// - `unused_regions`, the list of lists of physical free frames.
+pub struct FrameDistributer {
+    memory_map: &'static MemoryMap,
+    next: u32,
 }
 
-
-
 impl FrameDistributer {
-
-    fn new(boot_info: BootInfo) -> None {
-
-        /*
-        `memory_map` is a list of memory regions 4Kib align,
-        each `MemoryRegion` has a type enum called `MemoryRegionType`
-        */
-        let regions = boot_info.memory_map.iter();
-        let usable_regions = regions
-            .filter(|r| r.region_type == MemoryRegionType::Usable);
-        let addr_ranges = usable_regions
-            .map(|r| r.range.start_addr()..r.range.end_addr());
-        
-        /*
-        we use `map_flat` to remove the nesting from collections. 
-        using `step_by` creates an iterator of frames inside the memory region.
-        */
-        let frame_addresses = addr_ranges.flat_map(|r| r.step_by(FRAME_SIZE));
-        frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)));
-       
-
+    pub fn new(memory_map: &'static MemoryMap) -> Self {
         FrameDistributer {
-            unused_frames: frame_addresses,
+            memory_map,
             next: 0,
         }
     }
 
-    /// gets an unused frame from the memory map
-    fn get_unused_frame() -> PhysFrame<Size4KiB> {
-        let mut frame = unused_frames.next();
-        return frame;
-    }
+    pub fn get_unused_region(&mut self) -> RangeInclusive<i32> {
+        let unused_regions = self
+            .memory_map
+            .iter()
+            .filter(|r| r.region_type == MemoryRegionType::Usable);
 
-    /// gets an unused range of frames. note that this range must be in size of 4Kib * 2^x
-    fn get_unused_range() -> PhysFrameRange<Size4KiB> {
-        
         /*
-        let mut it = PrevPeekable::new(unused_frames);
-        let mut frame = it.next();
-        let mut temp = frame;
+        converts the iterator of `MemoryRegion` to an iterator of iterators that describes frames
+        */
+        let unused_regions = unused_regions
+            .map(|r| r.range.start_addr()..r.range.end_addr())
+            .map(|r| r.step_by(SIZE_4K as usize));
 
-        for frame in it {
-            for frame in it
-            if it.next().start_address() == (frame.start_address() + 4Kib) {
-
-            }
-        } */
-    
         
-    }
+        // TODO: add an Iterator for the distributed regions distributedRegions(unused_regions) (take(4))
+        // let unsued_regions = unused_regions.flat_map(|region| {
 
-    fn get_unused_range_in_power2() -> PhysFrameRange<Size4KiB> {
+        //         let first_address = region.clone().next().unwrap();
+        //         let blocks = &mut Self::get_power2_blocks(region.clone().count() as u32);
+               
+               
+        //         // blocks.iter().map(|block_size| {
+        //         //     first_address..=(first_address + (SIZE_4K as u64) * (*block_size as u64))
+        //         // })
+        //         region
+        //     }
+            
+            // );
+        
+        // consumes the iterator!
+        for mut region in unused_regions {
+            println!("{}", region.clone().count());
+            let blocks = Self::get_power2_blocks(region.count() as u32);
+            println!("{:?}", blocks);
 
-        let mut it = PrevPeekable::new(unused_frames); // 2 directions iterator
-        let mut range = get_unused_range();
-        let mut start = range.start.start_address();
-        let mut end = range.end.start_address();
-        it = range.end;
-        let num = end - start;
-        while (num & (num - 1)) != 0 { // while end is not a power of 2
-            end = it.prev();
+            //println!("region {}..{}", region.next().unwrap(), region.last().unwrap());
         }
-        start.range(self, end);
+
+        //
+        0..=0
     }
 
+    /// given a number of frames, returns the blocks of frames that are at the power of two
+    fn get_power2_blocks(mut frames: u32) -> [u32; INTEGER_SIZE] {
+        let mut blocks = [0u32; INTEGER_SIZE];
+        let base = 2u32;
+
+        for i in 0..INTEGER_SIZE {
+            blocks[i] = (frames & 1) * base.pow(i as u32);
+            frames = frames >> 1;
+        }
+
+        blocks
+    }
 }

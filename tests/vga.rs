@@ -4,15 +4,14 @@
 #![test_runner(CrabOS::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use CrabOS::{test_panic_handler, graphic_println};
 use core::panic::PanicInfo;
+use CrabOS::{graphic_println, test_panic_handler, hlt_loop};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     test_main();
-    loop {}
+    hlt_loop();
 }
-
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
