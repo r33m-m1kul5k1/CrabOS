@@ -31,13 +31,13 @@ impl FrameDistributer {
             end_frame_number: 0,
         }; INTEGER_SIZE];
 
-        println!("region_start {:#x}", region_start);
-        println!("region_size {:#x}", region_size);
 
         let mut offset_frame_number = region_start / FRAME_SIZE;
 
         for i in 0..INTEGER_SIZE {
             let block_size = (region_size & 1) << (i as u64);
+
+            println!("block size: {}", block_size);
             if block_size == 0 {
                 continue;
             }
@@ -51,6 +51,8 @@ impl FrameDistributer {
             region_size = region_size >> 1;
         }
 
+        
+        println!("{:?}\n", blocks);
         blocks
     }
 }
@@ -58,7 +60,11 @@ impl FrameDistributer {
 impl Iterator for FrameDistributer {
     type Item = FrameRange;
 
+    /// gets the next unused region that is in size of 2^x.
+    // NOTE: unused_region is a Map object meaning every time I use it it calls the maps and filter again
     fn next(&mut self) -> Option<Self::Item> {
+
+
         let unused_regions = self
             .memory_map
             .iter()
@@ -71,39 +77,33 @@ impl Iterator for FrameDistributer {
             .map(|r| r.range.start_addr()..r.range.end_addr())
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
+
         for region in unused_regions.clone() {
             println!("{:?}", region);
         }
 
         let unused_regions = unused_regions.map(|region| {
-            println!("1");
+
             let region_start = region.clone().next().unwrap();
             let region_size = region.clone().count() as u64;
 
-            //Self::get_region_memory_units(region_start, region_size)
-            region
+            // println!("region_start {:#x}", region_start);
+            // println!("region_size {:#x}", region_size);
+            Self::get_region_memory_units(region_start, region_size)
+            
         });
 
-        // for region in unused_regions.clone() {
 
-        //     for sub_region in region {
-
-        //         if sub_region.end_addr() == 0 {
-        //             continue
-        //         }
-
-        //         println!("{:?}", sub_region);
-        //     }
-
-        // }
+        for region in unused_regions.clone() {
+            
+            // println!("{:?}\n", region);
+            
+        }
 
         let region = unused_regions.flat_map(|region| region).nth(self.next);
 
         self.next += 1;
 
-        Some(FrameRange {
-            start_frame_number: 0,
-            end_frame_number: 0,
-        })
+        region
     }
 }
