@@ -1,28 +1,64 @@
 //! this modules defines the physical memory managers (frame distributer & buddy)
 
 use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
-use core::ops::RangeInclusive;
 
-use crate::{print, println};
-const SIZE_4K: u32 = 4096;
+use crate::{println};
+const FRAME_SIZE: u64 = 4096;
 const INTEGER_SIZE: usize = 32;
 /// the `FrameDistributer` will distribute all the RAM frames to the different buddies
 /// # Fields
 /// - `unused_regions`, the list of lists of physical free frames.
 pub struct FrameDistributer {
     memory_map: &'static MemoryMap,
-    next: u32,
+    next: usize,
 }
 
 impl FrameDistributer {
     pub fn new(memory_map: &'static MemoryMap) -> Self {
         FrameDistributer {
-            memory_map,
+            memory_map: memory_map,
             next: 0,
         }
     }
 
-    pub fn get_unused_region(&mut self) -> RangeInclusive<i32> {
+    /// given a region start and a region size, return a list of regions in the following format: 2^x
+    fn get_region_memory_units(
+        region_start: u64,
+        mut region_size: u64,
+    ) -> [FrameRange; INTEGER_SIZE] {
+        let mut blocks = [FrameRange {
+            start_frame_number: 0,
+            end_frame_number: 0,
+        }; INTEGER_SIZE];
+
+        println!("region_start {:#x}", region_start);
+        println!("region_size {:#x}", region_size);
+
+        let mut offset_frame_number = region_start / FRAME_SIZE;
+
+        for i in 0..INTEGER_SIZE {
+            let block_size = (region_size & 1) << (i as u64);
+            if block_size == 0 {
+                continue;
+            }
+
+            blocks[i] = FrameRange {
+                start_frame_number: offset_frame_number,
+                end_frame_number: offset_frame_number + block_size,
+            };
+
+            offset_frame_number = blocks[i].end_frame_number;
+            region_size = region_size >> 1;
+        }
+
+        blocks
+    }
+}
+
+impl Iterator for FrameDistributer {
+    type Item = FrameRange;
+
+    fn next(&mut self) -> Option<Self::Item> {
         let unused_regions = self
             .memory_map
             .iter()
@@ -33,47 +69,41 @@ impl FrameDistributer {
         */
         let unused_regions = unused_regions
             .map(|r| r.range.start_addr()..r.range.end_addr())
-            .map(|r| r.step_by(SIZE_4K as usize));
+            .map(|r| r.step_by(FRAME_SIZE as usize));
 
-        
-        // TODO: add an Iterator for the distributed regions distributedRegions(unused_regions) (take(4))
-        // let unsued_regions = unused_regions.flat_map(|region| {
+        for region in unused_regions.clone() {
+            println!("{:?}", region);
+        }
 
-        //         let first_address = region.clone().next().unwrap();
-        //         let blocks = &mut Self::get_power2_blocks(region.clone().count() as u32);
-               
-               
-        //         // blocks.iter().map(|block_size| {
-        //         //     first_address..=(first_address + (SIZE_4K as u64) * (*block_size as u64))
-        //         // })
-        //         region
+        let unused_regions = unused_regions.map(|region| {
+            println!("1");
+            let region_start = region.clone().next().unwrap();
+            let region_size = region.clone().count() as u64;
+
+            //Self::get_region_memory_units(region_start, region_size)
+            region
+        });
+
+        // for region in unused_regions.clone() {
+
+        //     for sub_region in region {
+
+        //         if sub_region.end_addr() == 0 {
+        //             continue
+        //         }
+
+        //         println!("{:?}", sub_region);
         //     }
-            
-            // );
-        
-        // consumes the iterator!
-        for mut region in unused_regions {
-            println!("{}", region.clone().count());
-            let blocks = Self::get_power2_blocks(region.count() as u32);
-            println!("{:?}", blocks);
 
-            //println!("region {}..{}", region.next().unwrap(), region.last().unwrap());
-        }
+        // }
 
-        //
-        0..=0
-    }
+        let region = unused_regions.flat_map(|region| region).nth(self.next);
 
-    /// given a number of frames, returns the blocks of frames that are at the power of two
-    fn get_power2_blocks(mut frames: u32) -> [u32; INTEGER_SIZE] {
-        let mut blocks = [0u32; INTEGER_SIZE];
-        let base = 2u32;
+        self.next += 1;
 
-        for i in 0..INTEGER_SIZE {
-            blocks[i] = (frames & 1) * base.pow(i as u32);
-            frames = frames >> 1;
-        }
-
-        blocks
+        Some(FrameRange {
+            start_frame_number: 0,
+            end_frame_number: 0,
+        })
     }
 }

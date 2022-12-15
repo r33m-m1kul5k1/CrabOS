@@ -12,7 +12,7 @@ use CrabOS::{memory::pmm::FrameDistributer, hlt_loop, test_panic_handler};
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
-    distributer.get_unused_region();
+    distributer.next();
     test_main();
     hlt_loop();
 }
