@@ -6,13 +6,17 @@
 
 use core::panic::PanicInfo;
 use bootloader::BootInfo;
-use CrabOS::{memory::pmm::FrameDistributer, hlt_loop, test_panic_handler};
+use CrabOS::{memory::pmm::FrameDistributer, hlt_loop, test_panic_handler, println};
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
-    let mut distributer = FrameDistributer::new(&boot_info.memory_map);
-    distributer.next();
+    let distributer = FrameDistributer::new(&boot_info.memory_map);
+    
+    for frame_range in distributer {
+        println!("{:?}", frame_range);
+    }
+    
     test_main();
     hlt_loop();
 }
