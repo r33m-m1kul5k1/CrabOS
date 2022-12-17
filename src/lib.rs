@@ -13,6 +13,7 @@ pub mod interrupts;
 pub mod logger;
 pub mod serial;
 pub mod vga_buffer;
+pub mod vmm;
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {
