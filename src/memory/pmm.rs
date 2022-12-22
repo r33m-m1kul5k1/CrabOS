@@ -1,23 +1,25 @@
 //! this modules defines the physical memory managers (frame distributer & buddy)
 
 use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
-
+use log;
 
 const FRAME_SIZE: u64 = 4096;
-const INTEGER_SIZE: usize = 32;
+const INTEGER_SIZE: usize = 64;
 const INVALID_REGION: FrameRange = FrameRange {
     start_frame_number: 0,
     end_frame_number: 0,
 };
-/// the `FrameDistributer` will distribute all the RAM frames to the different buddies
-/// # Fields
-/// - 
+/// the `FrameDistributer` is an Iterator that returns regions in power of 2
+/// ## Fields
+/// - `memory_map` - bootloader static memory map
+/// - `next` - the index of the next free region that is in power of 2
 pub struct FrameDistributer {
     memory_map: &'static MemoryMap,
     next: usize,
 }
 
 impl FrameDistributer {
+
     pub fn new(memory_map: &'static MemoryMap) -> Self {
         FrameDistributer {
             memory_map: memory_map,
@@ -26,33 +28,34 @@ impl FrameDistributer {
     }
 
     /// given a region start and a region size, return a list of regions in the following format: 2^x
-    fn get_region_memory_units(
+    fn get_subregions(
         region_start: u64,
         mut region_size: u64,
     ) -> [FrameRange; INTEGER_SIZE] {
-        let mut blocks = [INVALID_REGION; INTEGER_SIZE];
+        let mut subregions = [INVALID_REGION; INTEGER_SIZE];
 
         let mut offset_frame_number = region_start / FRAME_SIZE;
 
         for i in 0..INTEGER_SIZE {
 
-            let block_size = (region_size & 1) << (i as u64);
+            let subregion_size = (region_size & 1) << (i as u64);
             region_size = region_size >> 1;
 
 
-            if block_size == 0 {
+            if subregion_size == 0 {
                 continue;
             }
 
-            blocks[i] = FrameRange {
+            subregions[i] = FrameRange {
                 start_frame_number: offset_frame_number,
-                end_frame_number: offset_frame_number + block_size,
+                end_frame_number: offset_frame_number + subregion_size,
             };
 
-            offset_frame_number = blocks[i].end_frame_number;
+            offset_frame_number = subregions[i].end_frame_number;
         }
 
-        blocks
+        log::trace!("subregions of region {:?} are: {:?}", region_start, subregions);
+        subregions
     }
 }
 
@@ -80,7 +83,7 @@ impl Iterator for FrameDistributer {
             let region_start = region.clone().next().unwrap();
             let region_size = region.clone().count() as u64;
             
-            Self::get_region_memory_units(region_start, region_size)
+            Self::get_subregions(region_start, region_size)
         });
 
 
