@@ -1,4 +1,5 @@
 [INFO] - Starts the initialization sequence
 [INFO] - ---Global Descriptor Table and the kernel's Segments
 [INFO] - ---Interrupt Descriptor Table
-[DEBUG] - remaining range of frames is FrameRange(0x282000..0x7fdf000)
+[DEBUG] - region: 0x283000..0x3ff000
+[DEBUG] - region: 0x450000..0x7fdf000

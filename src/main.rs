@@ -51,8 +51,9 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     logger::info!("---Interrupt Descriptor Table");
     idt::IDT.load();
 
-    let _frame_distributer = FrameDistributer::new(&boot_info.memory_map);
-    _frame_distributer.remaining_frames();
+    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
+    
+    frame_distributer.get_region();
 
     hlt_loop()
 }
