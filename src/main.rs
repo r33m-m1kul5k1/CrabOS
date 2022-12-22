@@ -42,7 +42,7 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     );
 
 
-    logger::init(log::LevelFilter::Info);
+    logger::init(log::LevelFilter::Debug);
 
     logger::info!("Starts the initialization sequence");
 
@@ -50,13 +50,9 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     gdt::init();
     logger::info!("---Interrupt Descriptor Table");
     idt::IDT.load();
-    
-    let distributer = FrameDistributer::new(&boot_info.memory_map);
 
-    log::debug!("sup");
-    for region in distributer {
-        logger::debug!("{:?}", region)
-    }
+    let _frame_distributer = FrameDistributer::new(&boot_info.memory_map);
+    _frame_distributer.remaining_frames();
 
     hlt_loop()
 }
