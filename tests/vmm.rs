@@ -5,18 +5,21 @@
 #![reexport_test_harness_main = "test_main"]
 
 use bootloader::BootInfo;
-use x86_64::VirtAddr;
 use core::panic::PanicInfo;
-use CrabOS::{test_should_panic_handler, vmm};
+use x86_64::VirtAddr;
+use CrabOS::{test_should_panic_handler, vmm, hlt_loop};
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
-    let virtual_add = VirtAddr { 
-        addr: boot_info.physical_memory_offset 
+    
+    let _offset_page_table = unsafe {
+         vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
     };
-    unsafe { vmm::init(virtual_add) };
+    
+
     test_main();
-    loop {}
+
+    hlt_loop()
 }
 
 #[panic_handler]
