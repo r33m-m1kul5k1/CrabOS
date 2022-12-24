@@ -56,7 +56,7 @@ impl FrameDistributer {
         }
 
         log::trace!(
-            "subregions of region {:?} are: {:?}",
+            "subregions of region {:#x} are: {:?}",
             region_start,
             subregions
         );
@@ -79,7 +79,7 @@ impl FrameDistributer {
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
         for mut region in unused_regions.clone() {
-            log::debug!(
+            log::trace!(
                 "region: {:#x}..{:#x}",
                 region.next().unwrap(),
                 region.last().unwrap()
@@ -91,6 +91,12 @@ impl FrameDistributer {
             let region_end = region.clone().last().unwrap();
             let free_memory_start = self.get_free_memory_start();
 
+            log::trace!(
+                "region: {:#x}..{:#x}",
+                region_start,
+                region_end,
+            );
+            
             if region_start < free_memory_start && free_memory_start < region_end {
                 region_start = free_memory_start;
             } else if free_memory_start > region_end {

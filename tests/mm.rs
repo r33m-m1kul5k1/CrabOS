@@ -6,24 +6,24 @@
 
 use core::panic::PanicInfo;
 use bootloader::BootInfo;
-use CrabOS::{memory::pmm::FrameDistributer, log, hlt_loop, test_panic_handler, println};
+use CrabOS::{memory::pmm::FrameDistributer, log, hlt_loop, test_panic_handler};
 use x86_64::structures::paging::FrameAllocator;
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
-    log::logger::init(log::LevelFilter::Info);
+    log::logger::init(log::LevelFilter::Trace);
 
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     
     for _ in 1..20 {
         
-        println!("frame {:?} allocated", distributer.allocate_frame().unwrap());
+        log::debug!("frame {:?} allocated", distributer.allocate_frame().unwrap());
     }
     
-    for _ in 1..40 {
+    while let Some(region) = distributer.get_region() {
         
-        println!("region: {:?}", distributer.get_region().unwrap());
+        log::debug!("region: {:?}", region);
     }
     
     test_main();
