@@ -9,20 +9,24 @@
 
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
-use interrupts::{gdt, idt};
-use vga_buffer::{Color, WRITER};
-use CrabOS::{graphic_println, interrupts, logger, vga_buffer, hlt_loop};
+use CrabOS::{
+    drivers::vga::{Color, WRITER},
+    graphic_println, hlt_loop,
+    interrupts::{gdt, idt},
+    log::logger,
+    memory::pmm::FrameDistributer,
+};
 
 entry_point!(kmain);
 
-pub fn kmain(_boot_info: &'static BootInfo) -> ! {
-    
+pub fn kmain(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
     WRITER
         .lock()
         .set_writer_theme(Color::LightRed, Color::Black);
+
     graphic_println!(
         r"
   $$$$$$\                     $$\        $$$$$$\   $$$$$$\  
@@ -37,7 +41,8 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
     "
     );
 
-    logger::init(log::LevelFilter::Info);
+
+    logger::init(log::LevelFilter::Debug);
 
     logger::info!("Starts the initialization sequence");
 
@@ -45,6 +50,10 @@ pub fn kmain(_boot_info: &'static BootInfo) -> ! {
     gdt::init();
     logger::info!("---Interrupt Descriptor Table");
     idt::IDT.load();
+
+    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
+    
+    frame_distributer.get_region();
 
     hlt_loop()
 }

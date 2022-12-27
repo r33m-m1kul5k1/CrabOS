@@ -7,7 +7,7 @@
 use bootloader::BootInfo;
 use core::panic::PanicInfo;
 use x86_64::VirtAddr;
-use CrabOS::{test_should_panic_handler, vmm, hlt_loop};
+use CrabOS::{test_should_panic_handler, memory::vmm, hlt_loop};
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {

@@ -1,6 +1,6 @@
 /* A list of all interrupt service routines */
 
-use crate::logger;
+use crate::log::logger;
 use x86_64::structures::idt::InterruptStackFrame;
 
 /// A double fault (#DF) exception can occur
