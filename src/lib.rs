@@ -11,11 +11,9 @@
 use core::panic::PanicInfo;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
 pub mod interrupts;
-pub mod memory;
 pub mod log;
 pub mod drivers;
-
-
+pub mod memory;
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {
