@@ -4,18 +4,20 @@
 #![test_runner(CrabOS::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use CrabOS::{test_should_panic_handler, interrupts::{gdt, idt}};
 use core::panic::PanicInfo;
+
+use CrabOS::{
+    interrupts::{gdt, idt},
+    test_should_panic_handler, hlt_loop,
+};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-
     gdt::init();
     idt::IDT.load();
     test_main();
-    loop {}
+    hlt_loop();
 }
-
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -23,7 +25,7 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[test_case]
-fn basic_print() {
+fn check_reserved_stack() {
     #[allow(unconditional_recursion)]
     fn stack_overflow() {
         stack_overflow()

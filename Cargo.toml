@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 volatile = "0.2.6"
-bootloader = "0.9.8"
+bootloader = { version = "0.9.23", features = ["map_physical_memory"]}
 uart_16550 = "0.2.0"
 spin = "0.5.2"
 log = "0.4.17"
@@ -24,9 +24,17 @@ features = ["spin_no_std"]
 
 
 [package.metadata.bootimage]
-run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
+run-command = [
+    "qemu-system-x86_64",
+    "-chardev", "stdio,id=char0,mux=on,logfile=history.log,signal=off",
+    "-serial", "chardev:char0",
+    "-mon", "chardev=char0",
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+    "-drive", "format=raw,file={}",
+    ]
 test-args = [
-    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
-    "-display", "none"
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+    "-display", "none",
+    "-m", "2G",
 ]
 test-success-exit-code = 33 # must be different from the default exit status

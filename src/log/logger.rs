@@ -1,7 +1,5 @@
 //! this logger will help us debug / log our kernel 
 
-
-// everyone that will import the logger will have direct access to the logging functions
 pub use log::{debug, error, info, trace, warn};
 use log::{Level, LevelFilter, Metadata, Record};
 
@@ -16,7 +14,7 @@ impl log::Log for Logger {
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            //println!("[{}] - {}", record.level(), record.args());
+            println!("[{}] - {}", record.level(), record.args());
         }
     }
     fn flush(&self) {}
