@@ -33,38 +33,9 @@ impl FrameDistributer {
         }
     }
 
-    /// given a region start and a region size, return a list of regions in the following format: 2^x
-    fn get_subregions(region_start: u64, mut region_size: u64) -> [FrameRange; INTEGER_SIZE] {
-        let mut subregions = [INVALID_REGION; INTEGER_SIZE];
-
-        let mut offset_frame_number = region_start / FRAME_SIZE;
-
-        for i in 0..INTEGER_SIZE {
-            let subregion_size = (region_size & 1) << (i as u64);
-            region_size = region_size >> 1;
-
-            if subregion_size == 0 {
-                continue;
-            }
-
-            subregions[i] = FrameRange {
-                start_frame_number: offset_frame_number,
-                end_frame_number: offset_frame_number + subregion_size,
-            };
-
-            offset_frame_number = subregions[i].end_frame_number;
-        }
-
-        log::trace!(
-            "subregions of region {:#x} are: {:?}",
-            region_start,
-            subregions
-        );
-        subregions
-    }
+    
 
     /// gets the next unused region that is in size of 2^x.
-
     pub fn get_region(&mut self) -> Option<FrameRange> {
         let unused_regions = self
             .memory_map
@@ -78,6 +49,7 @@ impl FrameDistributer {
             .map(|r| r.range.start_addr()..r.range.end_addr())
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
+        #[cfg(test)]
         for mut region in unused_regions.clone() {
             log::trace!(
                 "region: {:#x}..{:#x}",
@@ -87,24 +59,8 @@ impl FrameDistributer {
         }
 
         let unused_regions = unused_regions.map(|region| {
-            let mut region_start = region.clone().next().unwrap();
-            let region_end = region.clone().last().unwrap();
-            let free_memory_start = self.get_free_memory_start();
-
-            log::trace!(
-                "region: {:#x}..{:#x}",
-                region_start,
-                region_end,
-            );
             
-            if region_start < free_memory_start && free_memory_start < region_end {
-                region_start = free_memory_start;
-            } else if free_memory_start > region_end {
-                return [INVALID_REGION; INTEGER_SIZE];
-            }
-            let region_size = region.clone().count() as u64;
-
-            Self::get_subregions(region_start, region_size)
+            MemoryRegion::new(region.clone().next().unwrap() / FRAME_SIZE, region.clone().count()).unwrap().get_subregions()
         });
 
         let region = unused_regions
@@ -120,6 +76,7 @@ impl FrameDistributer {
         region
     }
 
+    
     pub fn unused_frames(&self) -> impl Iterator<Item = PhysFrame> {
         let unused_regions = self
             .memory_map
@@ -132,10 +89,8 @@ impl FrameDistributer {
             .map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
     }
 
-    fn get_free_memory_start(&self) -> u64 {
-        let frame = self.unused_frames().nth(self.current_frame);
-
-        frame.unwrap().start_address().as_u64()
+    fn next_frame_number(&self) -> u64 {
+        self.unused_frames().nth(self.current_frame).unwrap().start_address().as_u64() / FRAME_SIZE
     }
 }
 
@@ -145,5 +100,74 @@ unsafe impl FrameAllocator<Size4KiB> for FrameDistributer {
         self.current_frame += 1;
 
         frame
+    }
+}
+
+struct MemoryRegion {
+    /// The range of frames that belong to the region.
+    pub range: FrameRange,
+    /// the number of frames inside the region.
+    pub size: usize,
+}
+
+impl MemoryRegion {
+    pub fn new(start_frame_number: u64, size: usize) -> Option<Self> {
+        
+        let mut region_range = FrameRange { start_frame_number: start_frame_number, end_frame_number: start_frame_number + size as u64 };
+        let free_memory_address = 0; // FrameDistributer::get_free_memory_start();
+        
+        
+
+        #[cfg(test)]
+        log::trace!(
+            "region: {:?}", region_range
+        );
+
+        Some(MemoryRegion {
+            range: region_range,
+            size: size,
+        })
+    }
+
+    pub fn resize_region_range(&mut self, free_frame_number: u64) -> Result<Self, > {
+        if free_frame_number > self.range.end_addr() {
+            return None;
+        }
+
+        if self.range.start_addr() < free_frame_number && free_frame_number < self.range.end_addr() {
+            region_range.start_frame_number = free_memory_address / FRAME_SIZE;
+        }
+    }
+
+    /// given a region start and a region size, return a list of regions in the following format: 2^x
+    pub fn get_subregions(&self) -> [FrameRange; INTEGER_SIZE] {
+        let mut subregions = [INVALID_REGION; INTEGER_SIZE];
+        let mut region_size = self.size;
+        let mut offset_frame_number = self.range.start_frame_number;
+
+        for i in 0..INTEGER_SIZE {
+            let subregion_size = (region_size & 1) << (i as u64);
+            region_size = region_size >> 1;
+
+            if subregion_size == 0 {
+                continue;
+            }
+
+            subregions[i] = FrameRange {
+                start_frame_number: offset_frame_number,
+                end_frame_number: offset_frame_number + subregion_size as u64,
+            };
+
+            offset_frame_number = subregions[i].end_frame_number;
+        }
+
+        #[cfg(test)]
+        log::trace!(
+            "subregions of region {:?} are: {:?}",
+            self.range,
+            subregions
+        );
+
+        subregions
     }
 }
