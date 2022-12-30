@@ -22,9 +22,6 @@ impl MemoryRegion {
             end_frame_number: start_frame_number + size as u64,
         };
 
-        #[cfg(test)]
-        log::trace!("region: {:?}", region_range);
-
         Some(MemoryRegion {
             range: region_range,
             size: size,
@@ -70,7 +67,7 @@ impl MemoryRegion {
             offset_frame_number = subregions[i].end_frame_number;
         }
 
-        #[cfg(test)]
+
         log::trace!(
             "subregions of region {:?} are: {:?}",
             self.range,

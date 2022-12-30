@@ -1,1 +1,39 @@
+[DEBUG] - frame PhysFrame[4KiB](0x279000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27a000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27b000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27c000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27d000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27e000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27f000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x280000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x281000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x282000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x283000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x284000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x285000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x286000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x287000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x288000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x289000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x28a000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x28b000) allocated
+[DEBUG] - region: FrameRange(0x279000..0x27a000)
+[DEBUG] - region: FrameRange(0x27a000..0x27c000)
+[DEBUG] - region: FrameRange(0x27c000..0x280000)
+[DEBUG] - region: FrameRange(0x280000..0x300000)
+[DEBUG] - region: FrameRange(0x300000..0x400000)
+[DEBUG] - region: FrameRange(0x84d000..0x84e000)
+[DEBUG] - region: FrameRange(0x84e000..0x850000)
+[DEBUG] - region: FrameRange(0x850000..0x860000)
+[DEBUG] - region: FrameRange(0x860000..0x8e0000)
+[DEBUG] - region: FrameRange(0x8e0000..0x9e0000)
+[DEBUG] - region: FrameRange(0x9e0000..0xbe0000)
+[DEBUG] - region: FrameRange(0xbe0000..0xfe0000)
+[DEBUG] - region: FrameRange(0xfe0000..0x1fe0000)
+[DEBUG] - region: FrameRange(0x1fe0000..0x3fe0000)
+[DEBUG] - region: FrameRange(0x3fe0000..0x7fe0000)
+[DEBUG] - region: FrameRange(0x7fe0000..0xffe0000)
+[DEBUG] - region: FrameRange(0xffe0000..0x1ffe0000)
+[DEBUG] - region: FrameRange(0x1ffe0000..0x3ffe0000)
+[DEBUG] - region: FrameRange(0x3ffe0000..0x7ffe0000)
 Running 0 tests

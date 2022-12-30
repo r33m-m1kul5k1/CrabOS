@@ -12,7 +12,7 @@ use x86_64::structures::paging::FrameAllocator;
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
-    log::logger::init(log::LevelFilter::Trace);
+    log::logger::init(log::LevelFilter::Debug);
 
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     
@@ -24,6 +24,9 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     while let Some(region) = distributer.get_region() {
         
         log::debug!("region: {:?}", region);
+        // check if the region size is in a power of two :)
+        let region_size = region.end_addr() - region.start_addr();
+        assert_eq!(region_size.count_ones(), 1);
     }
     
     test_main();

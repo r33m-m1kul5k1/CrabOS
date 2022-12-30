@@ -41,7 +41,8 @@ impl FrameDistributer {
             .map(|r| r.range.start_addr()..r.range.end_addr())
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
-        #[cfg(test)]
+        
+        log::trace!("The machine free regions are: ");
         for mut region in unused_regions.clone() {
             log::trace!(
                 "region: {:#x}..{:#x}",
@@ -65,7 +66,7 @@ impl FrameDistributer {
         let region = unused_regions
             .flat_map(|region| region)
             .filter(|region| {
-                region.is_empty() // is default
+                !region.is_empty() // is default
             })
             .nth(self.current_region);
 
@@ -74,6 +75,7 @@ impl FrameDistributer {
         region
     }
 
+    
     pub fn unused_frames(&self) -> impl Iterator<Item = PhysFrame> {
         let unused_regions = self
             .memory_map
