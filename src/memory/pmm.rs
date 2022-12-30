@@ -53,8 +53,8 @@ impl FrameDistributer {
 
         let unused_regions = unused_regions.map(|region| {
             let mut region = MemoryRegion::new(
-                region.clone().next().unwrap() / FRAME_SIZE,
-                region.clone().count(),
+                region.clone().next().unwrap(),
+                region.clone().last().unwrap(),
             )
             .unwrap();
 

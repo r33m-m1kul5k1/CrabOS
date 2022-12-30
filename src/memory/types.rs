@@ -16,15 +16,12 @@ pub struct MemoryRegion {
 }
 
 impl MemoryRegion {
-    pub fn new(start_frame_number: u64, size: usize) -> Option<Self> {
-        let region_range = FrameRange {
-            start_frame_number: start_frame_number,
-            end_frame_number: start_frame_number + size as u64,
-        };
+    pub fn new(start_frame_address: u64, end_frame_address: u64) -> Option<Self> {
+        let region_range = FrameRange::new(start_frame_address, end_frame_address);
 
         Some(MemoryRegion {
             range: region_range,
-            size: size,
+            size: (region_range.end_frame_number - region_range.start_frame_number) as usize,
         })
     }
 
