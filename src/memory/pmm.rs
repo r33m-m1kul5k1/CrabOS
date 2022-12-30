@@ -1,17 +1,11 @@
 //! this modules defines the physical memory managers (frame distributer & buddy)
 
-use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
-use log;
+use bootloader::bootinfo::{MemoryMap, MemoryRegionType, FrameRange};
+
+use crate::memory::types::{MemoryRegion, FRAME_SIZE};
 use x86_64::{
     structures::paging::{FrameAllocator, PhysFrame, Size4KiB},
     PhysAddr,
-};
-
-const FRAME_SIZE: u64 = 4096;
-const INTEGER_SIZE: usize = 64;
-const INVALID_REGION: FrameRange = FrameRange {
-    start_frame_number: 0,
-    end_frame_number: 0,
 };
 
 /// the `FrameDistributer` is an Iterator that returns regions in power of 2
@@ -33,38 +27,7 @@ impl FrameDistributer {
         }
     }
 
-    /// given a region start and a region size, return a list of regions in the following format: 2^x
-    fn get_subregions(region_start: u64, mut region_size: u64) -> [FrameRange; INTEGER_SIZE] {
-        let mut subregions = [INVALID_REGION; INTEGER_SIZE];
-
-        let mut offset_frame_number = region_start / FRAME_SIZE;
-
-        for i in 0..INTEGER_SIZE {
-            let subregion_size = (region_size & 1) << (i as u64);
-            region_size = region_size >> 1;
-
-            if subregion_size == 0 {
-                continue;
-            }
-
-            subregions[i] = FrameRange {
-                start_frame_number: offset_frame_number,
-                end_frame_number: offset_frame_number + subregion_size,
-            };
-
-            offset_frame_number = subregions[i].end_frame_number;
-        }
-
-        log::trace!(
-            "subregions of region {:#x} are: {:?}",
-            region_start,
-            subregions
-        );
-        subregions
-    }
-
     /// gets the next unused region that is in size of 2^x.
-
     pub fn get_region(&mut self) -> Option<FrameRange> {
         let unused_regions = self
             .memory_map
@@ -78,6 +41,8 @@ impl FrameDistributer {
             .map(|r| r.range.start_addr()..r.range.end_addr())
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
+        
+        log::trace!("The machine free regions are: ");
         for mut region in unused_regions.clone() {
             log::trace!(
                 "region: {:#x}..{:#x}",
@@ -87,31 +52,21 @@ impl FrameDistributer {
         }
 
         let unused_regions = unused_regions.map(|region| {
-            let mut region_start = region.clone().next().unwrap();
-            let region_end = region.clone().last().unwrap();
-            let free_memory_start = self.get_free_memory_start();
+            let mut region = MemoryRegion::new(
+                region.clone().next().unwrap() / FRAME_SIZE,
+                region.clone().count(),
+            )
+            .unwrap();
 
-            log::trace!(
-                "region: {:#x}..{:#x}",
-                region_start,
-                region_end,
-            );
-            
-            if region_start < free_memory_start && free_memory_start < region_end {
-                region_start = free_memory_start;
-            } else if free_memory_start > region_end {
-                return [INVALID_REGION; INTEGER_SIZE];
-            }
-            let region_size = region.clone().count() as u64;
+            region.resize_region_range(self.next_frame_number());
 
-            Self::get_subregions(region_start, region_size)
+            region.get_subregions()
         });
 
         let region = unused_regions
             .flat_map(|region| region)
             .filter(|region| {
-                region.start_addr() != INVALID_REGION.start_addr()
-                    && region.end_addr() != INVALID_REGION.end_addr()
+                !region.is_empty() // is default
             })
             .nth(self.current_region);
 
@@ -120,6 +75,7 @@ impl FrameDistributer {
         region
     }
 
+    
     pub fn unused_frames(&self) -> impl Iterator<Item = PhysFrame> {
         let unused_regions = self
             .memory_map
@@ -132,10 +88,13 @@ impl FrameDistributer {
             .map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
     }
 
-    fn get_free_memory_start(&self) -> u64 {
-        let frame = self.unused_frames().nth(self.current_frame);
-
-        frame.unwrap().start_address().as_u64()
+    fn next_frame_number(&self) -> u64 {
+        self.unused_frames()
+            .nth(self.current_frame)
+            .unwrap()
+            .start_address()
+            .as_u64()
+            / FRAME_SIZE
     }
 }
 

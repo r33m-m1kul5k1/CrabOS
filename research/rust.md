@@ -511,3 +511,23 @@ To enable a feature add it to the `default` feature.
 `repr(transparent)`
 
 1. used for one filed type, makes the type use its field representation.
+
+## [derivable traits](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html)
+
+## PartialEq
+```
+symmetric: a == b implies b == a; and
+transitive: a == b and b == c implies a == c.
+```
+NaN != Nan, meaning it cannot be reflexive than we don't use Eq.
+## Eq
+```
+reflexive: a == a;
+symmetric: a == b implies b == a; and
+transitive: a == b and b == c implies a == c.
+```
+## Copy
+if there is no different between deep and sallow copy, it is best to use Copy trait.
+which does a deep copy when a sallow copy should occur, changing ownership for example.
+## Clone
+deep copy of an object
