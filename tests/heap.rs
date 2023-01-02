@@ -10,16 +10,17 @@
 use bootloader::bootinfo::BootInfo;
 use core::panic::PanicInfo;
 use CrabOS::{
-    log,
+    log::{LevelFilter, logger},
     hlt_loop,
     test_panic_handler,
     alloc::boxed::Box,
 };
 
 #[no_mangle]
-pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+pub extern "C" fn _start(_boot_info: &'static BootInfo) -> ! {
     
-    let x = Box::new(41);
+    logger::init(LevelFilter::Debug);
+    let _ = Box::new(41);
     log::info!("It did not crash!");
     test_main();
     hlt_loop()
