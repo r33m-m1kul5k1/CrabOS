@@ -4,14 +4,23 @@
 #![test_runner(CrabOS::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-extern crate alloc;
-use alloc::boxed::Box;
+
+
+
+use bootloader::bootinfo::BootInfo;
+use core::panic::PanicInfo;
+use CrabOS::{
+    log,
+    hlt_loop,
+    test_panic_handler,
+    alloc::boxed::Box,
+};
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     
     let x = Box::new(41);
-    println!("It did not crash!");
+    log::info!("It did not crash!");
     test_main();
     hlt_loop()
 }
@@ -19,5 +28,5 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    test_should_panic_handler(info)
+    test_panic_handler(info)
 }

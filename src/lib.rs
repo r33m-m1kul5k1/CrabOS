@@ -8,6 +8,7 @@
 #![feature(abi_x86_interrupt)]
 #![allow(nonstandard_style)] 
 
+pub extern crate alloc;
 use core::panic::PanicInfo;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
 pub mod interrupts;
