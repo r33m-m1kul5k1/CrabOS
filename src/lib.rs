@@ -1,5 +1,5 @@
-//! this library goal is to expose the OS api to the test directory for integration tests
-//! moreover this library implements basic functionalities for testing
+//! This library goal is to expose the OS api to the test directory for integration tests
+//! Moreover this library implements basic functionalities for testing
 #![no_std]
 #![cfg_attr(test, no_main)]
 #![feature(alloc_error_handler)]

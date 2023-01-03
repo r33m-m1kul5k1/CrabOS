@@ -1,17 +1,17 @@
-//! this module implements the buddy system for allocating physical frames
+//! This module implements the buddy system for allocating physical frames
 
 use bootloader::bootinfo::FrameRange;
 const FRAME_SIZE: u32 = 4096;
 
 /// [Buddy](https://wiki.osdev.org/Page_Frame_Allocation) is an allocation algorithm, running at O(log(n)) at worst case
 pub struct Buddy {
-    /// the physical region that buddy manages
+    /// The physical region that buddy manages
     region: FrameRange,
-    /// the number of vectors representing different sizes
+    /// The number of vectors representing different sizes
     order_count: u8,
-    // the minimum size of a block the buddy system can allocate / deallocate.
+    // The minimum size of a block the buddy system can allocate / deallocate.
     limit: u32,
-    /// a vector of vectors describing the physical address space in different block sizes
+    /// A vector of vectors describing the physical address space in different block sizes
     free_area: Vec<Vec<u32>>,
 }
 

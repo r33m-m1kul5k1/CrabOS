@@ -1,4 +1,4 @@
-//! this modules defines the physical memory managers (frame distributer & buddy)
+//! This modules defines the physical memory managers (frame distributer & buddy)
 
 use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
 

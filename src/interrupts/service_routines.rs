@@ -1,4 +1,4 @@
-/* A list of all interrupt service routines */
+//! A list of all interrupt service routines 
 
 use crate::log::logger;
 use x86_64::structures::idt::InterruptStackFrame;

@@ -1,4 +1,4 @@
-//! this module defines types for memory components
+//! This module defines types for memory components
 use bootloader::bootinfo::FrameRange;
 
 pub const FRAME_SIZE: u64 = 4096;
