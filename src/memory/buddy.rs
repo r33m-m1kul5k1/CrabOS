@@ -16,15 +16,15 @@ pub struct Buddy {
 }
 
 impl Buddy {
-    /// initiate buddy with a region and a limit
+    /// Initiate buddy with a region and a limit
     pub fn init(region: FrameRange, limit: u32) {}
 
-    // returns an empty buddy object to initiate
+    /// Returns an empty buddy object to initiate
     pub const fn empty() -> Self {}
 
-    /// return the biggest size of a block `Buddy` can allocate.
-    /// `limit * 2 ^ (order_count -1)`
+    /// Return the biggest size of a block `Buddy` can allocate.
     fn block_max_size(&self) -> usize {
+        // limit * 2 ^ (order_count -1)
         (self.limit as usize) << (self.order_count as usize - 1)
     }
 }

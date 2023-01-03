@@ -1,3 +1,4 @@
+//! this module defines types for memory components
 use bootloader::bootinfo::FrameRange;
 
 pub const FRAME_SIZE: u64 = 4096;
@@ -7,15 +8,17 @@ pub const INVALID_FRAME_RANGE: FrameRange = FrameRange {
     end_frame_number: 0,
 };
 
+/// A struct representing a physical memory region
 #[derive(PartialEq, Eq, Debug)]
 pub struct MemoryRegion {
     /// The range of frames that belong to the region.
     pub range: FrameRange,
-    /// the number of frames inside the region.
+    /// The number of frames inside the region.
     pub size: usize,
 }
 
 impl MemoryRegion {
+    /// Create a new FrameDistributer from the passed bootloader's memory map.
     pub fn new(start_frame_address: u64, end_frame_address: u64) -> Option<Self> {
         let region_range = FrameRange::new(start_frame_address, end_frame_address);
 
@@ -24,20 +27,21 @@ impl MemoryRegion {
             size: (region_range.end_frame_number - region_range.start_frame_number) as usize,
         })
     }
-
-    pub fn resize_region_range(&mut self, free_frame_number: u64) {
-        if free_frame_number > self.range.end_addr() {
+    /// Resize the memory region's range and it's size accordingly to the given new start address
+    pub fn resize_region_range(&mut self, start_address: u64) {
+        if start_address > self.range.end_addr() {
             *self = MemoryRegion::default();
         }
 
-        if self.range.start_addr() < free_frame_number && free_frame_number < self.range.end_addr()
+        if self.range.start_addr() < start_address && start_address < self.range.end_addr()
         {
-            self.range.start_frame_number = free_frame_number;
+            self.range = FrameRange::new(start_address, self.range.end_addr());
+            self.size = (self.range.end_frame_number - self.range.start_frame_number) as usize;
         }
 
     }
 
-    /// given a region start and a region size, return a list of regions in the following format: 2^x
+    /// Given a region start and a region size, return a list of regions in the following format: 2^x
     pub fn get_subregions(&self) -> [FrameRange; INTEGER_SIZE] {
         let mut subregions = [INVALID_FRAME_RANGE; INTEGER_SIZE];
 
@@ -49,7 +53,9 @@ impl MemoryRegion {
         let mut offset_frame_number = self.range.start_frame_number;
 
         for i in 0..INTEGER_SIZE {
+            // (current bit) * (2^i)
             let subregion_size = (region_size & 1) << (i as u64);
+            // continue to the next bit
             region_size = region_size >> 1;
 
             if subregion_size == 0 {
