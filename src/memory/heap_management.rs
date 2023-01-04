@@ -36,10 +36,23 @@ impl HeapManager {
 }
 
 unsafe impl GlobalAlloc for HeapManager {
+    // returns a raw pointer to the first byte of the allocated memory block.
+    //
+    // #Arguments
+    //
+    // 'layout' - a Layout instance 
+    //
+    // Instead of an explicit error value, the alloc method returns a null pointer to signal an allocation error.
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
         null_mut()
     }
 
+    // dealloc is the counterpart and is responsible for freeing a memory block again.
+    //
+    // #Arguments 
+    // 'ptr' - the pointer returned by alloc
+    //
+    // 'layout' - the Layout that was used for the allocation.
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
         panic!("dealloc should be never called")
     }
