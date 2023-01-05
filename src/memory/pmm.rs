@@ -1,6 +1,6 @@
 //! This modules defines the physical memory managers (frame distributer & buddy)
 
-use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
+use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
 use crate::memory::types::{MemoryRegion, FRAME_SIZE};
 use x86_64::{
@@ -32,7 +32,7 @@ impl FrameDistributer {
     }
 
     /// Gets the next unused `FrameRange` see `FrameDistributer` documentation.
-    pub fn get_region(&mut self) -> Option<FrameRange> {
+    pub fn get_region(&mut self) -> Option<MemoryRegion> {
         
         
         let unused_regions = self
@@ -59,8 +59,7 @@ impl FrameDistributer {
             let mut region = MemoryRegion::new(
                 region.clone().next().unwrap(),
                 region.clone().last().unwrap(),
-            )
-            .unwrap();
+            );
 
             region.resize_region_range(self.next_frame_number());
 
@@ -73,11 +72,11 @@ impl FrameDistributer {
             .filter(|region| {
                 !region.is_empty() // is default
             })
-            .nth(self.current_region);
+            .nth(self.current_region).unwrap();
 
         self.current_region += 1;
 
-        region
+        Some(MemoryRegion::new(region.start_addr(), region.end_addr()))
     }
 
     /// Returns the unused frames iterator from the bootloader `memory_map`

@@ -8,7 +8,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
+use core::{panic::PanicInfo};
 use CrabOS::{
     drivers::vga::{Color, WRITER},
     graphic_println, hlt_loop,
@@ -55,6 +55,7 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     
     frame_distributer.get_region();
 
+    
     hlt_loop()
 }
 

@@ -1,3 +1,21 @@
-[INFO] - Starts the initialization sequence
-[INFO] - ---Global Descriptor Table and the kernel's Segments
-[INFO] - ---Interrupt Descriptor Table
+[DEBUG] - frame PhysFrame[4KiB](0x279000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27a000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27b000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27c000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27d000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27e000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x27f000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x280000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x281000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x282000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x283000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x284000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x285000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x286000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x287000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x288000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x289000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x28a000) allocated
+[DEBUG] - frame PhysFrame[4KiB](0x28b000) allocated
+[INFO] - buddy: maximum order: 4
+Running 0 tests

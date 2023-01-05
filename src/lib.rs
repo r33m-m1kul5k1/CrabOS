@@ -4,6 +4,7 @@
 #![cfg_attr(test, no_main)]
 #![feature(alloc_error_handler)]
 #![feature(custom_test_frameworks)]
+#![feature(generic_const_exprs)]
 #![test_runner(test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]

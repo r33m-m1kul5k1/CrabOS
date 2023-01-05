@@ -19,13 +19,13 @@ pub struct MemoryRegion {
 
 impl MemoryRegion {
     /// Create a new FrameDistributer from the passed bootloader's memory map.
-    pub fn new(start_frame_address: u64, end_frame_address: u64) -> Option<Self> {
+    pub fn new(start_frame_address: u64, end_frame_address: u64) -> Self {
         let region_range = FrameRange::new(start_frame_address, end_frame_address);
 
-        Some(MemoryRegion {
+        MemoryRegion {
             range: region_range,
             size: (region_range.end_frame_number - region_range.start_frame_number) as usize,
-        })
+        }
     }
     /// Resize the memory region's range and it's size accordingly to the given new start address
     pub fn resize_region_range(&mut self, start_address: u64) {
