@@ -4,7 +4,7 @@ use super::types::MemoryRegion;
 use core::fmt;
 use heapless::Vec;
 use core::cmp;
-use crate::mem::PhysAddr;
+use x86_64::PhysAddr;
 
 /// [Buddy](https://wiki.osdev.org/Page_Frame_Allocation) is an allocation algorithm, running at O(log(n)) at worst case
 pub struct Buddy<const MAX_ORDER: usize>
@@ -16,10 +16,6 @@ where
     region: MemoryRegion,
     // The minimum size of a block the buddy system can allocate / deallocate.
     limit: u32,
-    // number of levels
-    num_levels: u8,
-    start_addr: PhysAddr,
-    end_addr: PhysAddr,
     /// A vector of vectors describing the physical address space in different block sizes
     /// The capacity can be calculated by Vector's count * size of biggest vector
     free_blocks: Vec<Vec<u64, { 1 << MAX_ORDER }>, { MAX_ORDER + 1 }>,
@@ -31,11 +27,10 @@ where
     [(); 1 << MAX_ORDER]: Sized,
 {
     /// Initiate buddy with a region and a limit
-    pub fn new(region: MemoryRegion, limit: u32, num_levels: u8) -> Self {
+    pub fn new(region: MemoryRegion, limit: u32) -> Self {
         Buddy {
             region: region,
             limit: limit,
-            num_levels: num_levels,
             free_blocks: Vec::new(),
         }
     }
@@ -48,8 +43,9 @@ where
     }
     //pub fn manages()
 
+
     // this func finds which memory level we need to use to serve a request for size bytes.
-    fn req_size_to_level(&self, size: usize) -> Option<usize> {
+    pub fn req_size_to_level(&self, size: usize) -> Option<usize> {
         let max_size = self.block_max_size(); // finds the level of this allocator than can accommodate the required memory size.
         if size > max_size {
             None
@@ -58,13 +54,13 @@ where
             while (max_size >> next_level) >= size {
                 next_level += 1;
             }
-            let req_level = cmp::min(next_level - 1, self.num_levels as usize);
+            let req_level = cmp::min(next_level - 1, MAX_ORDER as usize);
             Some(req_level)
         }
     }
 
     // this func gets a block from the free list at this level or split a block above and return one of the splitted blocks.
-    fn get_free_block(&mut self, level: usize) -> Option<u32> {
+    pub fn get_free_block(&mut self, level: usize) -> Option<u64> {
         
         self.free_blocks[level]
             .pop()
@@ -74,7 +70,7 @@ where
     // this func deals with the case of reaching the maximum level
     // there is no option to split the memory; this allocation is aborted
     // returns the other splitted block as we now have a block for this allocation
-    fn split_level(&mut self, level: usize) -> Option<u32> {
+    pub fn split_level(&mut self, level: usize) -> Option<u64> {
         if level == 0 {
             None
         } else {
@@ -97,7 +93,7 @@ where
                 // to get the offset of the memory that was allocated.
                 let offset = block as u64 * (self.block_max_size() >> req_level as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
-                PhysAddr::new(self.start_addr.addr() + offset)
+                PhysAddr::new(self.region.range.start_addr() + offset)
             })
         })
     }
