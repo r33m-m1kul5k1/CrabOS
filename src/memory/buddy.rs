@@ -28,6 +28,13 @@ where
 {
     /// Initiate buddy with a region and a limit
     pub fn new(region: MemoryRegion, limit: u32) -> Self {
+        /*
+        this code is not working but we need to initalize the vec with some capacity
+        let free_blocks = Vec::new();
+        for _ in 0..(MAX_ORDER + 1) {
+            free_blocks.push(Vec::with_capacity(4));
+        }
+         */
         Buddy {
             region: region,
             limit: limit,
@@ -61,7 +68,6 @@ where
 
     // this func gets a block from the free list at this level or split a block above and return one of the splitted blocks.
     pub fn get_free_block(&mut self, level: usize) -> Option<u64> {
-        
         self.free_blocks[level]
             .pop()
             .or_else(|| self.split_level(level))
