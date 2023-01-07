@@ -26,18 +26,12 @@ where
     [(); MAX_ORDER + 1]: Sized,
     [(); 1 << MAX_ORDER]: Sized,
 {
-    /// Initiate buddy with a region and a limit
+    /// Creates buddy with a region and a limit
     pub fn new(region: MemoryRegion, limit: u32) -> Self {
-        /*
-        this code is not working but we need to initalize the vec with some capacity
-        let free_blocks = Vec::new();
-        for _ in 0..(MAX_ORDER + 1) {
-            free_blocks.push(Vec::with_capacity(4));
-        }
-         */
+
         Buddy {
-            region: region,
-            limit: limit,
+            region,
+            limit,
             free_blocks: Vec::new(),
         }
     }
@@ -45,59 +39,63 @@ where
     #[allow(dead_code)]
     /// Return the biggest size of a block `Buddy` can allocate.
     fn block_max_size(&self) -> usize {
-        // limit * 2 ^ (order_count -1)
-        (self.limit as usize) << (MAX_ORDER as usize - 1)
+        // limit * 2 ^ (max order)
+        (self.limit as usize) << (MAX_ORDER as usize)
     }
-    //pub fn manages()
 
 
-    // this func finds which memory level we need to use to serve a request for size bytes.
-    pub fn req_size_to_level(&self, size: usize) -> Option<usize> {
-        let max_size = self.block_max_size(); // finds the level of this allocator than can accommodate the required memory size.
+    /// Finds the smallest block size that contains the request size bytes.
+    /// Returns None if the request block size is bigger then buddy's region 
+    pub fn get_order(&self, size: usize) -> Option<usize> {
+        // finds the maximum block size which of this allocator.
+        let max_size = self.block_max_size(); 
         if size > max_size {
-            None
-        } else {
-            let mut next_level = 1;
-            while (max_size >> next_level) >= size {
-                next_level += 1;
-            }
-            let req_level = cmp::min(next_level - 1, MAX_ORDER as usize);
-            Some(req_level)
+            return None
         }
+
+        let mut next_order = 1;
+        // while the current order block size is >= request size check smaller block sizes
+        while (max_size >> next_order) >= size {
+            next_order += 1;
+        }
+
+        let request_order = cmp::min(next_order - 1, MAX_ORDER as usize);
+        Some(request_order)
+    
     }
 
-    // this func gets a block from the free list at this level or split a block above and return one of the splitted blocks.
-    pub fn get_free_block(&mut self, level: usize) -> Option<u64> {
-        self.free_blocks[level]
+    /// Gets a block from the free list at a given order or split a block above and return one of the splitted blocks.
+    pub fn get_free_block(&mut self, order: usize) -> Option<u64> {
+        self.free_blocks[order]
             .pop()
-            .or_else(|| self.split_level(level))
+            .or_else(|| self.split_level(order))
     }
 
-    // this func deals with the case of reaching the maximum level
-    // there is no option to split the memory; this allocation is aborted
-    // returns the other splitted block as we now have a block for this allocation
-    pub fn split_level(&mut self, level: usize) -> Option<u64> {
-        if level == 0 {
+    /// This func deals with the case of splitting a block from a given order and returning the new block index.
+    /// Reaching the maximum order, there is no option to split the memory; this allocation is aborted.
+    pub fn split_level(&mut self, order: usize) -> Option<u64> {
+        if order == 0 {
             None
         } else {
-            self.get_free_block(level - 1).map(|block| {
+            self.get_free_block(order - 1).map(|block| {
                 // first, we get a block from 1 level above us and split it.
                 // second, we push the second of the splitted blocks to the current free list
-                self.free_blocks[level].push(block * 2 + 1);
+                self.free_blocks[order].push(block * 2 + 1).unwrap();
                 block * 2
             })
         }
     }
 
-    // this func is responsible for the allocation
-    fn alloc(&mut self, size: usize, alignment: usize) -> Option<PhysAddr> {
+    /// Allocates a block given it's size and alignment
+    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<PhysAddr> {
         let size = cmp::max(size, alignment);
-        self.req_size_to_level(size).and_then(|req_level| { // this line finds which level of this allocator can accommodate this amount of memory (if any)
-            self.get_free_block(req_level).map(|block| {
-                // get_free_block gives us the index of the block in the given level
-                // so we need to find the size of each block in that level and multiply by the index
-                // to get the offset of the memory that was allocated.
-                let offset = block as u64 * (self.block_max_size() >> req_level as usize) as u64;
+         // this line finds which order of this allocator can accommodate this amount of memory (if any)
+        self.get_order(size).and_then(|request_order| {
+            self.get_free_block(request_order)
+            .map(|block| {
+                // to get the offset of the memory that was allocated
+                // we multiply the block's size by it's index.
+                let offset = block as u64 * (self.block_max_size() >> request_order as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
                 PhysAddr::new(self.region.range.start_addr() + offset)
             })

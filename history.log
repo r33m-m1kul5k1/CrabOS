@@ -1,4 +1,6 @@
+[INFO] - order of block under the limit is: 4
+[INFO] - order of block of size 2Kib: 3
 [failed]
 
-Error: panicked at 'index out of bounds: the len is 0 but the index is 0', /mnt/c/Users/magshimim/Documents/Magshimim/lod-1302-operating-system/src/memory/buddy.rs:71:9
+Error: panicked at 'index out of bounds: the len is 0 but the index is 2', /mnt/c/Users/reemp/Desktop/lod-1302-operating-system/src/memory/buddy.rs:69:9
 
