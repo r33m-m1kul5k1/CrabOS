@@ -32,8 +32,20 @@ where
         Buddy {
             region,
             limit,
-            free_blocks: Vec::new(),
+            free_blocks: Buddy::<MAX_ORDER>::initialized_free_blocks(),
         }
+    }
+
+    fn initialized_free_blocks() -> Vec<Vec<u64, { 1 << MAX_ORDER }>, { MAX_ORDER + 1 }>{
+        let mut tmp_vec: Vec<Vec<u64, { 1 << MAX_ORDER }>, { MAX_ORDER + 1 }> =  Vec::new();
+                
+                for _ in 1..MAX_ORDER + 1 {
+                    let inner_vec: Vec<u64, { 1 << MAX_ORDER }> = Vec::new();
+                    tmp_vec.push(inner_vec).unwrap();
+                }
+
+                tmp_vec[0].push(0).unwrap();
+                tmp_vec
     }
 
     #[allow(dead_code)]
@@ -77,7 +89,10 @@ where
         if order == 0 {
             None
         } else {
+            
             self.get_free_block(order - 1).map(|block| {
+
+                log::debug!("splits level {}", order - 1);
                 // first, we get a block from 1 level above us and split it.
                 // second, we push the second of the splitted blocks to the current free list
                 self.free_blocks[order].push(block * 2 + 1).unwrap();
@@ -95,6 +110,8 @@ where
             .map(|block| {
                 // to get the offset of the memory that was allocated
                 // we multiply the block's size by it's index.
+                log::debug!("block's index: {}", block);
+                // this calculation doesn't work
                 let offset = block as u64 * (self.block_max_size() >> request_order as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
                 PhysAddr::new(self.region.range.start_addr() + offset)
@@ -111,8 +128,9 @@ where
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "maximum order: {}",
+            "Buddy: [\nmaximum order: {}\nregion: {:?}\n]",
             MAX_ORDER,
+            self.region
         )
     }
 }

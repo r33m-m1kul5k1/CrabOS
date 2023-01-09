@@ -1,6 +1,10 @@
-[INFO] - order of block under the limit is: 4
-[INFO] - order of block of size 2Kib: 3
-[failed]
-
-Error: panicked at 'index out of bounds: the len is 0 but the index is 2', /mnt/c/Users/reemp/Desktop/lod-1302-operating-system/src/memory/buddy.rs:69:9
-
+[INFO] - Buddy: [
+maximum order: 1
+region: MemoryRegion { range: FrameRange(0x279000..0x27b000), size: 2 }
+]
+[INFO] - order of block under the limit is: 1
+[INFO] - order of block of size 2Kib: 0
+[DEBUG] - block's index: 0
+[INFO] - allocated Some(PhysAddr(0x279000))
+[INFO] - allocated None
+Running 0 tests
