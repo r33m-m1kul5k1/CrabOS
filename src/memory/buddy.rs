@@ -1,12 +1,13 @@
 //! This module implements the buddy system for allocating physical frames
 
-use super::types::MemoryRegion;
-use core::fmt;
+use super::{types::MemoryRegion, heap_management::Locked};
+use core::{fmt, alloc::{Layout, GlobalAlloc}};
 use heapless::Vec;
-use core::cmp;
 use x86_64::PhysAddr;
+use core::cmp;
 
 /// [Buddy](https://wiki.osdev.org/Page_Frame_Allocation) is an allocation algorithm, running at O(log(n)) at worst case
+/// a region with size nKib,  nKib = (1 << MAX_ORDER) the index of the set bit is the MAX_ORDER
 pub struct Buddy<const MAX_ORDER: usize>
 where
     [(); MAX_ORDER + 1]: Sized,
@@ -26,29 +27,54 @@ where
     [(); MAX_ORDER + 1]: Sized,
     [(); 1 << MAX_ORDER]: Sized,
 {
-    /// Creates buddy with a region and a limit
-    pub fn new(region: MemoryRegion, limit: u32) -> Self {
 
+    /// Creates a buddy with constant default members
+    pub const fn empty() -> Self {
         Buddy {
-            region,
-            limit,
-            free_blocks: Buddy::<MAX_ORDER>::initialized_free_blocks(),
+            region: MemoryRegion::empty(),
+            limit: 0,
+            free_blocks: Vec::new(),
         }
     }
 
-    fn initialized_free_blocks() -> Vec<Vec<u64, { 1 << MAX_ORDER }>, { MAX_ORDER + 1 }>{
-        let mut tmp_vec: Vec<Vec<u64, { 1 << MAX_ORDER }>, { MAX_ORDER + 1 }> =  Vec::new();
-                
-                for _ in 1..MAX_ORDER + 1 {
-                    let inner_vec: Vec<u64, { 1 << MAX_ORDER }> = Vec::new();
-                    tmp_vec.push(inner_vec).unwrap();
-                }
-
-                tmp_vec[0].push(0).unwrap();
-                tmp_vec
+    /// Initializing buddy with a region and a limit
+    /// 
+    /// # Arguments
+    /// 
+    /// * `region` - a continues power-of-two aligned memory region
+    /// * `limit` - the minimum block size that can be allocated
+    /// 
+    /// # Safety
+    /// This function is unsafe because the caller must guarantee that the given
+    /// buddy bounds are unused. This method must be called only once.
+    pub unsafe fn init(&mut self, region: MemoryRegion, limit: u32) {
+        self.region = region;
+        self.limit = limit;
+        self.initialize_free_blocks()
     }
 
-    #[allow(dead_code)]
+    /// Creates a buddy with initialized members
+    /// 
+    /// # Safety
+    /// This function is unsafe because the caller must guarantee that the given
+    /// buddy bounds are unused. This method must be called only once.
+    pub unsafe fn new(region: MemoryRegion, limit: u32) -> Self {
+        let mut new_buddy = Buddy::<MAX_ORDER>::empty(); 
+        new_buddy.init(region, limit);
+        new_buddy
+    }
+
+    // Initialize an empty vector of vectors for the free blocks vector
+    fn initialize_free_blocks(&mut self) {
+
+        for _ in 1..MAX_ORDER + 1 {
+            let inner_vec: Vec<u64, { 1 << MAX_ORDER }> = Vec::new();
+            self.free_blocks.push(inner_vec).unwrap();
+        }
+
+        self.free_blocks[0].push(0).unwrap();
+    }
+
     /// Return the biggest size of a block `Buddy` can allocate.
     fn block_max_size(&self) -> usize {
         // limit * 2 ^ (max order)
@@ -118,7 +144,29 @@ where
             })
         })
     }
+
+    pub fn deallocate() {
+
+    }
 }
+
+
+unsafe impl<const MAX_ORDER: usize> GlobalAlloc for Locked<Buddy<MAX_ORDER>> 
+where
+    [(); MAX_ORDER + 1]: Sized,
+    [(); 1 << MAX_ORDER]: Sized,
+{
+
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let mut allocator = self.lock();
+        allocator.allocate(layout.size(), layout.align()).unwrap().as_u64() as *mut u8
+    }
+
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
+        panic!("dealloc should be never called")
+    }
+}
+
 
 impl<const MAX_ORDER: usize> fmt::Display for Buddy<MAX_ORDER>
 where
@@ -134,3 +182,4 @@ where
         )
     }
 }
+

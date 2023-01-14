@@ -8,10 +8,10 @@ use x86_64::{
     PhysAddr,
 };
 
-/// A memory component which distributes physical frames of memory.
-/// It can distribute physical memory in chunks of 4Kib (frame).
-/// Or distribute a `FrameRange` of physical memory.
-/// This range size must be two's power and describe a continues memory.
+/// A memory component which distributes physical frames of memory.\
+/// It can distribute physical memory in chunks of 4Kib (frame).\
+/// Or distribute a `FrameRange` of physical memory.\
+/// This range size must power-of-two alignment and describe a continues memory.
 pub struct FrameDistributer {
     /// Bootloader static memory map
     memory_map: &'static MemoryMap,

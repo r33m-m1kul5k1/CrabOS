@@ -17,8 +17,8 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
 
     // region size is 2Kib meaning levels 0, 1 (MAX_ORDER = 1)
-    // a region with size nKib,  nKib = (1 << MAX_ORDER) the index of the set bit is the MAX_ORDER
-    let mut buddy = Buddy::<1>::new(distributer.get_region().unwrap(), 0x1000);
+   
+    let mut buddy = unsafe { Buddy::<1>::new(distributer.get_region().unwrap(), 0x1000)};
 
     log::info!("{}", buddy);
     log::info!("order of block under the limit is: {}", buddy.get_order(1).unwrap());

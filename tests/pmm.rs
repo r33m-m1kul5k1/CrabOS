@@ -7,7 +7,7 @@
 use bootloader::BootInfo;
 use core::panic::PanicInfo;
 use x86_64::structures::paging::FrameAllocator;
-use CrabOS::{hlt_loop, log, memory::{pmm::FrameDistributer, buddy::Buddy}, test_panic_handler};
+use CrabOS::{hlt_loop, log, memory::{pmm::FrameDistributer}, test_panic_handler};
 
 #[no_mangle]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
@@ -28,8 +28,6 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     //     assert_eq!(region.size.count_ones(), 1);
     // }
 
-    let buddy = Buddy::<4>::new(distributer.get_region().unwrap(), 4096);
-    log::info!("buddy: {}", buddy);
     test_main();
     hlt_loop();
 }

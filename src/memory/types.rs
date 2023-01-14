@@ -8,7 +8,7 @@ pub const INVALID_FRAME_RANGE: FrameRange = FrameRange {
     end_frame_number: 0,
 };
 
-/// A struct representing a physical memory region
+/// A struct representing a memory region (physical or virtual)
 #[derive(PartialEq, Eq, Debug)]
 pub struct MemoryRegion {
     /// The range of frames that belong to the region.
@@ -18,7 +18,17 @@ pub struct MemoryRegion {
 }
 
 impl MemoryRegion {
-    /// Create a new FrameDistributer from the passed bootloader's memory map.
+
+    pub const fn empty() -> Self {
+        MemoryRegion {
+            range: FrameRange {
+                start_frame_number: 0,
+                end_frame_number: 0,
+            },
+            size: 0,
+        }
+    }
+
     pub fn new(start_frame_address: u64, end_frame_address: u64) -> Self {
         let region_range = FrameRange::new(start_frame_address, end_frame_address);
 
@@ -83,12 +93,6 @@ impl MemoryRegion {
 
 impl core::default::Default for MemoryRegion {
     fn default() -> Self {
-        MemoryRegion {
-            range: FrameRange {
-                start_frame_number: 0,
-                end_frame_number: 0,
-            },
-            size: 0,
-        }
+        MemoryRegion::empty()
     }
 }

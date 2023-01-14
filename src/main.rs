@@ -8,13 +8,15 @@
 #![reexport_test_harness_main = "test_main"]
 
 use bootloader::{entry_point, BootInfo};
+use x86_64::VirtAddr;
 use core::{panic::PanicInfo};
 use CrabOS::{
     drivers::vga::{Color, WRITER},
     graphic_println, hlt_loop,
     interrupts::{gdt, idt},
     log::logger,
-    memory::pmm::FrameDistributer,
+    alloc::boxed::Box,
+    memory::{vmm, pmm::FrameDistributer, heap_management::init_heap},
 };
 
 entry_point!(kmain);
@@ -53,9 +55,15 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
 
     let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
     
-    frame_distributer.get_region();
+    logger::info!("---Virtual Memory Manager");
+    let mut mapper = unsafe {
+        vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
+    };
 
+    logger::info!("---Kernel's heap");
+    init_heap(&mut mapper, &mut frame_distributer);
     
+    let _ = Box::new(41);
     hlt_loop()
 }
 
