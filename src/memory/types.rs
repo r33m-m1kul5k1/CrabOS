@@ -9,7 +9,7 @@ pub const INVALID_FRAME_RANGE: FrameRange = FrameRange {
 };
 
 /// A struct representing a memory region (physical or virtual)
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct MemoryRegion {
     /// The range of frames that belong to the region.
     pub range: FrameRange,

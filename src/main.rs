@@ -15,7 +15,6 @@ use CrabOS::{
     graphic_println, hlt_loop,
     interrupts::{gdt, idt},
     log::logger,
-    alloc::boxed::Box,
     memory::{vmm, pmm::FrameDistributer, heap_management::init_heap},
 };
 
@@ -48,22 +47,24 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
 
     logger::info!("Starts the initialization sequence");
 
-    logger::info!("---Global Descriptor Table and the kernel's Segments");
+    logger::info!("Initializing the GDT");
     gdt::init();
-    logger::info!("---Interrupt Descriptor Table");
+    logger::info!("Initializing the IDT");
     idt::IDT.load();
 
     let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
     
-    logger::info!("---Virtual Memory Manager");
+    logger::info!("Initializing paging");
     let mut mapper = unsafe {
         vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
     };
 
-    logger::info!("---Kernel's heap");
-    init_heap(&mut mapper, &mut frame_distributer);
     
-    let _ = Box::new(41);
+    let _ =  [[0u64; 0x80_0000]; 23];
+
+    logger::info!("Initializing heap");
+    init_heap(&mut mapper, &mut frame_distributer).expect("heap initialization failed");
+
     hlt_loop()
 }
 
