@@ -32,7 +32,7 @@ fn handle_alloc_error(layout: Layout) -> ! {
 static ALLOCATOR: Locked<Dummy> = Locked::new(Dummy::empty());
 
 /// Create a virtual address space for the heap (must be above the already mapped physical memory)
-pub fn init_heap(
+pub fn init(
     mapper: &mut impl Mapper<Size4KiB>,
     frame_allocator: &mut impl FrameAllocator<Size4KiB>
 ) -> Result<(), MapToError<Size4KiB>> {

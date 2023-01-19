@@ -5,10 +5,18 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use CrabOS::{graphic_println, test_panic_handler, hlt_loop};
+use CrabOS::{
+    graphic_println,
+    drivers::vga::{WRITER, Color},
+    test_panic_handler,
+    hlt_loop, 
+};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    WRITER
+        .lock()
+        .set_writer_theme(Color::LightRed, Color::Black);
     test_main();
     hlt_loop();
 }

@@ -1,7 +1,9 @@
 //! this logger will help us debug / log our kernel 
 
-pub use log::{debug, error, info, trace, warn};
-use log::{Level, LevelFilter, Metadata, Record};
+pub use log::{debug, error, info, trace, warn, LevelFilter};
+use log::{Level, Metadata, Record};
+
+use crate::serial_println;
 
 static LOGGER: Logger = Logger;
 
@@ -14,7 +16,7 @@ impl log::Log for Logger {
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            println!("[{}] - {}", record.level(), record.args());
+            serial_println!("[{}] - {}", record.level(), record.args());
         }
     }
     fn flush(&self) {}

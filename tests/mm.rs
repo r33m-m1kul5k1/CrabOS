@@ -9,32 +9,33 @@
 use bootloader::{entry_point, bootinfo::BootInfo};
 use x86_64::VirtAddr;
 use core::panic::PanicInfo;
+
 use CrabOS::{
-    log::{LevelFilter, logger},
+    log::{self, LevelFilter, info},
     hlt_loop,
     test_panic_handler,
-    memory::{pmm::FrameDistributer, vmm, heap_management::init_heap},
+    memory::{frame_allocator::FrameDistributer, vmm, heap},
     interrupts::{gdt, idt},
 };
 
 entry_point!(main);
 fn main(boot_info: &'static BootInfo) -> ! {
     
-    logger::init(LevelFilter::Debug);
+    log::init(LevelFilter::Debug);
 
     gdt::init();
     idt::IDT.load();
     
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
-    log::info!("frame distributer initialized");
+    info!("frame distributer initialized");
    
     let mut mapper = unsafe {
         vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
     };
 
-    log::info!("mapper initialized");
-    init_heap(&mut mapper, &mut distributer).expect("heap initialization failed");
-    log::info!("heap initialized");
+    info!("mapper initialized");
+    heap::init(&mut mapper, &mut distributer).expect("heap initialization failed");
+    info!("heap initialized");
 
     test_main();
     hlt_loop()

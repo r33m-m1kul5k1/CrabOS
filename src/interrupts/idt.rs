@@ -24,3 +24,7 @@ lazy_static! {
         idt
     };
 }
+
+pub fn init() {
+    IDT.load();
+}

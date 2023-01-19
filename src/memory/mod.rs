@@ -1,4 +1,4 @@
-pub mod pmm;
+pub mod frame_allocator;
 pub mod vmm;
-pub mod heap_management;
+pub mod heap;
 pub mod types;

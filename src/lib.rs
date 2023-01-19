@@ -4,12 +4,11 @@
 #![cfg_attr(test, no_main)]
 #![feature(alloc_error_handler)]
 #![feature(custom_test_frameworks)]
-#![feature(generic_const_exprs)]
 #![test_runner(test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
-#![allow(nonstandard_style)]
-#![allow(incomplete_features)]
+#![allow(non_snake_case)]
+
 
 pub extern crate alloc;
 use core::panic::PanicInfo;
@@ -52,15 +51,15 @@ where
     T: Fn(),
 {
     fn run(&self) {
-        print!("{}...\t", core::any::type_name::<T>());
+        serial_print!("{}...\n", core::any::type_name::<T>());
         self();
-        println!("[ok]");
+        serial_println!("[ok]");
     }
 }
 
 /// Run the array of #[test_case] functions, and implement for them the `Testable` trait
 pub fn test_runner(tests: &[&dyn Testable]) {
-    println!("Running {} tests", tests.len());
+    serial_println!("Running {} tests", tests.len());
 
     for test in tests {
         test.run();
@@ -70,16 +69,16 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
 /// Panic handler for integration testing
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    println!("[failed]\n");
-    println!("Error: {}\n", info);
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     hlt_loop();
 }
 
 /// Panic handler that expects to be called
 pub fn test_should_panic_handler(info: &PanicInfo) -> ! {
-    println!("[Success]\n");
-    println!("Panic info: {}\n", info);
+    serial_println!("[Success]\n");
+    serial_println!("Panic info: {}\n", info);
     exit_qemu(QemuExitCode::Success);
     hlt_loop();
 }

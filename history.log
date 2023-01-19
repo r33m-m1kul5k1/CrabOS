@@ -1,2 +1,19 @@
 Running 1 tests
-vga::basic_print...	[ok]
+interrupts::check_reserved_stack...
+[DEBUG] - EXCEPTION: Double Fault
+[DEBUG] - Error code: 0x0
+[DEBUG] - Stack Frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x2045e1,
+    ),
+    code_segment: 0x18,
+    cpu_flags: 0x2,
+    stack_pointer: VirtAddr(
+        0x10000002000,
+    ),
+    stack_segment: 0x0,
+}
+[Success]
+
+Panic info: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
+
