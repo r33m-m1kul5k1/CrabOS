@@ -39,7 +39,6 @@ pub fn init_heap(
 
     mmap(VirtAddr::new(HEAP_BOTTOM), HEAP_SIZE, mapper, frame_allocator)?;
     
-
     Ok(())
 }
 

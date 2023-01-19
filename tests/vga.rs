@@ -13,12 +13,13 @@ pub extern "C" fn _start() -> ! {
     hlt_loop();
 }
 
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
-}
 
 #[test_case]
 fn basic_print() {
     graphic_println!(r"(\/) (°,,,,°) (\/)");
+}
+
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    test_panic_handler(info)
 }
