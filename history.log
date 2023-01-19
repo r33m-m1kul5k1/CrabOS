@@ -1,19 +1,6 @@
-Running 1 tests
-interrupts::check_reserved_stack...
-[DEBUG] - EXCEPTION: Double Fault
-[DEBUG] - Error code: 0x0
-[DEBUG] - Stack Frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x2045f1,
-    ),
-    code_segment: 0x18,
-    cpu_flags: 0x2,
-    stack_pointer: VirtAddr(
-        0x10000002000,
-    ),
-    stack_segment: 0x0,
-}
-[Success]
-
-Panic info: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
-
+[INFO] - Starts the initialization sequence
+[INFO] - GDT initialized
+[INFO] - IDT initialized
+[DEBUG] - The physical offset is: VirtAddr(0x18000000000)
+[INFO] - Paging initialized
+[INFO] - Heap initialized

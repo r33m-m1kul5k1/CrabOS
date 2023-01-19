@@ -2,12 +2,14 @@
 //! Moreover this library implements basic functionalities for testing
 #![no_std]
 #![no_main]
+#![allow(non_snake_case)]
+
 #![feature(alloc_error_handler)]
+#![feature(abi_x86_interrupt)]
+
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
-#![feature(abi_x86_interrupt)]
-#![allow(non_snake_case)]
 
 
 pub extern crate alloc;
@@ -23,3 +25,17 @@ pub mod tests;
 
 pub use core::panic::PanicInfo;
 pub use panic::{hlt_loop, test_panic_handler, test_should_panic_handler};
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+
+    #[cfg(test)]
+    test_main();
+    hlt_loop()
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    panic::test_panic_handler(info)
+}
