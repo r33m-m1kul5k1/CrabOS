@@ -4,7 +4,7 @@ interrupts::check_reserved_stack...
 [DEBUG] - Error code: 0x0
 [DEBUG] - Stack Frame: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x2045e1,
+        0x2045f1,
     ),
     code_segment: 0x18,
     cpu_flags: 0x2,

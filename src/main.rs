@@ -1,25 +1,21 @@
 #![no_std]
 #![no_main]
+#![feature(alloc_error_handler)]
 #![allow(non_snake_case)]
-#![feature(custom_test_frameworks)]
-#![test_runner(CrabOS::test_runner)]
-#![reexport_test_harness_main = "test_main"]
 
 use bootloader::{entry_point, BootInfo};
 use x86_64::VirtAddr;
-use core::{panic::PanicInfo};
 use CrabOS::{
-    hlt_loop,
     log::{self, info, LevelFilter},
     interrupts::{gdt, idt},
     memory::{vmm, frame_allocator::FrameDistributer, heap},
+    panic::{kernel_panic, PanicInfo},
+    hlt_loop,
 };
 
 entry_point!(kmain);
 
-pub fn kmain(boot_info: &'static BootInfo) -> ! {
-    #[cfg(test)]
-    test_main();
+fn kmain(boot_info: &'static BootInfo) -> ! {
 
     log::init(LevelFilter::Debug);
 
@@ -45,14 +41,8 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     hlt_loop()
 }
 
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    hlt_loop()
-}
 
-#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    CrabOS::test_panic_handler(info)
+    kernel_panic(info)
 }

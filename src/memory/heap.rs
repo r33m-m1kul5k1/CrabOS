@@ -1,7 +1,7 @@
 
 use core::{alloc::GlobalAlloc, ptr::null_mut};
 
-use crate::{exit_qemu, hlt_loop, QemuExitCode};
+use crate::panic::{exit_qemu, hlt_loop, QemuExitCode};
 use alloc::alloc::Layout;
 use x86_64::{structures::paging::{Mapper, Size4KiB, FrameAllocator, mapper::MapToError}, VirtAddr};
 use super::vmm::mmap;
