@@ -22,16 +22,10 @@ impl log::Log for Logger {
     fn flush(&self) {}
 }
 
-/// initiate a logger static object
+/// Initiate a logger static object
+/// 
 /// # Arguments
 ///  - `filter` the max level of our logger
-///
-/// ## Filter Levels
-/// 1. Error
-/// 2. Warn
-/// 3. Info
-/// 4. Debug
-/// 5. Trace
 pub fn init(filter: LevelFilter) {
     log::set_logger(&LOGGER).unwrap();
     log::set_max_level(filter);

@@ -1,3 +1,4 @@
+//! The drivers module goal is to manage IO (keyboard & screen)
 
 #[macro_export]
 macro_rules! graphic_print {

@@ -1,5 +1,4 @@
 //! This library goal is to expose the OS api to the test directory for integration tests
-//! Moreover this library implements basic functionalities for testing
 #![no_std]
 #![no_main]
 #![allow(non_snake_case)]
