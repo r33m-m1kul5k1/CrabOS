@@ -1,4 +1,4 @@
-//! This modules defines the physical memory managers (frame distributer & buddy)
+//! This modules defines the internal page frame allocation.
 
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
@@ -8,7 +8,7 @@ use x86_64::{
     PhysAddr,
 };
 
-/// A memory component which distributes physical frames of memory.\
+/// A memory component which distributes page frames to the OS page frame allocators.\
 /// It can distribute physical memory in chunks of 4Kib (frame).\
 /// Or distribute a `FrameRange` of physical memory.\
 /// This range size must power-of-two alignment and describe a continues memory.

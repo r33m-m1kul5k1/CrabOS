@@ -14,7 +14,7 @@ use CrabOS::{
     log::{self, LevelFilter, info},
     hlt_loop,
     test_panic_handler,
-    memory::{frame_allocator::FrameDistributer, vmm, heap},
+    memory::{frame_allocator::FrameDistributer, paging, heap},
     interrupts::{gdt, idt},
 };
 
@@ -30,7 +30,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     info!("frame distributer initialized");
    
     let mut mapper = unsafe {
-        vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
+        paging::init(VirtAddr::new(boot_info.physical_memory_offset))
     };
 
     info!("mapper initialized");

@@ -15,7 +15,7 @@ use CrabOS::panic::kernel_panic;
 use CrabOS::{
     log::{self, info, LevelFilter},
     interrupts::{gdt, idt},
-    memory::{vmm, frame_allocator::FrameDistributer, heap},
+    memory::{paging, frame_allocator::FrameDistributer, heap},
     panic::PanicInfo,
     hlt_loop,
 };
@@ -37,7 +37,7 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     info!("IDT initialized");
  
     let mut mapper = unsafe {
-        vmm::init(VirtAddr::new(boot_info.physical_memory_offset))
+        paging::init(VirtAddr::new(boot_info.physical_memory_offset))
     };
     info!("Paging initialized");
     
