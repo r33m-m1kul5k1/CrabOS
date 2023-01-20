@@ -4,8 +4,10 @@
 #![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
 
 
+use alloc::{boxed::Box, vec::Vec};
 use bootloader::{entry_point, bootinfo::BootInfo};
 use x86_64::VirtAddr;
 use core::panic::PanicInfo;
@@ -43,7 +45,20 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
 #[test_case]
 fn basic_allocation() {
-    //let _ = Box::new(41);
+    let _ = Box::new(41);
+}
+
+#[test_case]
+fn big_allocation() {
+    let mut vec  = Vec::<i32>::new();
+
+    for i in 0..100 {
+        vec.push(i);
+    }
+
+    info!("{:?}", vec);
+
+    
 }
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {

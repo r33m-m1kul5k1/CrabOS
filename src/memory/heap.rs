@@ -1,11 +1,9 @@
 //! Defines a heap algorithm and initiate the heap virutal memory.
-use core::{alloc::GlobalAlloc, ptr::null_mut};
-
 use crate::panic::{exit_qemu, hlt_loop, QemuExitCode};
 use alloc::alloc::Layout;
 use x86_64::{structures::paging::{Mapper, Size4KiB, FrameAllocator, mapper::MapToError}, VirtAddr};
 use super::paging::mmap;
-use spin;
+use linked_list_allocator::LockedHeap;
 
 // Note that the heap must start at a page that is not already mapped.
 const HEAP_BOTTOM: u64 = 0x_4444_4444_0000;
@@ -29,7 +27,7 @@ fn handle_alloc_error(layout: Layout) -> ! {
 }
 
 #[global_allocator]
-static ALLOCATOR: Locked<Dummy> = Locked::new(Dummy::empty());
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 /// Create a virtual address space for the heap (must be above the already mapped physical memory)
 pub fn init(
@@ -39,45 +37,10 @@ pub fn init(
 
     mmap(VirtAddr::new(HEAP_BOTTOM), HEAP_SIZE, mapper, frame_allocator)?;
     
+    unsafe {
+        ALLOCATOR.lock().init(HEAP_BOTTOM as usize, HEAP_SIZE);
+    }
+
     Ok(())
 }
-
-pub struct Dummy {
-}
-
-impl Dummy {
-    pub const fn empty() -> Self {
-        Dummy {
-        }
-    }
-}
-
-unsafe impl GlobalAlloc for Locked<Dummy> {
-    unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
-        null_mut()
-    }
-
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
-        panic!("dealloc should be never called")
-    }
-}
-
-
-/// A wrapper around spin::Mutex.
-pub struct Locked<A> {
-    inner: spin::Mutex<A>,
-}
-
-impl<A> Locked<A> {
-    pub const fn new(inner: A) -> Self {
-        Locked {
-            inner: spin::Mutex::new(inner),
-        }
-    }
-
-    pub fn lock(&self) -> spin::MutexGuard<A> {
-        self.inner.lock()
-    }
-}
-
 
