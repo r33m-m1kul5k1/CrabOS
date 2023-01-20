@@ -15,7 +15,7 @@ use CrabOS::panic::kernel_panic;
 use CrabOS::{
     log::{self, info, LevelFilter},
     interrupts::{gdt, idt},
-    memory::{paging, frame_allocator::FrameDistributer, heap},
+    memory::{paging, frame_distributer::FrameDistributer, heap},
     panic::PanicInfo,
     hlt_loop,
 };
