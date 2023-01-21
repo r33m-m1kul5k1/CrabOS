@@ -44,9 +44,13 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut page_frame_allocator = unsafe { Buddy::new(memory_region)};
     info!("page frame allocator initialized");
 
-    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
-    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
-    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
+    let process1_address_space_base = page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE).unwrap();
+    let process2_address_space_base = page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE).unwrap();
+    info!("{:?} allocated", process1_address_space_base);
+    info!("{:?} allocated", process2_address_space_base);
+    
+    page_frame_allocator.deallocate(process1_address_space_base, 0x20000 / 2, PAGE_SIZE);
+    page_frame_allocator.deallocate(process2_address_space_base, 0x20000 / 2, PAGE_SIZE);
     
     test_main();
     hlt_loop()

@@ -7,10 +7,12 @@
 [INFO] - page frame allocator initialized
 [DEBUG] - splits level 0
 [DEBUG] - block's index: 0
-[INFO] - Some(PhysAddr(0xaff000)) allocated
 [DEBUG] - block's index: 1
-[INFO] - Some(PhysAddr(0xb0f000)) allocated
-[INFO] - None allocated
+[INFO] - PhysAddr(0xaff000) allocated
+[INFO] - PhysAddr(0xb0f000) allocated
+[DEBUG] - free_blocks: [[], [0], [], [], []]
+[DEBUG] - free_blocks: [[], [0, 1], [], [], []]
+[DEBUG] - free_blocks: [[0], [], [], [], []]
 Running 2 tests
 memory::basic_allocation...
 [ok]
