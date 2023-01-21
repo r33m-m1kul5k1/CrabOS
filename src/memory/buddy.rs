@@ -1,6 +1,5 @@
 //! Page frame allocation allgorithm at O(log(n))
 
-#![allow(unused)]
 use core::cmp;
 
 use super::types::MemoryRegion;
@@ -84,12 +83,13 @@ impl Buddy {
     /// This func deals with the case of splitting a block from a given order and returning the new block index.
     /// Reaching the maximum order, there is no option to split the memory; this allocation is aborted.
     fn split_level(&mut self, order: usize) -> Option<u64> {
+
         if order == 0 {
             None
         } else {
             
             self.get_free_block(order - 1).map(|block| {
-
+                
                 debug!("splits level {}", order - 1);
                 // first, we get a block from 1 level above us and split it.
                 // second, we push the second of the splitted blocks to the current free list
@@ -106,8 +106,7 @@ impl Buddy {
         let buddy_block = block ^ 1;
 
         // don't merge if the block's buddy is used or the block is the parent block (0)
-        if (!self.free_blocks[order].contains(&buddy_block))
-        {
+        if !self.free_blocks[order].contains(&buddy_block) {
             return;
         }
 
@@ -130,6 +129,7 @@ impl Buddy {
                 // to get the offset of the memory that was allocated
                 // we multiply the block's size by it's index.
                 debug!("block's index: {}", block);
+                debug!("free blocks: {:?}", self.free_blocks);
                 // index * order size
                 let offset = block as u64 * (self.block_max_size() >> request_order as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
