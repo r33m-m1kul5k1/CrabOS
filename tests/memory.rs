@@ -44,10 +44,10 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut page_frame_allocator = unsafe { Buddy::new(memory_region)};
     info!("page frame allocator initialized");
 
-    let page_frame = page_frame_allocator.allocate(4 * PAGE_SIZE, PAGE_SIZE).unwrap();
-
-    info!("{:?} allocated", page_frame);
-
+    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
+    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
+    info!("{:?} allocated", page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE));
+    
     test_main();
     hlt_loop()
 }
