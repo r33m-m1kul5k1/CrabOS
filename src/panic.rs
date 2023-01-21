@@ -1,5 +1,5 @@
-pub use core::panic::PanicInfo;
 use crate::serial_println;
+pub use core::panic::PanicInfo;
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {

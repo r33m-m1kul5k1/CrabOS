@@ -6,18 +6,16 @@
 
 use core::panic::PanicInfo;
 use CrabOS::{
-    log::{self, LevelFilter},
+    hlt_loop,
     interrupts::{gdt, idt},
-    test_should_panic_handler, hlt_loop,
+    log::{self, LevelFilter},
+    test_should_panic_handler,
 };
-
-
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-
     log::init(LevelFilter::Debug);
-    
+
     gdt::init();
     idt::IDT.load();
 

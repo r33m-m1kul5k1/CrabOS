@@ -33,8 +33,6 @@ impl FrameDistributer {
 
     /// Gets the next unused `FrameRange` see `FrameDistributer` documentation.
     pub fn get_region(&mut self) -> Option<MemoryRegion> {
-        
-        
         let unused_regions = self
             .memory_map
             .iter()
@@ -44,7 +42,6 @@ impl FrameDistributer {
             .map(|r| r.range.start_addr()..r.range.end_addr())
             .map(|r| r.step_by(FRAME_SIZE as usize));
 
-        
         log::trace!("The machine free regions are: ");
         for mut region in unused_regions.clone() {
             log::trace!(
@@ -66,13 +63,14 @@ impl FrameDistributer {
             region.get_subregions()
         });
 
-        // filter the invalid FrameRanges. 
+        // filter the invalid FrameRanges.
         let region = unused_regions
             .flat_map(|region| region)
             .filter(|region| {
                 !region.is_empty() // is default
             })
-            .nth(self.current_region).unwrap();
+            .nth(self.current_region)
+            .unwrap();
 
         self.current_region += 1;
 
@@ -92,7 +90,7 @@ impl FrameDistributer {
             .map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
     }
 
-    /// Returns the next free frame address 
+    /// Returns the next free frame address
     fn next_frame_number(&self) -> u64 {
         self.unused_frames()
             .nth(self.current_frame)
@@ -101,7 +99,6 @@ impl FrameDistributer {
             .as_u64()
     }
 }
-
 
 unsafe impl FrameAllocator<Size4KiB> for FrameDistributer {
     fn allocate_frame(&mut self) -> Option<PhysFrame<Size4KiB>> {

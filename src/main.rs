@@ -1,11 +1,9 @@
 #![no_std]
 #![no_main]
 #![allow(non_snake_case)]
-
 #![feature(custom_test_frameworks)]
 #![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
-
 
 use bootloader::{entry_point, BootInfo};
 use x86_64::VirtAddr;
@@ -13,17 +11,16 @@ use x86_64::VirtAddr;
 use CrabOS::panic::kernel_panic;
 
 use CrabOS::{
-    log::{self, info, LevelFilter},
-    interrupts::{gdt, idt},
-    memory::{paging, frame_distributer::FrameDistributer, heap},
-    panic::PanicInfo,
     hlt_loop,
+    interrupts::{gdt, idt},
+    log::{self, info, LevelFilter},
+    memory::{frame_distributer::FrameDistributer, heap, paging},
+    panic::PanicInfo,
 };
 
 entry_point!(kmain);
 
 fn kmain(boot_info: &'static BootInfo) -> ! {
-
     #[cfg(test)]
     test_main();
 
@@ -35,13 +32,10 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
 
     idt::init();
     info!("IDT initialized");
- 
-    let mut mapper = unsafe {
-        paging::init(VirtAddr::new(boot_info.physical_memory_offset))
-    };
+
+    let mut mapper = unsafe { paging::init(VirtAddr::new(boot_info.physical_memory_offset)) };
     info!("Paging initialized");
-    
-    
+
     let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
 
     heap::init(&mut mapper, &mut frame_distributer).expect("heap initialization failed");

@@ -18,7 +18,6 @@ pub struct MemoryRegion {
 }
 
 impl MemoryRegion {
-
     pub const fn empty() -> Self {
         MemoryRegion {
             range: FrameRange {
@@ -43,12 +42,10 @@ impl MemoryRegion {
             *self = MemoryRegion::default();
         }
 
-        if self.range.start_addr() < start_address && start_address < self.range.end_addr()
-        {
+        if self.range.start_addr() < start_address && start_address < self.range.end_addr() {
             self.range = FrameRange::new(start_address, self.range.end_addr());
             self.size = (self.range.end_frame_number - self.range.start_frame_number) as usize;
         }
-
     }
 
     /// Given a region start and a region size, return a list of regions in the following format: 2^x
@@ -80,7 +77,6 @@ impl MemoryRegion {
             offset_frame_number = subregions[i].end_frame_number;
         }
 
-
         log::trace!(
             "subregions of region {:?} are: {:?}",
             self.range,
@@ -88,6 +84,10 @@ impl MemoryRegion {
         );
 
         subregions
+    }
+
+    pub fn get_region_byte_size(&self) -> u32 {
+        self.size as u32 * 0x1000u32
     }
 }
 
