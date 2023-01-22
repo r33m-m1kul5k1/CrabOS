@@ -3,7 +3,7 @@
 //! 2. virutal memory mapping with mmap
 //! 3. enables dynamic object use
 
-pub mod buddy;
+pub mod buddy_system;
 pub mod frame_distributer;
 pub mod heap;
 pub mod paging;

@@ -2,7 +2,7 @@
 
 use core::cmp;
 
-use super::types::MemoryRegion;
+use super::super::types::MemoryRegion;
 use alloc::vec::Vec;
 use log::debug;
 use x86_64::PhysAddr;

@@ -17,7 +17,7 @@ use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging, buddy::Buddy},
+    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::buddy::Buddy},
     test_panic_handler,
 };
 
