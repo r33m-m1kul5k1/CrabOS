@@ -1,5 +1,6 @@
 //! This module defines types for memory components
 use bootloader::bootinfo::FrameRange;
+use x86_64::PhysAddr;
 
 pub const FRAME_SIZE: u64 = 4096;
 pub const INTEGER_SIZE: usize = 64;
@@ -88,6 +89,10 @@ impl MemoryRegion {
 
     pub fn get_region_byte_size(&self) -> u32 {
         self.size as u32 * 0x1000u32
+    }
+
+    pub fn contains(&self, addr: PhysAddr) -> bool {
+           return self.range.start_addr() <= addr.as_u64() && addr.as_u64() <= self.range.end_addr();
     }
 }
 

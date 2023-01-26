@@ -11,7 +11,7 @@ const BUDDY_LIMIT: u32 = 0x1000;
 
 pub struct Buddy {
     /// The physical region that buddy manages
-    region: MemoryRegion,
+    pub region: MemoryRegion,
     /// The maximum power of two that buddy can manage
     max_order: u32,
     /// A vector of vectors describing the physical address space in different block sizes
@@ -45,6 +45,7 @@ impl Buddy {
             },
         }
     }
+
 
     /// Return the biggest size of a block `Buddy` can allocate.
     fn block_max_size(&self) -> usize {
