@@ -37,7 +37,7 @@ impl Buddy {
             max_order,
             free_blocks: {
                 let mut temp: Vec<Vec<u64>> = Vec::new();
-                for _ in 0..max_order {
+                for _ in 0..=max_order {
                     temp.push(Vec::<u64>::new());
                 }
                 temp[0].push(0);
@@ -148,6 +148,7 @@ impl Buddy {
     pub fn deallocate(&mut self, address: PhysAddr, size: usize, alignment: usize) {
         let size = cmp::max(size, alignment);
         
+        debug!("deallocation size: 0x{:x}", size);
         let order = self.get_order(size).unwrap();
         let block = (address - self.region.range.start_addr()).as_u64() / size as u64;
 

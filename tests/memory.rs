@@ -17,7 +17,7 @@ use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::buddy::Buddy},
+    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::manager::BuddyManager},
     test_panic_handler,
 };
 
@@ -36,14 +36,8 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
     heap::init(&mut mapper, &mut distributer).expect("heap initialization failed");
     info!("heap initialized");
-    let _ = distributer.get_region().unwrap();
-    let _ = distributer.get_region().unwrap();
-    let memory_region = distributer.get_region().unwrap();
-
-    info!("buddy's memory region : {:?}", memory_region);
-    let mut page_frame_allocator = unsafe { Buddy::new(memory_region)};
-    info!("page frame allocator initialized");
-
+   
+    let mut page_frame_allocator = BuddyManager::new(&mut distributer); 
     let process1_address_space_base = page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE).unwrap();
     let process2_address_space_base = page_frame_allocator.allocate(0x20000 / 2, PAGE_SIZE).unwrap();
     info!("{:?} allocated", process1_address_space_base);

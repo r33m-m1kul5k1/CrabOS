@@ -69,8 +69,7 @@ impl FrameDistributer {
             .filter(|region| {
                 !region.is_empty() // is default
             })
-            .nth(self.current_region)
-            .unwrap();
+            .nth(self.current_region)?;
 
         self.current_region += 1;
 
