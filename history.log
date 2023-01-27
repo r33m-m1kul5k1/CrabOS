@@ -2,7 +2,6 @@
 [DEBUG] - The physical offset is: VirtAddr(0x18000000000)
 [INFO] - mapper initialized
 [INFO] - heap initialized
-[DEBUG] - max_order: 0
 [DEBUG] - max_order: 1
 [DEBUG] - max_order: 5
 [DEBUG] - max_order: 6

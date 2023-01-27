@@ -1,7 +1,7 @@
 #![allow(unused)]
 use alloc::vec::Vec;
 use log::debug;
-use x86_64::{PhysAddr, structures::paging::frame};
+use x86_64::{PhysAddr, structures::paging::frame, registers::debug};
 use crate::memory::frame_distributer::FrameDistributer;
 
 use super::buddy::Buddy;
@@ -40,11 +40,14 @@ impl BuddyManager {
     /// Deallocates a physical block of memory with the appropriate buddy 
     pub fn deallocate(&mut self, address: PhysAddr, size: usize, alignment: usize) {
         
-        for buddy in self.buddies.iter_mut() {
-            if buddy.region.contains(address) {
+        if let Some(buddy) = self.buddies
+            .iter_mut()
+            .find(|buddy| buddy.region.contains(address)) {
                 debug!("region: {:?}\naddr: {:?}", buddy.region, address);
                 buddy.deallocate(address, size, alignment);
-            }
+        }
+        else {
+            debug!("No buddy manages this memory :(");
         }
     }
 }
