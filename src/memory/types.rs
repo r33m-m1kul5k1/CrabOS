@@ -92,7 +92,8 @@ impl MemoryRegion {
     }
 
     pub fn contains(&self, addr: PhysAddr) -> bool {
-           return self.range.start_addr() <= addr.as_u64() && addr.as_u64() <= self.range.end_addr();
+        // exclude the final page frame
+        return self.range.start_addr() <= addr.as_u64() && addr.as_u64() <= self.range.end_addr() - 0x1000;
     }
 }
 
