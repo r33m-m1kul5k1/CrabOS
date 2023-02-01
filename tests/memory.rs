@@ -28,6 +28,8 @@ fn main(boot_info: &'static BootInfo) -> ! {
     gdt::init();
     idt::init();
 
+    info!("Memory map: {:#?}", boot_info.memory_map);
+    
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 

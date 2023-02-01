@@ -1,8 +1,71 @@
+[INFO] - Memory map: [
+    MemoryRegion {
+        range: FrameRange(0x0..0x1000),
+        region_type: FrameZero,
+    },
+    MemoryRegion {
+        range: FrameRange(0x1000..0x5000),
+        region_type: PageTable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x5000..0x16000),
+        region_type: Bootloader,
+    },
+    MemoryRegion {
+        range: FrameRange(0x16000..0x17000),
+        region_type: BootInfo,
+    },
+    MemoryRegion {
+        range: FrameRange(0x17000..0x9f000),
+        region_type: KernelStack,
+    },
+    MemoryRegion {
+        range: FrameRange(0x9f000..0xa0000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0xf0000..0x100000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0x100000..0x278000),
+        region_type: KernelStack,
+    },
+    MemoryRegion {
+        range: FrameRange(0x278000..0x400000),
+        region_type: Usable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x400000..0x470000),
+        region_type: Kernel,
+    },
+    MemoryRegion {
+        range: FrameRange(0x470000..0xbffe0000),
+        region_type: Usable,
+    },
+    MemoryRegion {
+        range: FrameRange(0xbffe0000..0xc0000000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0xfffc0000..0x100000000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0x100000000..0x10000f000),
+        region_type: PageTable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x10000f000..0x140000000),
+        region_type: Usable,
+    },
+]
 [INFO] - frame distributer initialized
 [DEBUG] - The physical offset is: VirtAddr(0x18000000000)
 [INFO] - mapper initialized
 [INFO] - heap initialized
-[DEBUG] - max_order: 1
+[DEBUG] - max_order: 0
+[DEBUG] - max_order: 4
 [DEBUG] - max_order: 5
 [DEBUG] - max_order: 6
 [DEBUG] - max_order: 7
@@ -13,22 +76,36 @@
 [DEBUG] - max_order: 15
 [DEBUG] - max_order: 16
 [DEBUG] - max_order: 17
-[DEBUG] - max_order: 18
+[DEBUG] - max_order: 19
+[DEBUG] - max_order: 4
+[DEBUG] - max_order: 5
+[DEBUG] - max_order: 6
+[DEBUG] - max_order: 7
+[DEBUG] - max_order: 8
+[DEBUG] - max_order: 9
+[DEBUG] - max_order: 10
+[DEBUG] - max_order: 11
+[DEBUG] - max_order: 12
+[DEBUG] - max_order: 13
+[DEBUG] - max_order: 14
+[DEBUG] - max_order: 15
+[DEBUG] - max_order: 16
+[DEBUG] - max_order: 17
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [], [], [], []]
 [DEBUG] - splits level 0
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[], [1], [], [], [], []]
-[DEBUG] - block's index: 1
-[DEBUG] - free blocks: [[], [], [], [], [], []]
+[INFO] - PhysAddr(0xaef000) allocated
 [INFO] - PhysAddr(0xaff000) allocated
-[INFO] - PhysAddr(0xb0f000) allocated
+[DEBUG] - region: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
+addr: PhysAddr(0xaef000)
+[DEBUG] - deallocation size: 0x10000
+[DEBUG] - free_blocks: [[0], [], [], [], []]
 [DEBUG] - region: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 addr: PhysAddr(0xaff000)
 [DEBUG] - deallocation size: 0x10000
-[DEBUG] - free_blocks: [[], [0], [], [], [], []]
-[DEBUG] - region: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
-addr: PhysAddr(0xb0f000)
-[DEBUG] - deallocation size: 0x10000
-[DEBUG] - free_blocks: [[], [0, 1], [], [], [], []]
+[DEBUG] - free_blocks: [[], [1, 0], [], [], [], []]
 [DEBUG] - free_blocks: [[0], [], [], [], [], []]
 Running 2 tests
 memory::basic_allocation...
