@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 volatile = "0.2.6"
-bootloader = { version = "0.9.23", features = ["map_physical_memory"]}
+bootloader = { version = "0.9.23", features = ["map_physical_memory"], physical-memory-offset = "0x0"}
 uart_16550 = "0.2.0"
 linked_list_allocator = "0.9"
 spin = "0.9.4"
@@ -31,7 +31,7 @@ run-command = [
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
     "-display", "none",
-    "-m", "2G",
+    "-m", "4G",
     #"-s", "-S"
 ]
 test-success-exit-code = 33 # must be different from the default exit status

@@ -9,7 +9,7 @@ use x86_64::{
 };
 
 // Note that the heap must start at a page that is not already mapped.
-const HEAP_BOTTOM: u64 = 0x_4444_4444_0000;
+const HEAP_BOTTOM: u64 = 0x10000f000;
 
 /// Heap size in bytes.
 ///
