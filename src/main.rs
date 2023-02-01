@@ -5,6 +5,8 @@
 #![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
 
+#![allow(unused)]
+
 use bootloader::{entry_point, BootInfo};
 use x86_64::VirtAddr;
 #[allow(unused_imports)]
@@ -32,14 +34,6 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
 
     idt::init();
     info!("IDT initialized");
-
-    let mut mapper = unsafe { paging::init(VirtAddr::new(boot_info.physical_memory_offset)) };
-    info!("Paging initialized");
-
-    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
-
-    heap::init(&mut mapper, &mut frame_distributer).expect("heap initialization failed");
-    info!("Heap initialized");
 
     hlt_loop()
 }

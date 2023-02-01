@@ -1,9 +1,43 @@
-use alloc::boxed::Box;
-use core::fmt::Display;
+//! This module controls a 4 level table structure.
+use x86_64::{
+    structures::paging::{
+        mapper::MapToError, FrameAllocator, Mapper, Page,
+        PageTableFlags, Size4KiB,
+    },
+    VirtAddr,
+};
 
-const VIRT_OFFSET: u64 = 0xC0000000;
-pub const FRAME_SIZE: u64 = 0x1000;
-type EmptyFrame = [u8; FRAME_SIZE as usize];
+/// Creates a new mapping in the virtual address space of the calling process.
+///
+/// # Arguments
+///
+/// * `addr` - starting virtual address
+/// * `length` - the new mapping's size in bytes
+/// * `mapper` - maps pages to page frames.
+/// * `frame_allocator` - allocate a frame from the physical address space
+pub fn mmap(
+    addr: VirtAddr,
+    length: usize,
+    mapper: &mut impl Mapper<Size4KiB>,
+    frame_allocator: &mut impl FrameAllocator<Size4KiB>,
+) -> Result<(), MapToError<Size4KiB>> {
+    let page_range = Page::range_inclusive(
+        Page::containing_address(addr),
+        Page::containing_address(addr + length - 1u64),
+    );
+
+    for page in page_range {
+        let frame = frame_allocator
+            .allocate_frame()
+            .ok_or(MapToError::FrameAllocationFailed)?;
+
+        let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
+        unsafe { mapper.map_to(page, frame, flags, frame_allocator)?.flush() };
+    }
+
+    Ok(())
+}
+
 
 // page table entry struct
 #[repr(C)]

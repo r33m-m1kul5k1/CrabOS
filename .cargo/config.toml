@@ -8,3 +8,6 @@ build-std = ["core", "compiler_builtins", "alloc"]
 
 [target.'cfg(target_os = "none")']
 runner = "bootimage runner"
+
+[dependencies.bootloader]
+physical-memory-offset = "0x0"

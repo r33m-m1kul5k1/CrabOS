@@ -1,3 +1,4 @@
+# Manifest file
 [package]
 name = "CrabOS"
 version = "0.1.0"
@@ -7,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 volatile = "0.2.6"
-bootloader = { version = "0.9.23", features = ["map_physical_memory"], physical-memory-offset = "0x0"}
+bootloader = { version = "0.9.23", features = ["map_physical_memory"]}
 uart_16550 = "0.2.0"
 linked_list_allocator = "0.9"
 spin = "0.9.4"
