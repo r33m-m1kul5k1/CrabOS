@@ -1,3 +1,67 @@
-[INFO] - Starts the initialization sequence
-[INFO] - GDT initialized
-[INFO] - IDT initialized
+[INFO] - Memory map: [
+    MemoryRegion {
+        range: FrameRange(0x0..0x1000),
+        region_type: FrameZero,
+    },
+    MemoryRegion {
+        range: FrameRange(0x1000..0x5000),
+        region_type: PageTable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x5000..0x16000),
+        region_type: Bootloader,
+    },
+    MemoryRegion {
+        range: FrameRange(0x16000..0x17000),
+        region_type: BootInfo,
+    },
+    MemoryRegion {
+        range: FrameRange(0x17000..0x9f000),
+        region_type: KernelStack,
+    },
+    MemoryRegion {
+        range: FrameRange(0x9f000..0xa0000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0xf0000..0x100000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0x100000..0x278000),
+        region_type: KernelStack,
+    },
+    MemoryRegion {
+        range: FrameRange(0x278000..0x400000),
+        region_type: Usable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x400000..0x440000),
+        region_type: Kernel,
+    },
+    MemoryRegion {
+        range: FrameRange(0x440000..0xbffe0000),
+        region_type: Usable,
+    },
+    MemoryRegion {
+        range: FrameRange(0xbffe0000..0xc0000000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0xfffc0000..0x100000000),
+        region_type: Reserved,
+    },
+    MemoryRegion {
+        range: FrameRange(0x100000000..0x10000f000),
+        region_type: PageTable,
+    },
+    MemoryRegion {
+        range: FrameRange(0x10000f000..0x140000000),
+        region_type: Usable,
+    },
+]
+[INFO] - frame distributer initialized
+Running 1 tests
+memory::load_cr3_and_flush_tlb...
+[INFO] - loading cr3 successfully
+[ok]

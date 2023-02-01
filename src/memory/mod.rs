@@ -7,4 +7,5 @@ pub mod buddy_system;
 pub mod frame_distributer;
 pub mod heap;
 pub mod paging;
+pub mod mapper;
 pub mod types;
