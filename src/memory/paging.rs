@@ -7,7 +7,7 @@ use x86_64::{
     VirtAddr,
 };
 
-use core::fmt;
+use core::{fmt, arch::asm};
 use bitflags::bitflags;
 
 /// Creates a new mapping in the virtual address space of the calling process.
@@ -95,7 +95,7 @@ impl fmt::Debug for Entry {
 #[repr(align(0x1000))]
 #[repr(C)]
 pub struct Table {
-    entries: [Entry; 512]
+   pub entries: [Entry; 512]
 }
 
 
@@ -119,3 +119,17 @@ bitflags! {
     }
 }
 
+
+pub fn get_cr3()  -> u64 {
+    let mut cr3: u64;
+    unsafe { 
+        asm!(
+            "mov {}, cr3",
+            "mov cr3, rax",
+            out(reg) cr3,
+            options(nostack, preserves_flags),
+        );
+    }
+
+    cr3
+}

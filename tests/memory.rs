@@ -11,14 +11,14 @@ const PAGE_SIZE: usize = 0x1000;
 
 use alloc::{boxed::Box, vec::Vec};
 use bootloader::{bootinfo::BootInfo, entry_point};
-use core::panic::PanicInfo;
-use x86_64::{VirtAddr, registers::control::Cr3};
+use core::{panic::PanicInfo, arch::asm};
+
 
 use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper, paging::{Entry, EntryFlags}},
+    memory::{frame_distributer::{FrameDistributer, FrameAllocator}, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper, paging::{Entry, EntryFlags, get_cr3}},
     test_panic_handler,
 };
 
@@ -31,9 +31,18 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
     info!("Memory map: {:#?}", boot_info.memory_map);
     
-    let mut _distributer = FrameDistributer::new(&boot_info.memory_map);
+    let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
+    
+
+    let mapper = Mapper::new(get_cr3());
+    let physical_addr = distributer.allocate_frame().unwrap();
+    let linear_addr = physical_addr;
+    
+    unsafe {
+        mapper.map(linear_addr, physical_addr, &mut distributer, EntryFlags::PRESENT | EntryFlags::WRITABLE)
+    }
     
     test_main();
     hlt_loop()
@@ -41,7 +50,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
 #[test_case]
 fn load_cr3_and_flush_tlb() {
-    let mapper = Mapper::new(Cr3::read().0.start_address().as_u64());
+    let mapper = Mapper::new(get_cr3());
     unsafe {
         mapper.load_cr3();
     }
@@ -57,6 +66,9 @@ fn entry_test() {
 
     info!("Created {:#x?}", entry);
 }
+
+
+
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)

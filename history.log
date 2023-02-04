@@ -63,7 +63,11 @@
 [INFO] - frame distributer initialized
 Running 2 tests
 memory::entry_test...
-[failed]
-
-Error: panicked at 'assertion failed: addr == addr & 0x000f_ffff_ffff_f000', /home/reem/lod-1302-operating-system/src/memory/mapper.rs:78:9
-
+[INFO] - Created Entry {
+    page frame base: 0x8000,
+    flags: PRESENT | WRITABLE | USER,
+}
+[ok]
+memory::load_cr3_and_flush_tlb...
+[INFO] - loading cr3 successfully
+[ok]
