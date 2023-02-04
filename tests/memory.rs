@@ -18,7 +18,7 @@ use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper},
+    memory::{frame_distributer::FrameDistributer, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper, paging::{Entry, EntryFlags}},
     test_panic_handler,
 };
 
@@ -47,6 +47,15 @@ fn load_cr3_and_flush_tlb() {
     }
 
     info!("loading cr3 successfully");
+}
+
+#[test_case]
+fn entry_test() {
+    let mut entry = Entry::new();
+
+    entry.set_entry(0x8000, EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER);
+
+    info!("Created {:#x?}", entry);
 }
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
