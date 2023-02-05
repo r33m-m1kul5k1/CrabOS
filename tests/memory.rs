@@ -11,14 +11,14 @@ const PAGE_SIZE: usize = 0x1000;
 
 use alloc::{boxed::Box, vec::Vec};
 use bootloader::{bootinfo::BootInfo, entry_point};
-use core::{panic::PanicInfo, arch::asm};
+use core::{panic::PanicInfo, arch::asm, borrow::BorrowMut};
 
 
 use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::{FrameDistributer, FrameAllocator}, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper, paging::{Entry, EntryFlags, get_cr3}},
+    memory::{frame_distributer::{FrameDistributer, FrameAllocator}, heap, paging, buddy_system::manager::BuddyManager, mapper::Mapper, paging::{Entry, EntryFlags, get_cr3, Table}, as_mut_ref},
     test_panic_handler,
 };
 
@@ -34,9 +34,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
-    
-
-    let mapper = Mapper::new(get_cr3());
+    let mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
     let physical_addr = distributer.allocate_frame().unwrap();
     let linear_addr = physical_addr;
     
@@ -50,7 +48,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
 #[test_case]
 fn load_cr3_and_flush_tlb() {
-    let mapper = Mapper::new(get_cr3());
+    let mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
     unsafe {
         mapper.load_cr3();
     }

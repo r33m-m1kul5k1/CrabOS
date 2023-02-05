@@ -37,7 +37,6 @@ pub fn mmap(
         let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
         unsafe { mapper.map_to(page, frame, flags, frame_allocator)?.flush() };
     }
-
     Ok(())
 }
 
