@@ -36,11 +36,11 @@
         region_type: Usable,
     },
     MemoryRegion {
-        range: FrameRange(0x400000..0x447000),
+        range: FrameRange(0x400000..0x448000),
         region_type: Kernel,
     },
     MemoryRegion {
-        range: FrameRange(0x447000..0xbffe0000),
+        range: FrameRange(0x448000..0xbffe0000),
         region_type: Usable,
     },
     MemoryRegion {

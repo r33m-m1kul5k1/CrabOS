@@ -6,19 +6,19 @@ use core::arch::asm;
 use log::{info, debug};
 use x86_64::registers::debug;
 
-use super::{paging::{Table, EntryFlags}, frame_distributer::FrameAllocator};
+use super::{paging::{Table, EntryFlags, Entry}, frame_distributer::FrameAllocator};
 
 
 
 pub struct Mapper<'a> {
-    pml4_pointer: &'a mut Table,
+    pml4_table: &'a mut Table,
 }
 
 impl<'a> Mapper<'a> {
 
     /// Creates a new mapper object given a pointer to the page table structures
-    pub fn new(pml4_pointer: &'a mut Table) -> Self {
-        Mapper { pml4_pointer }
+    pub fn new(pml4_table: &'a mut Table) -> Self {
+        Mapper { pml4_table }
     }
 
     /// Loads a new page table level 4 pointer to cr3 and flushes the TLB.
@@ -27,13 +27,13 @@ impl<'a> Mapper<'a> {
     /// This method is unsafe because if the pml4 pointer is invalid the CPU will through an exception
     pub unsafe fn load_cr3(&self) {
         
-        debug!("pml4 addr: {:p}", &self.pml4_pointer);
+        debug!("pml4 addr: {:p}", &self.pml4_table);
         asm!(
             "mov rax, cr3",
             "mov cr3, rax",
             "mov rax, {}",
             "mov cr3, rax",
-            in(reg) &self.pml4_pointer,
+            in(reg) &self.pml4_table,
             options(nostack, preserves_flags),
         );
         
@@ -45,16 +45,37 @@ impl<'a> Mapper<'a> {
     /// 
     /// The caller must specify unmapped linear address
     pub unsafe fn map(
-        &self,
+        &mut self,
         linear_addr: u64, 
         physical_addr: u64, 
         frame_allocator: &mut impl FrameAllocator, 
         flags: EntryFlags
     ) {
-
-        debug!("pml4 first {:#x?}", self.pml4_pointer.entries[0]);
+        debug!("pml4 first {:#x?}", self.pml4_table.entries[0]);
+        
+        let pml4_index= Mapper::table_index(linear_addr, 4);
+        let pte = &mut self.pml4_table.entries[pml4_index];
+        
+        if !pte.flags().contains(EntryFlags::PRESENT) {
+            
+            pte.set_entry(
+                frame_allocator.allocate_frame().unwrap(), 
+            EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::NO_EXECUTE)
+        }
 
         asm!("invlpg [{}]", in(reg) linear_addr, options(nostack, preserves_flags));
+    }
+
+    /// Gets the table index by a given table level and linear address
+    /// 
+    /// # Levels
+    /// 
+    /// - `page map level 4` => 4
+    /// - `page directory pointer` => 3
+    /// - `page directory` => 2
+    /// - `page table` => 1
+    fn table_index(linear_addr: u64, level: usize) -> usize {
+        (linear_addr & 0b1_1111_1111 << (9 * (level - 1) + 12)) as usize
     }
 }
 

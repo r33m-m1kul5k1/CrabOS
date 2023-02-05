@@ -34,7 +34,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
-    let mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
+    let mut mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
     let physical_addr = distributer.allocate_frame().unwrap();
     let linear_addr = physical_addr;
     
