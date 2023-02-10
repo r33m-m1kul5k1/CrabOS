@@ -62,22 +62,20 @@
 ]
 [INFO] - virtual memory offset: 18000000000
 [INFO] - frame distributer initialized
-[DEBUG] - pml4 first Entry {
-    page frame base: 0x2000,
-    flags: PRESENT | WRITABLE | ACCESSED,
-}
-[DEBUG] - pml4 first Entry {
-    page frame base: 0x2000,
-    flags: PRESENT | WRITABLE | ACCESSED,
-}
-Running 2 tests
+[INFO] - mapping 18000278000 to 278000
+[DEBUG] - table 4 address: 1000
+[DEBUG] - table 3 address: 18100008000
+[DEBUG] - table 2 address: 18100009000
+[DEBUG] - table 1 address: 18000200000
+[DEBUG] - table 4 address: 1000
+[DEBUG] - table 3 address: 18100008000
+[DEBUG] - table 2 address: 18100009000
+[DEBUG] - table 1 address: 18000200000
+[INFO] - successfully mapped page 18000278000 to page frame: 278000
+Running 1 tests
 memory::entry_test...
 [INFO] - Created Entry {
     page frame base: 0x8000,
     flags: PRESENT | WRITABLE | USER,
 }
-[ok]
-memory::load_cr3_and_flush_tlb...
-[DEBUG] - pml4 addr: 0x10000201c18
-[INFO] - loading cr3 successfully
 [ok]

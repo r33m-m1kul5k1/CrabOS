@@ -33,6 +33,6 @@ pub fn as_mut_ref<'a, T>(address: u64) -> &'a mut T {
     unsafe { &mut *as_mut_ptr::<T>(address) }
 }
 
-pub fn as_addr<T>(object: &mut T) -> u64 {
+pub fn as_addr<T>(object: &T) -> u64 {
     object as *const T as u64
 }

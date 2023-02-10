@@ -11,6 +11,8 @@ const PAGE_SIZE: usize = 0x1000;
 
 use alloc::{boxed::Box, vec::Vec};
 use bootloader::{bootinfo::BootInfo, entry_point};
+use ::log::debug;
+
 use core::{panic::PanicInfo, arch::asm, borrow::BorrowMut};
 
 
@@ -35,26 +37,20 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
-    let mut mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
+    let mut mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()), boot_info.physical_memory_offset);
     let physical_addr = distributer.allocate_frame().unwrap();
     let linear_addr = physical_addr + boot_info.physical_memory_offset;
+    info!("mapping {:x} to {:x}", linear_addr, physical_addr);
     
     unsafe {
         mapper.map(linear_addr, physical_addr, &mut distributer, EntryFlags::PRESENT | EntryFlags::WRITABLE)
     }
+    let physical_addr = mapper.linear_to_physical(linear_addr).unwrap();
+
+    info!("successfully mapped page {:x} to page frame: {:x}", linear_addr, physical_addr);
 
     test_main();
     hlt_loop()
-}
-
-#[test_case]
-fn load_cr3_and_flush_tlb() {
-    let mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
-    unsafe {
-        mapper.load_cr3();
-    }
-
-    info!("loading cr3 successfully");
 }
 
 #[test_case]
