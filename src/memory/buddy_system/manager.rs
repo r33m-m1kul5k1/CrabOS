@@ -1,10 +1,7 @@
-#![allow(unused)]
+
 use alloc::vec::Vec;
 use log::debug;
-use x86_64::{PhysAddr, structures::paging::frame, registers::debug};
-use crate::memory::frame_distributer::FrameDistributer;
-
-use super::buddy::Buddy;
+use super::{buddy::Buddy, super::frame_distributer::FrameDistributer};
 
 /// This manager manages multiple buddy algorithms
 /// It divides the buddies to power-of-two memory regions
@@ -26,7 +23,7 @@ impl BuddyManager {
     }
 
     /// Allocates a given size of physical memory with the appropriate buddy
-    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<PhysAddr> {
+    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<u64> {
         
         for buddy in self.buddies.iter_mut() {
             if let Some(address) =  buddy.allocate(size, alignment) {
@@ -38,7 +35,7 @@ impl BuddyManager {
     }
 
     /// Deallocates a physical block of memory with the appropriate buddy 
-    pub fn deallocate(&mut self, address: PhysAddr, size: usize, alignment: usize) {
+    pub fn deallocate(&mut self, address: u64, size: usize, alignment: usize) {
         
         if let Some(buddy) = self.buddies
             .iter_mut()

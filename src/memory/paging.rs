@@ -79,6 +79,12 @@ impl Entry {
         assert!(addr == addr & 0x000f_ffff_ffff_f000);
         self.entry = addr | flags.bits();
     }
+
+    /// Returns whether the entry is present or not
+    #[inline]
+    pub fn is_present(&self) -> bool {
+        self.flags().contains(EntryFlags::PRESENT)
+    }
 }
 
 

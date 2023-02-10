@@ -5,7 +5,6 @@ use core::cmp;
 use super::super::types::MemoryRegion;
 use alloc::vec::Vec;
 use log::debug;
-use x86_64::PhysAddr;
 
 const BUDDY_LIMIT: u32 = 0x1000;
 
@@ -121,7 +120,7 @@ impl Buddy {
     }
 
     /// Allocates a block given it's size and alignment
-    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<PhysAddr> {
+    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<u64> {
         let size = cmp::max(size, alignment);
          // this line finds which order of this allocator can accommodate this amount of memory (if any)
         self.get_order(size).and_then(|request_order| {
@@ -134,7 +133,7 @@ impl Buddy {
                 // index * order size
                 let offset = block as u64 * (self.block_max_size() >> request_order as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
-                PhysAddr::new(self.region.range.start_addr() + offset)
+                self.region.range.start_addr() + offset
             })
         })
     }
@@ -145,12 +144,12 @@ impl Buddy {
     /// * `address` - the addres of the block
     /// * `size` - block's size
     /// * `alignment` - a **power of two** block's alignment
-    pub fn deallocate(&mut self, address: PhysAddr, size: usize, alignment: usize) {
+    pub fn deallocate(&mut self, address: u64, size: usize, alignment: usize) {
         let size = cmp::max(size, alignment);
         
         debug!("deallocation size: 0x{:x}", size);
         let order = self.get_order(size).unwrap();
-        let block = (address - self.region.range.start_addr()).as_u64() / size as u64;
+        let block = (address - self.region.range.start_addr()) / size as u64;
 
         self.free_blocks[order].push(block);
         self.merge_buddies(order, block);

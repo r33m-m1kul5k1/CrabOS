@@ -53,15 +53,18 @@ impl<'a> Mapper<'a> {
     ) {
         debug!("pml4 first {:#x?}", self.pml4_table.entries[0]);
         
+        // First 
         let pml4_index= Mapper::table_index(linear_addr, 4);
         let pte = &mut self.pml4_table.entries[pml4_index];
         
-        if !pte.flags().contains(EntryFlags::PRESENT) {
+        if !pte.is_present() {
             
             pte.set_entry(
                 frame_allocator.allocate_frame().unwrap(), 
             EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::NO_EXECUTE)
         }
+
+
 
         asm!("invlpg [{}]", in(reg) linear_addr, options(nostack, preserves_flags));
     }
