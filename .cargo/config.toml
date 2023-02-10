@@ -8,7 +8,3 @@ build-std = ["core", "compiler_builtins", "alloc"]
 
 [target.'cfg(target_os = "none")']
 runner = "bootimage runner"
-
-[dependencies.bootloader]
-# Note: we need an offset / recursive page tables when we don't have access to the physical address, (of the new page table). 
-physical-memory-offset = "0x0"

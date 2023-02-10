@@ -60,7 +60,12 @@
         region_type: Usable,
     },
 ]
+[INFO] - virtual memory offset: 18000000000
 [INFO] - frame distributer initialized
+[DEBUG] - pml4 first Entry {
+    page frame base: 0x2000,
+    flags: PRESENT | WRITABLE | ACCESSED,
+}
 [DEBUG] - pml4 first Entry {
     page frame base: 0x2000,
     flags: PRESENT | WRITABLE | ACCESSED,
@@ -73,6 +78,6 @@ memory::entry_test...
 }
 [ok]
 memory::load_cr3_and_flush_tlb...
-[DEBUG] - pml4 addr: 0x10000201ca8
+[DEBUG] - pml4 addr: 0x10000201c18
 [INFO] - loading cr3 successfully
 [ok]

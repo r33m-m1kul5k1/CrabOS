@@ -6,8 +6,8 @@
 pub mod buddy_system;
 pub mod frame_distributer;
 pub mod heap;
-pub mod paging;
 pub mod mapper;
+pub mod paging;
 pub mod types;
 
 // use with caution |
@@ -15,7 +15,7 @@ pub mod types;
 
 /// Converts an address to a const raw pointer
 fn as_ptr<T>(address: u64) -> *const T {
-    address as *const T 
+    address as *const T
 }
 
 /// Converts an adderss to a mutable raw pointer
@@ -30,5 +30,9 @@ pub fn as_ref<'a, T>(address: u64) -> &'a T {
 
 /// Converts an address to a mutable reference
 pub fn as_mut_ref<'a, T>(address: u64) -> &'a mut T {
-    unsafe { &mut *as_mut_ptr::<T>(address)}
+    unsafe { &mut *as_mut_ptr::<T>(address) }
+}
+
+pub fn as_addr<T>(object: &mut T) -> u64 {
+    object as *const T as u64
 }

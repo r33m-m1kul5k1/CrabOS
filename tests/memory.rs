@@ -30,18 +30,19 @@ fn main(boot_info: &'static BootInfo) -> ! {
     idt::init();
 
     info!("Memory map: {:#?}", boot_info.memory_map);
+    info!("virtual memory offset: {:x}", boot_info.physical_memory_offset);
     
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
     let mut mapper = Mapper::new(as_mut_ref::<Table>(get_cr3()));
     let physical_addr = distributer.allocate_frame().unwrap();
-    let linear_addr = physical_addr;
+    let linear_addr = physical_addr + boot_info.physical_memory_offset;
     
     unsafe {
         mapper.map(linear_addr, physical_addr, &mut distributer, EntryFlags::PRESENT | EntryFlags::WRITABLE)
     }
-    
+
     test_main();
     hlt_loop()
 }

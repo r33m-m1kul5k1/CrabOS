@@ -35,6 +35,8 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     idt::init();
     info!("IDT initialized");
 
+    info!("virtual memory offset: {:x}", boot_info.physical_memory_offset);
+    
     hlt_loop()
 }
 
