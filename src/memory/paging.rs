@@ -1,56 +1,46 @@
 //! This module controls a 4 level table structure.
-use x86_64::{
-    structures::paging::{
-        mapper::MapToError, FrameAllocator, Mapper, Page,
-        PageTableFlags, Size4KiB,
-    },
-    VirtAddr,
-};
 
-use core::{fmt, arch::asm};
+use super::{frame_distributer::FrameAllocator, mapper::Mapper, types::FRAME_SIZE};
 use bitflags::bitflags;
+use core::{arch::asm, fmt};
+use log::trace;
 
 /// Creates a new mapping in the virtual address space of the calling process.
 ///
 /// # Arguments
 ///
-/// * `addr` - starting virtual address
+/// * `addr` - starting linear address
 /// * `length` - the new mapping's size in bytes
 /// * `mapper` - maps pages to page frames.
 /// * `frame_allocator` - allocate a frame from the physical address space
 pub fn mmap(
-    addr: VirtAddr,
+    linear_addr: u64,
     length: usize,
-    mapper: &mut impl Mapper<Size4KiB>,
-    frame_allocator: &mut impl FrameAllocator<Size4KiB>,
-) -> Result<(), MapToError<Size4KiB>> {
-    let page_range = Page::range_inclusive(
-        Page::containing_address(addr),
-        Page::containing_address(addr + length - 1u64),
-    );
-
-    for page in page_range {
-        let frame = frame_allocator
-            .allocate_frame()
-            .ok_or(MapToError::FrameAllocationFailed)?;
-
-        let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
-        unsafe { mapper.map_to(page, frame, flags, frame_allocator)?.flush() };
+    mapper: &mut Mapper,
+    frame_allocator: &mut impl FrameAllocator,
+) {
+    for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
+        let physical_addr = frame_allocator.allocate_frame().unwrap();
+        unsafe {
+            mapper.map(
+                page_addr,
+                physical_addr,
+                frame_allocator,
+                EntryFlags::PRESENT | EntryFlags::WRITABLE,
+            )
+        };
+        trace!("mapping {:x} to {:x}", page_addr, physical_addr);
     }
-    Ok(())
 }
-
 
 /// A page table entry for 64 with PAE \
 /// [tables structure format](https://wiki.osdev.org/File:64-bit_page_tables1.png)
 #[repr(transparent)]
 pub struct Entry {
-    entry: u64
+    entry: u64,
 }
 
-
 impl Entry {
-
     /// Creates an unpresent entry
     #[inline]
     pub const fn new() -> Self {
@@ -65,12 +55,12 @@ impl Entry {
 
     /// Returns the entry flags
     #[inline]
-    pub fn flags(&self)  -> EntryFlags {
+    pub fn flags(&self) -> EntryFlags {
         EntryFlags::from_bits_truncate(self.entry)
     }
 
     /// Set entry address and flags
-    /// 
+    ///
     /// # Arguments
     /// - `addr`, the address must be page aligned
     /// - `flags`, the entry flags
@@ -87,7 +77,6 @@ impl Entry {
     }
 }
 
-
 impl fmt::Debug for Entry {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Entry")
@@ -100,10 +89,8 @@ impl fmt::Debug for Entry {
 #[repr(align(0x1000))]
 #[repr(C)]
 pub struct Table {
-   pub entries: [Entry; 512]
+    pub entries: [Entry; 512],
 }
-
-
 
 bitflags! {
     pub struct EntryFlags: u64 {
@@ -124,10 +111,9 @@ bitflags! {
     }
 }
 
-
-pub fn get_cr3()  -> u64 {
+pub fn get_cr3() -> u64 {
     let mut cr3: u64;
-    unsafe { 
+    unsafe {
         asm!(
             "mov {}, cr3",
             "mov cr3, rax",

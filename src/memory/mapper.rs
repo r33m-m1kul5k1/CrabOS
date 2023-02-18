@@ -15,13 +15,16 @@ use super::{
 
 pub struct Mapper<'a> {
     pml4_table: &'a mut Table,
-    physical_memory_offset: u64
+    physical_memory_offset: u64,
 }
 
 impl<'a> Mapper<'a> {
     /// Creates a new mapper object given a pointer to the page table structures
     pub fn new(pml4_table: &'a mut Table, physical_memory_offset: u64) -> Self {
-        Mapper { pml4_table, physical_memory_offset }
+        Mapper {
+            pml4_table,
+            physical_memory_offset,
+        }
     }
 
     /// Loads a new page table level 4 pointer to cr3 and flushes the TLB.
@@ -42,6 +45,8 @@ impl<'a> Mapper<'a> {
 
     /// Maps a linear 4KiB address to a physical one, and creates more paging tables if needed
     ///
+    /// # Arguments
+    /// - `physical_addr`, a linear address of the physical addres
     /// # Safty
     ///
     /// The caller must specify unmapped linear address
@@ -52,20 +57,17 @@ impl<'a> Mapper<'a> {
         frame_allocator: &mut impl FrameAllocator,
         flags: EntryFlags,
     ) {
-
         let mut table_linear_address = as_addr::<Table>(self.pml4_table);
 
         // Goes though pml4, pdp, pd, pt and initialize a basic entries.
         for table_level in (1..=4).rev() {
-            debug!("table {} address: {:x}", table_level, table_linear_address);
 
             let table = as_mut_ref::<Table>(table_linear_address);
             let next_table = &mut table.entries[Mapper::table_offset(linear_addr, table_level)];
 
             if table_level == 1 {
                 next_table.set_entry(physical_addr, flags);
-            }
-            else if !next_table.is_present() {
+            } else if !next_table.is_present() {
                 next_table.set_entry(
                     frame_allocator.allocate_frame().unwrap(),
                     EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::NO_EXECUTE,
@@ -84,12 +86,11 @@ impl<'a> Mapper<'a> {
 
         // Goes though pml4, pdp, pd if the linear address offset doesn't exsist then return None.
         for table_level in (1..=4).rev() {
-            debug!("table {} address: {:x}", table_level, table_linear_address);
             let table = as_mut_ref::<Table>(table_linear_address);
             let next_table = &mut table.entries[Mapper::table_offset(linear_addr, table_level)];
 
             if !next_table.is_present() {
-                return None
+                return None;
             }
 
             table_linear_address = next_table.addr() + self.physical_memory_offset;
@@ -97,7 +98,7 @@ impl<'a> Mapper<'a> {
 
         Some(table_linear_address - self.physical_memory_offset)
     }
-    
+
     /// Gets the table index by a given table level and linear address
     ///
     /// # Levels
@@ -109,5 +110,4 @@ impl<'a> Mapper<'a> {
     fn table_offset(linear_addr: u64, level: usize) -> usize {
         linear_addr as usize >> (9 * (level - 1) + 12) & 0b1_1111_1111
     }
-    
 }

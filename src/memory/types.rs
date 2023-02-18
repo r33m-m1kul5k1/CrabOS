@@ -1,7 +1,7 @@
 //! This module defines types for memory components
 use bootloader::bootinfo::FrameRange;
 
-pub const FRAME_SIZE: u64 = 4096;
+pub const FRAME_SIZE: usize = 4096;
 pub const INTEGER_SIZE: usize = 64;
 pub const INVALID_FRAME_RANGE: FrameRange = FrameRange {
     start_frame_number: 0,

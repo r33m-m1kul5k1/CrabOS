@@ -81,7 +81,7 @@ impl FrameDistributer {
 
         unused_regions
             .map(|r| r.range.start_addr()..r.range.end_addr())
-            .flat_map(|r| r.step_by(FRAME_SIZE as usize))
+            .flat_map(|r| r.step_by(FRAME_SIZE))
     }
 
     /// Returns the next free frame address
@@ -99,6 +99,7 @@ unsafe impl FrameAllocator for FrameDistributer {
 
         frame
     }
+    
 }
 
 
