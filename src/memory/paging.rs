@@ -47,7 +47,7 @@ impl Entry {
         Entry { entry: 0 }
     }
 
-    /// Returns the entry address (a page frame number)
+    /// Returns the entry address
     #[inline]
     pub fn addr(&self) -> u64 {
         self.entry & 0x000f_ffff_ffff_f000

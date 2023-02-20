@@ -121,7 +121,13 @@ impl Buddy {
 
     /// Allocates a block given it's size and alignment
     pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<u64> {
-        let size = cmp::max(size, alignment);
+        
+
+        let size = memory_alignment(size, alignment);
+
+        if size == 0 {
+            return None;
+        }
          // this line finds which order of this allocator can accommodate this amount of memory (if any)
         self.get_order(size).and_then(|request_order| {
             self.get_free_block(request_order)
@@ -154,4 +160,15 @@ impl Buddy {
         self.free_blocks[order].push(block);
         self.merge_buddies(order, block);
     }
+}
+
+/// Align a given size to a given alignment.
+/// 
+/// if the size is align it means that it is a multiplication of the `alignment`
+/// 
+/// Returns the new size
+fn memory_alignment(size: usize, alignment: usize) -> usize {
+    
+    // we add (alignment -1) to get the size to the upper alignment but not when aligned (-1)
+    ((size + alignment -1) / alignment) * alignment
 }
