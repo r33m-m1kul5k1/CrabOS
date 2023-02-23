@@ -24,5 +24,4 @@ pub struct Thread {
     pub r13w: u64,
     pub r14w: u64,
     pub r15w: u64,
-    
 }

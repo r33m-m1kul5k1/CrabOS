@@ -14,6 +14,8 @@ pub mod interrupts;
 pub mod log;
 pub mod drivers;
 pub mod memory;
+pub mod processes;
+pub mod userland;
 
 const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
 pub enum QemuExitCode {
