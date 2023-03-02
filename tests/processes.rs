@@ -13,7 +13,7 @@ use CrabOS::{
     },
     log::logger::init,
     processes::objects::Thread,
-    userland::dummy_process, test_panic_handler, memory::pmm::FrameDistributer,
+    userland::naked_process, test_panic_handler, memory::pmm::FrameDistributer,
 };
 
 use bootloader::BootInfo;
@@ -29,7 +29,7 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     let mut distributer = FrameDistributer::new(&boot_info.memory_map);
 
     let dummy_thread = Thread::new(
-        dummy_process as *const () as u64,
+        naked_process as *const () as u64,
         GDT.1.user_code.0,
         GDT.1.user_data.0,
         boot_info.physical_memory_offset + distributer.allocate_frame().unwrap().start_address().as_u64(),

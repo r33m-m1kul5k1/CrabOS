@@ -2,12 +2,12 @@
 [DEBUG] - Error code: 0x0
 [DEBUG] - Stack Frame: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x204ca0,
+        0x204c60,
     ),
     code_segment: 0x2B,
-    cpu_flags: 0x2,
+    cpu_flags: 0x202,
     stack_pointer: VirtAddr(
-        0x18000286000,
+        0x18000287000,
     ),
     stack_segment: 0x33,
 }

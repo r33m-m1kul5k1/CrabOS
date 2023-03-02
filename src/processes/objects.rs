@@ -1,11 +1,12 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
-use crate::hlt_loop;
+const INTERRUPT_ENABLE_FLAG: u64 = 1 << 9;
 
 #[derive(Default)]
 #[allow(unused)]
 pub struct Thread {
+    ds:     u64,
     // registers
     rax:    u64,
     rbx:    u64,
@@ -34,12 +35,15 @@ impl Thread {
     /// Creates a new Thread object with the given stack, selectors and thread main
     /// 
     /// Note that the thread main should be the virtual address of the process main.
-    pub fn new(thread_main: u64, cs: u16, ss: u16, rsp: u64) -> Self {
+    pub fn new(thread_main: u64, cs: u16, ds: u16, rsp: u64) -> Self {
         Thread {
             rip: thread_main,
             cs: cs as u64,
-            ss: ss as u64,
+            ss: ds as u64,
+            ds: ds as u64,
             rsp,
+            rflags: INTERRUPT_ENABLE_FLAG,
+
             ..Default::default()
         }
     }
@@ -51,12 +55,13 @@ impl Thread {
     #[inline]
     pub unsafe fn run(&self) -> ! {
         asm!(
+        "cli",
         "mov rsp, {}",
+        "pop rax; mov ds, ax; mov es, ax; mov fs, ax; mov gs, ax",
         "pop rax; pop rbx; pop rcx; pop rdx; pop rsi; pop rdi; pop rbp;\
          pop r8; pop r9; pop r10; pop r11; pop r12; pop r13; pop r14; pop r15;",
         "iretq",
-        in(reg) self);
+        in(reg) self, options(noreturn));
 
-        hlt_loop();
     }
 }
