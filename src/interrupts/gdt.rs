@@ -43,20 +43,20 @@ lazy_static! {
         // will save the reserved stacks and the privileged stacks
         let tss = gdt.add_entry(Descriptor::tss_segment(&TSS));
         // save all of these segments to switch between kernel mode and user mode segments
-        let code = gdt.add_entry(Descriptor::kernel_code_segment());
-        let data = gdt.add_entry(Descriptor::kernel_data_segment());
+        let kernel_code = gdt.add_entry(Descriptor::kernel_code_segment());
+        let kernel_data = gdt.add_entry(Descriptor::kernel_data_segment());
         let user_code = gdt.add_entry(Descriptor::user_code_segment());
         let user_data = gdt.add_entry(Descriptor::user_data_segment());
 
-        (gdt, Selectors { tss, code, data, user_code, user_data })
+        (gdt, Selectors { tss, kernel_code, kernel_data, user_code, user_data })
      };
 }
 
 // `GlobalDescriptorTable` table's is private, that is why we use the Selectors struct 
 pub struct Selectors {
     tss: SegmentSelector,
-    code: SegmentSelector,
-    data: SegmentSelector,
+    pub kernel_code: SegmentSelector,
+    pub kernel_data: SegmentSelector,
     pub user_code: SegmentSelector,
     pub user_data: SegmentSelector,
 }
@@ -64,8 +64,8 @@ pub struct Selectors {
 pub fn init() {
     GDT.0.load();
     unsafe {
-        CS::set_reg(GDT.1.code);
-        DS::set_reg(GDT.1.data);
+        CS::set_reg(GDT.1.kernel_code);
+        DS::set_reg(GDT.1.kernel_data);
         load_tss(GDT.1.tss);
     }
 }

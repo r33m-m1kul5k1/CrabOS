@@ -3,5 +3,4 @@
 //! 2. context switch - change the flow of execusion
 //! 3. exec - execusion of a process
 
-mod objects;
-mod exec;
+pub mod objects;

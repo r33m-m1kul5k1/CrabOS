@@ -7,31 +7,39 @@
 use core::panic::PanicInfo;
 
 use CrabOS::{
-    userland::dummy_process,
-    test_should_panic_handler, // hlt_loop,
-    log::logger::init
+    interrupts::{
+        gdt::{self, GDT},
+        idt,
+    },
+    log::logger::init,
+    processes::objects::Thread,
+    userland::dummy_process, test_panic_handler, memory::pmm::FrameDistributer,
 };
 
+use bootloader::BootInfo;
 use log::LevelFilter;
-
-
+use x86_64::structures::paging::FrameAllocator;
 
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
-    init(LevelFilter::Info);
-    dummy_process();
-    // test_main();
-    // hlt_loop();
+pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+    init(LevelFilter::Debug);
+    gdt::init();
+    idt::IDT.load();
+
+    let mut distributer = FrameDistributer::new(&boot_info.memory_map);
+
+    let dummy_thread = Thread::new(
+        dummy_process as *const () as u64,
+        GDT.1.kernel_code.0,
+        GDT.1.kernel_data.0,
+        GDT.1.kernel_data.0,
+        boot_info.physical_memory_offset + distributer.allocate_frame().unwrap().start_address().as_u64(),
+    );
+
+    unsafe { dummy_thread.run() }
 }
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    test_should_panic_handler(info)
+    test_panic_handler(info)
 }
-
-/* 
-#[test_case]
-fn check_context_switch() {
-    
-}
-*/
