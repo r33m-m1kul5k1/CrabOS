@@ -5,8 +5,7 @@ use crate::hlt_loop;
 
 #[derive(Default)]
 #[allow(unused)]
-pub struct Thread {    
-    ds:     u64,
+pub struct Thread {
     // registers
     rax:    u64,
     rbx:    u64,
@@ -35,11 +34,10 @@ impl Thread {
     /// Creates a new Thread object with the given stack, selectors and thread main
     /// 
     /// Note that the thread main should be the virtual address of the process main.
-    pub fn new(thread_main: u64, cs: u16, ds: u16, ss: u16, rsp: u64) -> Self {
+    pub fn new(thread_main: u64, cs: u16, ss: u16, rsp: u64) -> Self {
         Thread {
             rip: thread_main,
             cs: cs as u64,
-            ds: ds as u64,
             ss: ss as u64,
             rsp,
             ..Default::default()
@@ -54,7 +52,6 @@ impl Thread {
     pub unsafe fn run(&self) -> ! {
         asm!(
         "mov rsp, {}",
-        "pop rax; mov ds, ax",
         "pop rax; pop rbx; pop rcx; pop rdx; pop rsi; pop rdi; pop rbp;\
          pop r8; pop r9; pop r10; pop r11; pop r12; pop r13; pop r14; pop r15;",
         "iretq",

@@ -30,9 +30,8 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
     let dummy_thread = Thread::new(
         dummy_process as *const () as u64,
-        GDT.1.kernel_code.0,
-        GDT.1.kernel_data.0,
-        GDT.1.kernel_data.0,
+        GDT.1.user_code.0,
+        GDT.1.user_data.0,
         boot_info.physical_memory_offset + distributer.allocate_frame().unwrap().start_address().as_u64(),
     );
 

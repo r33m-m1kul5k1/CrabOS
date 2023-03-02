@@ -7,8 +7,10 @@ use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::VirtAddr;
 
-pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
-pub const GENERAL_PROTECTION_FAULT_IST_INDEX: u16 = 1;
+pub const DOUBLE_FAULT_IST_INDEX: usize = 0;
+pub const GENERAL_PROTECTION_FAULT_IST_INDEX: usize = 1;
+pub const USER_STACK_INDEX: usize = 2;
+pub const KERNEL_STACK_INDEX: usize = 0;
 const PAGE_SIZE: usize = 4096;
 const STACK_SIZE: usize = PAGE_SIZE * 4;
 
@@ -19,15 +21,21 @@ lazy_static! {
     /// A Table with stacks for interrupts and for different Privilege Levels
     pub static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
-        tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX as usize] = {
+        tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX] = {
             // allocate a stack on the kernel's address space (.bss)
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
             VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
         };
-        tss.interrupt_stack_table[GENERAL_PROTECTION_FAULT_IST_INDEX as usize] = {
+        tss.interrupt_stack_table[GENERAL_PROTECTION_FAULT_IST_INDEX] = {
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
             VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
         };
+
+        tss.privilege_stack_table[KERNEL_STACK_INDEX] = {
+            static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
+            VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
+        };
+        
 
         tss
     };

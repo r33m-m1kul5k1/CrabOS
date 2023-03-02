@@ -16,10 +16,10 @@ lazy_static! {
         unsafe {
             idt.double_fault
                 .set_handler_fn(double_fault)
-                .set_stack_index(DOUBLE_FAULT_IST_INDEX);
+                .set_stack_index(DOUBLE_FAULT_IST_INDEX as u16);
             idt.general_protection_fault
                 .set_handler_fn(general_protection_fault)
-                .set_stack_index(GENERAL_PROTECTION_FAULT_IST_INDEX);
+                .set_stack_index(GENERAL_PROTECTION_FAULT_IST_INDEX as u16);
         }
         idt
     };
