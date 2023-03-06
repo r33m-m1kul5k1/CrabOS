@@ -1,16 +1,13 @@
 //! This module defines a mapper object to map physical to virtual addresses.
-
-#![allow(unused)]
-
 use core::arch::asm;
-use log::{debug, info};
-use x86_64::registers::debug;
+use enum_iterator::{reverse_all, Sequence};
+use log::debug;
 
 use crate::memory::{as_addr, as_mut_ref};
 
 use super::{
     frame_distributer::FrameAllocator,
-    paging::{Entry, EntryFlags, Table},
+    paging::{EntryFlags, Table},
 };
 
 pub struct Mapper<'a> {
@@ -33,17 +30,11 @@ impl<'a> Mapper<'a> {
     /// This method is unsafe because if the pml4 pointer is invalid the CPU will through an exception
     pub unsafe fn load_cr3(&self) {
         debug!("pml4 addr: {:p}", &self.pml4_table);
-        asm!(
-            "mov rax, cr3",
-            "mov cr3, rax",
-            "mov rax, {}",
-            "mov cr3, rax",
-            in(reg) &self.pml4_table,
-            options(nostack, preserves_flags),
-        );
+
+        asm!("mov cr3, rax", in("rax") &self.pml4_table);
     }
 
-    /// Maps a linear 4KiB address to a physical one, and creates more paging tables if needed
+    /// Maps a linear 4KiB aligned address to a physical one, and creates more paging tables if needed
     ///
     /// # Arguments
     /// - `physical_addr`, a linear address of the physical addres
@@ -60,21 +51,20 @@ impl<'a> Mapper<'a> {
         let mut table_linear_address = as_addr::<Table>(self.pml4_table);
 
         // Goes though pml4, pdp, pd, pt and initialize a basic entries.
-        for table_level in (1..=4).rev() {
-
+        for table_level in reverse_all::<PageTableLevel>() {
             let table = as_mut_ref::<Table>(table_linear_address);
-            let next_table = &mut table.entries[Mapper::table_offset(linear_addr, table_level)];
+            let entry = &mut table.entries[Mapper::entry_index(linear_addr, table_level)];
 
-            if table_level == 1 {
-                next_table.set_entry(physical_addr, flags);
-            } else if !next_table.is_present() {
-                next_table.set_entry(
+            if table_level == PageTableLevel::PageTable {
+                entry.set_entry(physical_addr, flags);
+            } else if !entry.is_present() {
+                entry.set_entry(
                     frame_allocator.allocate_frame().unwrap(),
                     EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::NO_EXECUTE,
                 );
             }
 
-            table_linear_address = next_table.addr() + self.physical_memory_offset;
+            table_linear_address = entry.addr() + self.physical_memory_offset;
         }
 
         asm!("invlpg [{}]", in(reg) linear_addr, options(nostack, preserves_flags));
@@ -85,9 +75,9 @@ impl<'a> Mapper<'a> {
         let mut table_linear_address = as_addr::<Table>(self.pml4_table);
 
         // Goes though pml4, pdp, pd if the linear address offset doesn't exsist then return None.
-        for table_level in (1..=4).rev() {
-            let table = as_mut_ref::<Table>(table_linear_address);
-            let next_table = &mut table.entries[Mapper::table_offset(linear_addr, table_level)];
+        for table_level in reverse_all::<PageTableLevel>() {
+            let table = unsafe { as_mut_ref::<Table>(table_linear_address) };
+            let next_table = &mut table.entries[Mapper::entry_index(linear_addr, table_level)];
 
             if !next_table.is_present() {
                 return None;
@@ -99,15 +89,16 @@ impl<'a> Mapper<'a> {
         Some(table_linear_address - self.physical_memory_offset)
     }
 
-    /// Gets the table index by a given table level and linear address
-    ///
-    /// # Levels
-    ///
-    /// - `page map level 4` => 4
-    /// - `page directory pointer` => 3
-    /// - `page directory` => 2
-    /// - `page table` => 1
-    fn table_offset(linear_addr: u64, level: usize) -> usize {
-        linear_addr as usize >> (9 * (level - 1) + 12) & 0b1_1111_1111
+    /// Gets the entry index by a given table level and a linear address
+    fn entry_index(linear_addr: u64, level: PageTableLevel) -> usize {
+        linear_addr as usize >> (9 * (level as u64) + 12) & 0b1_1111_1111
     }
+}
+
+#[derive(Sequence, Clone, Copy, PartialEq)]
+enum PageTableLevel {
+    PageTable,
+    PageDirectory,
+    PageDirectoryPointerTable,
+    PageMapLevelFour,
 }

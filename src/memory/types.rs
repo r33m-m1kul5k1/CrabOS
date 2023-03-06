@@ -92,7 +92,7 @@ impl MemoryRegion {
 
     pub fn contains(&self, addr: u64) -> bool {
         // exclude the final page frame
-        return self.range.start_addr() <= addr && addr <= self.range.end_addr() - 0x1000;
+        return self.range.start_addr() <= addr && addr <= self.range.end_addr() - FRAME_SIZE as u64;
     }
 }
 

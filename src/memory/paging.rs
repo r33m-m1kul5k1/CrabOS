@@ -5,11 +5,13 @@ use bitflags::bitflags;
 use core::{arch::asm, fmt};
 use log::trace;
 
+const ENTRY_ADDRESS_BITS: u64 = 0x000f_ffff_ffff_f000;
+
 /// Creates a new mapping in the virtual address space of the calling process.
 ///
 /// # Arguments
 ///
-/// * `addr` - starting linear address
+/// * `linear_addr` - starting linear address
 /// * `length` - the new mapping's size in bytes
 /// * `mapper` - maps pages to page frames.
 /// * `frame_allocator` - allocate a frame from the physical address space
@@ -18,9 +20,9 @@ pub fn mmap(
     length: usize,
     mapper: &mut Mapper,
     frame_allocator: &mut impl FrameAllocator,
-) {
+) -> Result<(), ()> {
     for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
-        let physical_addr = frame_allocator.allocate_frame().unwrap();
+        let physical_addr = frame_allocator.allocate_frame().ok_or(())?;
         unsafe {
             mapper.map(
                 page_addr,
@@ -31,6 +33,8 @@ pub fn mmap(
         };
         trace!("mapping {:x} to {:x}", page_addr, physical_addr);
     }
+
+    Ok(())
 }
 
 /// A page table entry for 64 with PAE \
@@ -46,11 +50,10 @@ impl Entry {
     pub const fn new() -> Self {
         Entry { entry: 0 }
     }
-
     /// Returns the entry address
     #[inline]
     pub fn addr(&self) -> u64 {
-        self.entry & 0x000f_ffff_ffff_f000
+        self.entry & ENTRY_ADDRESS_BITS
     }
 
     /// Returns the entry flags
@@ -66,7 +69,7 @@ impl Entry {
     /// - `flags`, the entry flags
     #[inline]
     pub fn set_entry(&mut self, addr: u64, flags: EntryFlags) {
-        assert!(addr == addr & 0x000f_ffff_ffff_f000);
+        assert!(addr == addr & ENTRY_ADDRESS_BITS);
         self.entry = addr | flags.bits();
     }
 

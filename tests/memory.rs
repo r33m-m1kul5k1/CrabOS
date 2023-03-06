@@ -47,7 +47,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     info!("frame distributer initialized");
 
     let mut mapper = Mapper::new(
-        as_mut_ref::<Table>(get_cr3()),
+        unsafe {as_mut_ref::<Table>(get_cr3())},
         boot_info.physical_memory_offset,
     );
     let physical_addr = distributer.allocate_frame().unwrap();
