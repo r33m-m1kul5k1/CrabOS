@@ -1,7 +1,6 @@
 [INFO] - frame distributer initialized
-[INFO] - mapping 0x18000278000 to 0x278000
-[INFO] - successfully mapped page 0x18000278000 to page frame: 0x278000
-[INFO] - allocates 32 pages for a new dummy process at address 0xaff000
+[INFO] - mapper initialized
+[INFO] - kernel heap initialized
 Running 3 tests
 memory::basic_allocation...
 [ok]

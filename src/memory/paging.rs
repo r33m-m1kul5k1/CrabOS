@@ -1,5 +1,7 @@
 //! This module controls a 4 level table structure.
 
+use crate::memory::mapper::KERNEL_MAPPER;
+
 use super::{frame_distributer::FrameAllocator, mapper::Mapper, types::FRAME_SIZE};
 use bitflags::bitflags;
 use core::{arch::asm, fmt};
@@ -18,18 +20,17 @@ const ENTRY_ADDRESS_BITS: u64 = 0x000f_ffff_ffff_f000;
 pub fn mmap(
     linear_addr: u64,
     length: usize,
-    mapper: &mut Mapper,
     frame_allocator: &mut impl FrameAllocator,
 ) -> Result<(), ()> {
     for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
         let physical_addr = frame_allocator.allocate_frame().ok_or(())?;
         unsafe {
-            mapper.map(
+            KERNEL_MAPPER.lock().map(
                 page_addr,
                 physical_addr,
                 frame_allocator,
                 EntryFlags::PRESENT | EntryFlags::WRITABLE,
-            )
+            ).unwrap()
         };
         trace!("mapping {:x} to {:x}", page_addr, physical_addr);
     }

@@ -29,8 +29,8 @@ fn handle_alloc_error(layout: Layout) -> ! {
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 /// Create a virtual address space for the heap (must be above the already mapped physical memory)
-pub fn init(mapper: &mut Mapper, frame_allocator: &mut impl FrameAllocator) {
-    mmap(HEAP_BOTTOM, HEAP_SIZE, mapper, frame_allocator).unwrap();
+pub fn init(frame_allocator: &mut impl FrameAllocator) {
+    mmap(HEAP_BOTTOM, HEAP_SIZE, frame_allocator).unwrap();
 
     unsafe {
         ALLOCATOR.lock().init(HEAP_BOTTOM as usize, HEAP_SIZE);

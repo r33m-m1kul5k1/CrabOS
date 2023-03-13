@@ -2,6 +2,8 @@
 use core::arch::asm;
 use enum_iterator::{reverse_all, Sequence};
 use log::debug;
+use spin::Mutex;
+use lazy_static::lazy_static;
 
 use crate::memory::{as_addr, as_mut_ref};
 
@@ -10,18 +12,27 @@ use super::{
     paging::{EntryFlags, Table},
 };
 
+lazy_static! {
+    pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
+}
+
 pub struct Mapper<'a> {
-    pml4_table: &'a mut Table,
+    pml4_table: Option<&'a mut Table>,
     physical_memory_offset: u64,
 }
 
 impl<'a> Mapper<'a> {
-    /// Creates a new mapper object given a pointer to the page table structures
-    pub fn new(pml4_table: &'a mut Table, physical_memory_offset: u64) -> Self {
+    /// Creates an empty Mapper every call to map and translate linear address will do noting.
+    pub const fn empty() -> Self {
         Mapper {
-            pml4_table,
-            physical_memory_offset,
+            pml4_table: None,
+            physical_memory_offset: 0,
         }
+    }
+    /// Initialize a new mapper object given a pointer to the page table structures
+    pub fn init(&mut self, pml4_table: &'a mut Table, physical_memory_offset: u64) {
+            self.pml4_table = Some(pml4_table);
+            self.physical_memory_offset = physical_memory_offset;
     }
 
     /// Loads a new page table level 4 pointer to cr3 and flushes the TLB.
@@ -47,8 +58,8 @@ impl<'a> Mapper<'a> {
         physical_addr: u64,
         frame_allocator: &mut impl FrameAllocator,
         flags: EntryFlags,
-    ) {
-        let mut table_linear_address = as_addr::<Table>(self.pml4_table);
+    ) -> Result<(), ()> {
+        let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref().ok_or(())?);
 
         // Goes though pml4, pdp, pd, pt and initialize a basic entries.
         for table_level in reverse_all::<PageTableLevel>() {
@@ -68,25 +79,25 @@ impl<'a> Mapper<'a> {
         }
 
         asm!("invlpg [{}]", in(reg) linear_addr, options(nostack, preserves_flags));
+        Ok(())
     }
 
     /// Gets a physical address from a given linear address.
-    pub fn linear_to_physical(&self, linear_addr: u64) -> Option<u64> {
-        let mut table_linear_address = as_addr::<Table>(self.pml4_table);
-
+    pub fn linear_to_physical(&self, linear_addr: u64) -> Result<u64, ()> {
+        let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref().ok_or(())?);
         // Goes though pml4, pdp, pd if the linear address offset doesn't exsist then return None.
         for table_level in reverse_all::<PageTableLevel>() {
             let table = unsafe { as_mut_ref::<Table>(table_linear_address) };
             let next_table = &mut table.entries[Mapper::entry_index(linear_addr, table_level)];
 
             if !next_table.is_present() {
-                return None;
+                return Err(());
             }
 
             table_linear_address = next_table.addr() + self.physical_memory_offset;
         }
 
-        Some(table_linear_address - self.physical_memory_offset)
+        Ok(table_linear_address - self.physical_memory_offset)
     }
 
     /// Gets the entry index by a given table level and a linear address
