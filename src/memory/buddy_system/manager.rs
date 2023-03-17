@@ -1,12 +1,9 @@
-use super::{super::frame_distributer::FrameDistributer, buddy::Buddy};
-use alloc::vec::Vec;
-use lazy_static::lazy_static;
-use log::debug;
-use spin::Mutex;
+use crate::memory::{frame_distributer::{FrameAllocator, FrameDistributer}, types::FRAME_SIZE};
 
-lazy_static! {
-    pub static ref KERNEL_ALLOCATOR: Mutex<BuddyManager> = Mutex::new(BuddyManager::empty());
-}
+use alloc::vec::Vec;
+use log::debug;
+
+use super::buddy::Buddy;
 
 /// This manager manages multiple buddy algorithms
 /// It divides the buddies to power-of-two memory regions
@@ -51,5 +48,11 @@ impl BuddyManager {
         } else {
             debug!("No buddy manages this memory :(");
         }
+    }
+}
+
+unsafe impl FrameAllocator for BuddyManager {
+    fn allocate_frame(&mut self) -> Option<u64> {
+        self.allocate(FRAME_SIZE, FRAME_SIZE)
     }
 }

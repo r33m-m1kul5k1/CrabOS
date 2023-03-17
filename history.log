@@ -1,15 +1,15 @@
+[INFO] - Starts the initialization sequence
+[INFO] - GDT initialized
+[INFO] - IDT initialized
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-Running 3 tests
-memory::basic_allocation...
-[ok]
-memory::big_allocation...
-[INFO] - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
-[ok]
-memory::entry_test...
-[INFO] - Created Entry {
-    page frame base: 0x8000,
-    flags: PRESENT | WRITABLE | USER,
-}
-[ok]
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xbdf000..0xfdf000), size: 1024 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xfdf000..0x1fdf000), size: 4096 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1fdf000..0x3fdf000), size: 8192 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3fdf000..0x7fdf000), size: 16384 }
+[INFO] - Finished initialing memory

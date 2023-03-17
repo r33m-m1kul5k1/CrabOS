@@ -2,8 +2,6 @@
 use core::arch::asm;
 use enum_iterator::{reverse_all, Sequence};
 use log::debug;
-use spin::Mutex;
-use lazy_static::lazy_static;
 
 use crate::memory::{as_addr, as_mut_ref};
 
@@ -12,9 +10,6 @@ use super::{
     paging::{EntryFlags, Table},
 };
 
-lazy_static! {
-    pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
-}
 
 pub struct Mapper<'a> {
     pml4_table: Option<&'a mut Table>,

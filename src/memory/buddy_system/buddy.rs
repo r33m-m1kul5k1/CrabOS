@@ -30,7 +30,8 @@ impl Buddy {
     pub unsafe fn new(region: MemoryRegion) -> Self {
 
         let max_order = region.size.trailing_zeros();
-        debug!("max_order: {}", max_order);
+        debug!("creating a buddy with: {:?}", region);
+
         Buddy {
             region,
             max_order,
@@ -43,6 +44,7 @@ impl Buddy {
                 temp
             },
         }
+        
     }
 
 

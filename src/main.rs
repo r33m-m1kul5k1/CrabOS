@@ -16,7 +16,7 @@ use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging},
+    memory::{frame_distributer::FrameDistributer, heap, paging, self},
     panic::PanicInfo,
 };
 
@@ -35,7 +35,8 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     idt::init();
     info!("IDT initialized");
 
-    info!("virtual memory offset: {:x}", boot_info.physical_memory_offset);
+    memory::init(boot_info);
+    info!("Finished initialing memory");
     
     hlt_loop()
 }

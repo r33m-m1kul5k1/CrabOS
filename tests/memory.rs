@@ -6,59 +6,38 @@
 
 extern crate alloc;
 
-const PAGE_SIZE: usize = 0x1000;
-
-
 use alloc::{boxed::Box, vec::Vec};
 use bootloader::{bootinfo::BootInfo, entry_point};
 
-use core::{panic::PanicInfo};
+use core::panic::PanicInfo;
 
 use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{
-        self, as_mut_ref,
-        buddy_system::manager::{BuddyManager, KERNEL_ALLOCATOR},
-        frame_distributer::{FrameAllocator, FrameDistributer},
-        heap, kfree, kmalloc,
-        mapper::{Mapper, KERNEL_MAPPER},
-        paging::{self, mmap},
-        paging::{get_cr3, Entry, EntryFlags, Table},
-        types::FRAME_SIZE,
-    },
-    test_panic_handler,
+    memory::{self, kmalloc, types::FRAME_SIZE, kfree}, test_panic_handler,
 };
 
 entry_point!(main);
 fn main(boot_info: &'static BootInfo) -> ! {
-    log::init(LevelFilter::Info);
+    log::init(LevelFilter::Debug);
 
     gdt::init();
     idt::init();
 
     memory::init(boot_info);
-    let physical_addr = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
-    kfree(physical_addr, FRAME_SIZE, FRAME_SIZE);
-    let physical_addr = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
 
     test_main();
     hlt_loop()
 }
 
 #[test_case]
-fn entry_test() {
-    let mut entry = Entry::new();
-
-    entry.set_entry(
-        0x8000,
-        EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER,
-    );
-
-    info!("Created {:#x?}", entry);
+fn kernel_allocations() {
+    let address = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
+    info!("allocated {:x} of size {:x}", address, FRAME_SIZE);
+    kfree(address, FRAME_SIZE, FRAME_SIZE);
+    info!("freed {:x} of size {:x}", address, FRAME_SIZE);
 }
-
 #[test_case]
 fn basic_allocation() {
     let _ = Box::new(41);

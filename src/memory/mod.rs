@@ -5,15 +5,15 @@
 
 use bootloader::BootInfo;
 use log::info;
+use lazy_static::lazy_static;
+use spin::Mutex;
 
 use crate::memory::{
-    buddy_system::manager::KERNEL_ALLOCATOR,
+    buddy_system::manager::BuddyManager,
     frame_distributer::FrameDistributer,
-    mapper::KERNEL_MAPPER,
+    mapper::Mapper,
     paging::{get_cr3, Table},
 };
-
-use self::frame_distributer::FrameAllocator;
 
 pub mod buddy_system;
 pub mod frame_distributer;
@@ -22,9 +22,19 @@ pub mod mapper;
 pub mod paging;
 pub mod types;
 
+
+lazy_static! {
+    static ref KERNEL_ALLOCATOR: Mutex<BuddyManager> = Mutex::new(BuddyManager::empty());
+}
+
+lazy_static! {
+    static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
+}
+
 /// Initialize frame distributer and a mapper to eventually initialize the kernel heap.
 pub fn init(boot_info: &'static BootInfo) {
-    let mut distributer = FrameDistributer::new(&boot_info.memory_map);
+    
+    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
     KERNEL_MAPPER.lock().init(
@@ -34,35 +44,21 @@ pub fn init(boot_info: &'static BootInfo) {
 
     info!("mapper initialized");
 
-    heap::init(&mut distributer);
+    heap::init(&mut frame_distributer);
     info!("kernel heap initialized");
 
-    KERNEL_ALLOCATOR.lock().init(&mut distributer);
+    KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
+
 }
 
 /// Allocate a kernel physical memory
 pub fn kmalloc(size: usize, alignment: usize) -> Result<u64, ()> {
-    KERNEL_ALLOCATOR
-        .lock()
-        .allocate(size, alignment)
-        .ok_or(())
+    KERNEL_ALLOCATOR.lock().allocate(size, alignment).ok_or(())
 }
 
 /// Frees a kernel physical memory
 pub fn kfree(address: u64, size: usize, alignment: usize) {
     KERNEL_ALLOCATOR.lock().deallocate(address, size, alignment);
-}
-
-struct FrameAllocationStrategy<T: FrameAllocator> {
-    allocation_strategy: Option<T>,
-}
-
-impl<T: FrameAllocator> FrameAllocationStrategy<T> {
-
-    /// Creates an empty strategy object.
-    pub const fn empty() -> Self {
-        FrameAllocationStrategy { allocation_strategy: None }
-    }
 }
 
 /// Converts an address to a const raw pointer

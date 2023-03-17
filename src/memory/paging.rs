@@ -1,8 +1,9 @@
 //! This module controls a 4 level table structure.
 
-use crate::memory::mapper::KERNEL_MAPPER;
+use crate::memory::{KERNEL_ALLOCATOR, KERNEL_MAPPER};
+use crate::memory::frame_distributer::FrameAllocator;
 
-use super::{frame_distributer::FrameAllocator, mapper::Mapper, types::FRAME_SIZE};
+use super::types::FRAME_SIZE;
 use bitflags::bitflags;
 use core::{arch::asm, fmt};
 use log::trace;
@@ -15,26 +16,22 @@ const ENTRY_ADDRESS_BITS: u64 = 0x000f_ffff_ffff_f000;
 ///
 /// * `linear_addr` - starting linear address
 /// * `length` - the new mapping's size in bytes
-/// * `mapper` - maps pages to page frames.
-/// * `frame_allocator` - allocate a frame from the physical address space
-pub fn mmap(
-    linear_addr: u64,
-    length: usize,
-    frame_allocator: &mut impl FrameAllocator,
-) -> Result<(), ()> {
+pub fn mmap(linear_addr: u64, length: usize) -> Result<(), ()> {
+
     for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
-        let physical_addr = frame_allocator.allocate_frame().ok_or(())?;
+        let physical_addr = KERNEL_ALLOCATOR.lock().allocate_frame().ok_or(())?;
         unsafe {
-            KERNEL_MAPPER.lock().map(
-                page_addr,
-                physical_addr,
-                frame_allocator,
-                EntryFlags::PRESENT | EntryFlags::WRITABLE,
-            ).unwrap()
+            KERNEL_MAPPER
+                .lock()
+                .map(
+                    page_addr,
+                    physical_addr,
+                    &mut *KERNEL_ALLOCATOR.lock(),
+                    EntryFlags::PRESENT | EntryFlags::WRITABLE,
+                )?;
         };
         trace!("mapping {:x} to {:x}", page_addr, physical_addr);
     }
-
     Ok(())
 }
 
