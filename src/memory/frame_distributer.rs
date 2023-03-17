@@ -3,10 +3,6 @@
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
 use crate::memory::types::{MemoryRegion, FRAME_SIZE};
-use x86_64::{
-    structures::paging::{FrameAllocator, PhysFrame, Size4KiB},
-    PhysAddr,
-};
 
 /// A memory component which distributes page frames to the OS page frame allocators.\
 /// It can distribute physical memory in chunks of 4Kib (frame).\
@@ -77,7 +73,7 @@ impl FrameDistributer {
     }
 
     /// Returns the unused frames iterator from the bootloader `memory_map`
-    pub fn unused_frames(&self) -> impl Iterator<Item = PhysFrame> {
+    pub fn unused_frames(&self) -> impl Iterator<Item = u64> {
         let unused_regions = self
             .memory_map
             .iter()
@@ -85,8 +81,7 @@ impl FrameDistributer {
 
         unused_regions
             .map(|r| r.range.start_addr()..r.range.end_addr())
-            .flat_map(|r| r.step_by(FRAME_SIZE as usize))
-            .map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
+            .flat_map(|r| r.step_by(FRAME_SIZE))
     }
 
     /// Returns the next free frame address
@@ -94,16 +89,26 @@ impl FrameDistributer {
         self.unused_frames()
             .nth(self.current_frame)
             .unwrap()
-            .start_address()
-            .as_u64()
     }
 }
 
-unsafe impl FrameAllocator<Size4KiB> for FrameDistributer {
-    fn allocate_frame(&mut self) -> Option<PhysFrame<Size4KiB>> {
+unsafe impl FrameAllocator for FrameDistributer {
+    fn allocate_frame(&mut self) -> Option<u64> {
         let frame = self.unused_frames().nth(self.current_frame);
         self.current_frame += 1;
 
         frame
     }
+    
+}
+
+
+/// A trait for types that can allocate a frame of memory.
+///
+/// # Safety
+///
+/// the frame alloctor must allocate unused memory frames
+pub unsafe trait FrameAllocator {
+    /// Allocate a frame and return it if possible.
+    fn allocate_frame(&mut self) -> Option<u64>;
 }

@@ -2,9 +2,12 @@
 #![no_std]
 #![no_main]
 #![allow(non_snake_case)]
+
 #![feature(alloc_error_handler)]
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
+#![feature(const_mut_refs)]
+
 #![test_runner(crate::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
 

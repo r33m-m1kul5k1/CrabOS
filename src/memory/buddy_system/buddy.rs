@@ -5,7 +5,6 @@ use core::cmp;
 use super::super::types::MemoryRegion;
 use alloc::vec::Vec;
 use log::debug;
-use x86_64::PhysAddr;
 
 const BUDDY_LIMIT: u32 = 0x1000;
 
@@ -31,7 +30,8 @@ impl Buddy {
     pub unsafe fn new(region: MemoryRegion) -> Self {
 
         let max_order = region.size.trailing_zeros();
-        debug!("max_order: {}", max_order);
+        debug!("creating a buddy with: {:?}", region);
+
         Buddy {
             region,
             max_order,
@@ -44,6 +44,7 @@ impl Buddy {
                 temp
             },
         }
+        
     }
 
 
@@ -121,8 +122,14 @@ impl Buddy {
     }
 
     /// Allocates a block given it's size and alignment
-    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<PhysAddr> {
-        let size = cmp::max(size, alignment);
+    pub fn allocate(&mut self, size: usize, alignment: usize) -> Option<u64> {
+        
+
+        let size = memory_alignment(size, alignment);
+
+        if size == 0 {
+            return None;
+        }
          // this line finds which order of this allocator can accommodate this amount of memory (if any)
         self.get_order(size).and_then(|request_order| {
             self.get_free_block(request_order)
@@ -134,7 +141,7 @@ impl Buddy {
                 // index * order size
                 let offset = block as u64 * (self.block_max_size() >> request_order as usize) as u64;
                 // Add the base address of this buddy allocator's block and return
-                PhysAddr::new(self.region.range.start_addr() + offset)
+                self.region.range.start_addr() + offset
             })
         })
     }
@@ -145,14 +152,25 @@ impl Buddy {
     /// * `address` - the addres of the block
     /// * `size` - block's size
     /// * `alignment` - a **power of two** block's alignment
-    pub fn deallocate(&mut self, address: PhysAddr, size: usize, alignment: usize) {
+    pub fn deallocate(&mut self, address: u64, size: usize, alignment: usize) {
         let size = cmp::max(size, alignment);
         
         debug!("deallocation size: 0x{:x}", size);
         let order = self.get_order(size).unwrap();
-        let block = (address - self.region.range.start_addr()).as_u64() / size as u64;
+        let block = (address - self.region.range.start_addr()) / size as u64;
 
         self.free_blocks[order].push(block);
         self.merge_buddies(order, block);
     }
+}
+
+/// Align a given size to a given alignment.
+/// 
+/// if the size is align it means that it is a multiplication of the `alignment`
+/// 
+/// Returns the new size
+fn memory_alignment(size: usize, alignment: usize) -> usize {
+    
+    // we add (alignment -1) to get the size to the upper alignment but not when aligned (-1)
+    ((size + alignment -1) / alignment) * alignment
 }

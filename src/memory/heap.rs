@@ -1,12 +1,9 @@
 //! Defines a heap algorithm and initiate the heap virutal memory.
-use super::paging::mmap;
-use crate::panic::{exit_qemu, hlt_loop, QemuExitCode};
+use super::{frame_distributer::{FrameAllocator, FrameDistributer}, types::FRAME_SIZE};
+use crate::{panic::{exit_qemu, hlt_loop, QemuExitCode}, memory::{paging::EntryFlags, KERNEL_MAPPER}};
 use alloc::alloc::Layout;
 use linked_list_allocator::LockedHeap;
-use x86_64::{
-    structures::paging::{mapper::MapToError, FrameAllocator, Mapper, Size4KiB},
-    VirtAddr,
-};
+use log::trace;
 
 // Note that the heap must start at a page that is not already mapped.
 const HEAP_BOTTOM: u64 = 0x10000f000;
@@ -33,20 +30,25 @@ fn handle_alloc_error(layout: Layout) -> ! {
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 /// Create a virtual address space for the heap (must be above the already mapped physical memory)
-pub fn init(
-    mapper: &mut impl Mapper<Size4KiB>,
-    frame_allocator: &mut impl FrameAllocator<Size4KiB>,
-) -> Result<(), MapToError<Size4KiB>> {
-    mmap(
-        VirtAddr::new(HEAP_BOTTOM),
-        HEAP_SIZE,
-        mapper,
-        frame_allocator,
-    )?;
+pub fn init(frame_distributer: &mut FrameDistributer) {
+
+    for page_addr in (HEAP_BOTTOM..(HEAP_BOTTOM + HEAP_SIZE as u64)).step_by(FRAME_SIZE) {
+        let physical_addr = frame_distributer.allocate_frame().unwrap();
+        unsafe {
+            KERNEL_MAPPER
+                .lock()
+                .map(
+                    page_addr,
+                    physical_addr,
+                    frame_distributer,
+                    EntryFlags::PRESENT | EntryFlags::WRITABLE,
+                )
+                .unwrap()
+        };
+        trace!("mapping {:x} to {:x}", page_addr, physical_addr);
+    }
 
     unsafe {
         ALLOCATOR.lock().init(HEAP_BOTTOM as usize, HEAP_SIZE);
     }
-
-    Ok(())
 }

@@ -519,7 +519,7 @@ To enable a feature add it to the `default` feature.
 symmetric: a == b implies b == a; and
 transitive: a == b and b == c implies a == c.
 ```
-NaN != Nan, meaning it cannot be reflexive than we don't use Eq.
+NaN != NaN, meaning it cannot be reflexive than we don't use Eq.
 ## Eq
 ```
 reflexive: a == a;
@@ -528,6 +528,6 @@ transitive: a == b and b == c implies a == c.
 ```
 ## Copy
 if there is no different between deep and sallow copy, it is best to use Copy trait.
-which does a deep copy when a sallow copy should occur, changing ownership for example.
+which does a sallow copy.
 ## Clone
-deep copy of an object
+deep copy of an object.
