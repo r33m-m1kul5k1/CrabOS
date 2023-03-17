@@ -28,7 +28,7 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
 
     log::init(LevelFilter::Debug);
 
-    info!("Starts the initialization sequence");
+    info!("CrabOS starts initialization sequence");
     gdt::init();
     info!("GDT initialized");
 
@@ -36,7 +36,7 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     info!("IDT initialized");
 
     memory::init(boot_info);
-    info!("Finished initialing memory");
+    info!("finished initializing memory related structures");
     
     hlt_loop()
 }

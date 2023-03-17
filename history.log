@@ -1,4 +1,4 @@
-[INFO] - Starts the initialization sequence
+[INFO] - CrabOS starts initialization sequence
 [INFO] - GDT initialized
 [INFO] - IDT initialized
 [INFO] - frame distributer initialized
@@ -12,4 +12,4 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xfdf000..0x1fdf000), size: 4096 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1fdf000..0x3fdf000), size: 8192 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3fdf000..0x7fdf000), size: 16384 }
-[INFO] - Finished initialing memory
+[INFO] - finished initializing memory related structures
