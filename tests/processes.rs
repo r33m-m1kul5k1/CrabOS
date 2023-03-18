@@ -12,7 +12,7 @@ use CrabOS::{
         idt,
     },
     log,
-    memory::frame_distributer::{FrameAllocator, FrameDistributer},
+    memory::{self, kmalloc, types::FRAME_SIZE},
     processes::objects::Thread,
     test_panic_handler,
     userland::dummy_process,
@@ -25,15 +25,15 @@ use bootloader::BootInfo;
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     log::init(LevelFilter::Debug);
     gdt::init();
-    idt::IDT.load();
+    idt::init();
 
-    let mut distributer = FrameDistributer::new(&boot_info.memory_map);
+    memory::init(boot_info);
 
     let dummy_thread = Thread::new(
         dummy_process as *const () as u64,
         GDT.1.kernel_code.0,
         GDT.1.kernel_data.0,
-        boot_info.physical_memory_offset + distributer.allocate_frame().unwrap(),
+        boot_info.physical_memory_offset + kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap(),
     );
 
     unsafe { dummy_thread.run() }

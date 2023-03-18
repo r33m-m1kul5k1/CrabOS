@@ -1,8 +1,9 @@
 //! this module includes userland processes
+use log::info;
 
 
 // the sign ! `never` means that the func never returns
 pub fn dummy_process() -> ! {
-    // serial_println!("hello from user land :)");
+    info!("hello from user land :)");
     loop {}
 }

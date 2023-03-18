@@ -95,6 +95,11 @@ impl<'a> Mapper<'a> {
         Ok(table_linear_address - self.physical_memory_offset)
     }
 
+    /// Gets the mapper physical memory offset
+    pub fn get_physical_memory_offset(&self) -> u64 {
+        self.physical_memory_offset
+    }
+
     /// Gets the entry index by a given table level and a linear address
     fn entry_index(linear_addr: u64, level: PageTableLevel) -> usize {
         linear_addr as usize >> (9 * (level as u64) + 12) & 0b1_1111_1111

@@ -24,11 +24,11 @@ pub mod types;
 
 
 lazy_static! {
-    static ref KERNEL_ALLOCATOR: Mutex<BuddyManager> = Mutex::new(BuddyManager::empty());
+    pub static ref KERNEL_ALLOCATOR: Mutex<BuddyManager> = Mutex::new(BuddyManager::empty());
 }
 
 lazy_static! {
-    static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
+    pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
 }
 
 /// Initialize frame distributer and a mapper to eventually initialize the kernel heap.
