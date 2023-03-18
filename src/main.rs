@@ -1,71 +1,54 @@
 #![no_std]
 #![no_main]
-#![allow(nonstandard_style)]
-#![feature(abi_x86_interrupt)]
-#![feature(stmt_expr_attributes)]
+#![allow(non_snake_case)]
 #![feature(custom_test_frameworks)]
-#![test_runner(CrabOS::test_runner)]
+#![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
 
+#![allow(unused)]
+
 use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
+use x86_64::VirtAddr;
+#[allow(unused_imports)]
+use CrabOS::panic::kernel_panic;
+
 use CrabOS::{
-    drivers::vga::{Color, WRITER},
-    graphic_println, hlt_loop,
+    hlt_loop,
     interrupts::{gdt, idt},
-    log::logger,
-    memory::pmm::FrameDistributer,
+    log::{self, info, LevelFilter},
+    memory::{frame_distributer::FrameDistributer, heap, paging, self},
+    panic::PanicInfo,
 };
 
 entry_point!(kmain);
 
-pub fn kmain(boot_info: &'static BootInfo) -> ! {
+fn kmain(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    WRITER
-        .lock()
-        .set_writer_theme(Color::LightRed, Color::Black);
+    log::init(LevelFilter::Debug);
 
-    graphic_println!(
-        r"
-  $$$$$$\                     $$\        $$$$$$\   $$$$$$\  
- $$  __$$\                    $$ |      $$  __$$\ $$  __$$\ 
- $$ /  \__| $$$$$$\  $$$$$$\  $$$$$$$\  $$ /  $$ |$$ /  \__|
- $$ |      $$  __$$\ \____$$\ $$  __$$\ $$ |  $$ |\$$$$$$\  
- $$ |      $$ |  \__|$$$$$$$ |$$ |  $$ |$$ |  $$ | \____$$\ 
- $$ |  $$\ $$ |     $$  __$$ |$$ |  $$ |$$ |  $$ |$$\   $$ |
- \$$$$$$  |$$ |     \$$$$$$$ |$$$$$$$  | $$$$$$  |\$$$$$$  |
-  \______/ \__|      \_______|\_______/  \______/  \______/ 
-                     (\/) (°,,,,°) (\/)                                     
-    "
-    );
-
-
-    logger::init(log::LevelFilter::Debug);
-
-    logger::info!("Starts the initialization sequence");
-
-    logger::info!("---Global Descriptor Table and the kernel's Segments");
+    info!("CrabOS starts initialization sequence");
     gdt::init();
-    logger::info!("---Interrupt Descriptor Table");
-    idt::IDT.load();
+    info!("GDT initialized");
 
-    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
+    idt::init();
+    info!("IDT initialized");
+
+    memory::init(boot_info);
+    info!("finished initializing memory related structures");
     
-    frame_distributer.get_region();
-
     hlt_loop()
 }
 
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    hlt_loop()
+fn panic(info: &PanicInfo) -> ! {
+    kernel_panic(info)
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    CrabOS::test_panic_handler(info)
+    CrabOS::panic::test_panic_handler(info)
 }

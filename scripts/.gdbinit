@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 set disassembly-flavor intel
 define hook-stop
 x/i $rip

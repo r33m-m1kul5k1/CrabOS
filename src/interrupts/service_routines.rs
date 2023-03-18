@@ -1,14 +1,14 @@
-/* A list of all interrupt service routines */
+//! A list of all interrupt service routines 
 
-use crate::log::logger;
+use crate::log::debug;
 use x86_64::structures::idt::InterruptStackFrame;
 
 /// A double fault (#DF) exception can occur
 /// when a second exception occurs during the handling of a prior (first) exception or interrupt handler.
 pub extern "x86-interrupt" fn double_fault(stack_frame: InterruptStackFrame, error_code: u64) -> ! {
-    logger::debug!("EXCEPTION: Double Fault");
-    logger::debug!("Error code: {:#X?}", error_code);
-    logger::debug!("Stack Frame: {:#X?}", stack_frame);
+    debug!("EXCEPTION: Double Fault");
+    debug!("Error code: {:#X?}", error_code);
+    debug!("Stack Frame: {:#X?}", stack_frame);
     panic!();
 }
 
@@ -24,8 +24,8 @@ pub extern "x86-interrupt" fn general_protection_fault(
     stack_frame: InterruptStackFrame,
     error_code: u64,
 ) {
-    logger::debug!("EXCEPTION: General Protection Fault");
-    logger::debug!("Error code: {:#X?}", error_code);
-    logger::debug!("Stack Frame: {:#X?}", stack_frame);
+    debug!("EXCEPTION: General Protection Fault");
+    debug!("Error code: {:#X?}", error_code);
+    debug!("Stack Frame: {:#X?}", stack_frame);
     panic!();
 }

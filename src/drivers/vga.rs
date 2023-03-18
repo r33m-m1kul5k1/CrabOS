@@ -1,8 +1,10 @@
+//! This module writes to the VGA buffer in text mode.
+
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 const ADDRESS: usize = 0xb8000;
-const PRINTABLE_ASCII: u8 = 0x20;
-const PRINTABLE_ASCII_CMP: u8 = 0x7e;
+const SPACE_ASCII: u8 = 0x20;
+const TILDA_ASCII: u8 = 0x7e;
 const NOT_IN_ASCII_RANGE: u8 = 0xfe;
 
 use core::fmt::{self, Arguments};
@@ -21,7 +23,7 @@ lazy_static! {
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)] // By deriving the Copy, Clone, Debug, PartialEq, and Eq traits, we enable copy semantics for the type and make it printable and comparable.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)] 
 #[repr(u8)]
 pub enum Color {
     Black = 0,
@@ -44,7 +46,8 @@ pub enum Color {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
-struct ColorCode(u8); // ColorCode struct contains the full color byte, containing foreground and background color. 
+/// ColorCode struct contains the full color byte, containing foreground and background color. 
+struct ColorCode(u8); 
 
 impl ColorCode {
     fn new(foreground: Color, background: Color) -> ColorCode {
@@ -60,19 +63,25 @@ struct ScreenChar {
 }
 
 #[repr(transparent)]
+/// An 2d array representing the vga buffer
 struct Buffer {
     chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
-// This struct will write to the screen
+/// This struct writes to a given buffer in text mode
 pub struct Writer {
+
     column_position: usize,
     row_position: usize,
+    // Writer's theme
     color_code: ColorCode,
+    /// The vga buffer
     buffer: &'static mut Buffer,
 }
 
 impl Writer {
+
+    /// write one byte to the buffer, if new line go to the next row.
     fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
@@ -90,16 +99,19 @@ impl Writer {
         }
     }
     
+    /// Takes the writer to the start of the row below the current one.
     fn new_line(&mut self) {
         self.row_position += 1;
         self.column_position = 0;
     }
 
+    /// Writes every ASCII character to the screen
     fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
-                // printable ASCII byte or newline
-                PRINTABLE_ASCII..=PRINTABLE_ASCII_CMP | b'\n' => self.write_byte(byte),
+                // here we can add backspace operation (0x8)
+                SPACE_ASCII..=TILDA_ASCII | b'\n' => self.write_byte(byte),
+
                 // not part of printable ASCII range
                 _ => self.write_byte(NOT_IN_ASCII_RANGE),
             }
@@ -107,6 +119,7 @@ impl Writer {
         }
     }
 
+    /// Set the writer with a new color code.
     pub fn set_writer_theme(&mut self, foreground: Color, background: Color) {
         self.color_code = ColorCode::new(foreground, background);
     }
@@ -121,8 +134,7 @@ impl fmt::Write for Writer {
     }
 }
 
-
-
+/// private print for macros
 pub fn _print(args: Arguments) {
     
     use core::fmt::Write;

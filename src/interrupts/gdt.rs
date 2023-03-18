@@ -1,4 +1,4 @@
-/* This module constructs a Global Descriptor Table, and a Task State Segment */
+//! This module constructs a Global Descriptor Table, and a Task State Segment
 
 use lazy_static::lazy_static;
 use x86_64::instructions::tables::load_tss;

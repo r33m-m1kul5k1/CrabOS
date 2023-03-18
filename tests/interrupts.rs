@@ -1,20 +1,24 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(CrabOS::test_runner)]
+#![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-
 use CrabOS::{
+    hlt_loop,
     interrupts::{gdt, idt},
-    test_should_panic_handler, hlt_loop,
+    log::{self, LevelFilter},
+    test_should_panic_handler,
 };
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    log::init(LevelFilter::Debug);
+
     gdt::init();
     idt::IDT.load();
+
     test_main();
     hlt_loop();
 }

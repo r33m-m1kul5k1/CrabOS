@@ -1,17 +1,16 @@
-[DEBUG] - EXCEPTION: Double Fault
-[DEBUG] - Error code: 0x0
-[DEBUG] - Stack Frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x204c60,
-    ),
-    code_segment: 0x2B,
-    cpu_flags: 0x202,
-    stack_pointer: VirtAddr(
-        0x18000287000,
-    ),
-    stack_segment: 0x33,
-}
-[failed]
 
-Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
-
+[INFO] - CrabOS starts initialization sequence
+[INFO] - GDT initialized
+[INFO] - IDT initialized
+[INFO] - frame distributer initialized
+[INFO] - mapper initialized
+[INFO] - kernel heap initialized
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xbdf000..0xfdf000), size: 1024 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xfdf000..0x1fdf000), size: 4096 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1fdf000..0x3fdf000), size: 8192 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3fdf000..0x7fdf000), size: 16384 }
+[INFO] - finished initializing memory related structures
