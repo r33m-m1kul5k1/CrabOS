@@ -55,7 +55,6 @@ impl Thread {
     #[inline]
     pub unsafe fn run(&self) -> ! {
         asm!(
-        "cli",
         "mov rsp, {}",
         "pop rax; mov ds, ax; mov es, ax; mov fs, ax; mov gs, ax",
         "pop rax; pop rbx; pop rcx; pop rdx; pop rsi; pop rdi; pop rbp;\
