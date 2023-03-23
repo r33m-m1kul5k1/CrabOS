@@ -1,9 +1,14 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
+use log::debug;
 
-use crate::memory::{kmalloc, types::FRAME_SIZE, mapper::Mapper, KERNEL_MAPPER, KERNEL_ALLOCATOR};
+use crate::{
+    interrupts::get_userland_selectors,
+    memory::{get_virutal_memory_base, kmalloc, kmap, paging::EntryFlags, types::FRAME_SIZE},
+};
 const INTERRUPT_ENABLE_FLAG: u64 = 1 << 9;
+const USERLAND_OFFSET: u64 = 1 << 31;
 
 #[derive(Default)]
 pub struct Thread {
@@ -77,8 +82,47 @@ pub struct Process {
 }
 
 impl Process {
-    /// Creates a new process object, allocate to the process a stack, create new page tables on the kernel heap, and 
-    pub fn new(process_code_address: u64, pid: u64) -> Self {
-        unimplemented!()
+    /// Creates a new process object, allocate to the process a stack,
+    /// and maps the process code to userland pages
+    ///
+    /// # Safety
+    ///
+    /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
+    pub unsafe fn new(pid: u64, process_code: u64) -> Self {
+        let (cs, ds) = get_userland_selectors();
+        let stack_top = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap() + get_virutal_memory_base();
+        let code_page_frame = (process_code >> 12) << 12;
+        unsafe {
+            kmap(
+                stack_top + USERLAND_OFFSET,
+                stack_top,
+                EntryFlags::PRESENT
+                    | EntryFlags::WRITABLE
+                    | EntryFlags::NO_EXECUTE
+                    | EntryFlags::USER,
+            )
+            .unwrap();
+            kmap(
+                code_page_frame + USERLAND_OFFSET,
+                code_page_frame,
+                EntryFlags::PRESENT | EntryFlags::USER,
+            )
+            .unwrap();
+        };
+        Process {
+            pid,
+            thread: Thread::new(
+                process_code + USERLAND_OFFSET,
+                cs,
+                ds,
+                stack_top + USERLAND_OFFSET,
+            ),
+        }
+    }
+
+    /// Executes the process' main thread
+    pub fn execute(&self) -> ! {
+        debug!("executing process: {}", self.pid);
+        unsafe { self.thread.run() }
     }
 }

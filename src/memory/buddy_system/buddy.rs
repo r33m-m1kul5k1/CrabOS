@@ -118,7 +118,6 @@ impl Buddy {
         self.free_blocks[order - 1].push(block / 2);
 
         self.merge_buddies(order - 1, block / 2);
-
     }
 
     /// Allocates a block given it's size and alignment

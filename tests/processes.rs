@@ -8,12 +8,12 @@ use core::panic::PanicInfo;
 
 use CrabOS::{
     interrupts::{
-        gdt::{self, GDT},
+        gdt::{self},
         idt,
     },
     log,
-    memory::{self, kmalloc, types::FRAME_SIZE},
-    processes::objects::Thread,
+    memory::{self},
+    processes::objects::Process,
     test_panic_handler,
     userland::dummy_process,
 };
@@ -29,14 +29,9 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 
     memory::init(boot_info);
 
-    let dummy_thread = Thread::new(
-        dummy_process as *const () as u64,
-        GDT.1.kernel_code.0,
-        GDT.1.kernel_data.0,
-        boot_info.physical_memory_offset + kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap(),
-    );
+    let dummy_process = unsafe { Process::new(0, dummy_process as *const () as u64) };
 
-    unsafe { dummy_thread.run() }
+    dummy_process.execute();
 }
 
 #[panic_handler]

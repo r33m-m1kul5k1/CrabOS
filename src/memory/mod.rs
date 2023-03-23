@@ -15,6 +15,8 @@ use crate::memory::{
     paging::{get_cr3, Table},
 };
 
+use self::paging::EntryFlags;
+
 pub mod buddy_system;
 pub mod frame_distributer;
 pub mod heap;
@@ -61,6 +63,15 @@ pub fn kfree(address: u64, size: usize, alignment: usize) {
     KERNEL_ALLOCATOR.lock().deallocate(address, size, alignment);
 }
 
+/// Maps a kernel page to a page frame
+pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> Result<(), ()> {
+    unsafe { KERNEL_MAPPER.lock().map(linear_addr, physical_addr, &mut *KERNEL_ALLOCATOR.lock(), flags) }
+}
+
+/// Gets the start of the mapped physical memory
+pub fn get_virutal_memory_base() -> u64 {
+    KERNEL_MAPPER.lock().get_physical_memory_offset()
+}
 /// Converts an address to a const raw pointer
 const fn as_ptr<T>(address: u64) -> *const T {
     address as *const T

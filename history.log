@@ -1,7 +1,6 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae8000..0xae9000), size: 1 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae9000..0xaeb000), size: 2 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaeb000..0xaef000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
@@ -30,18 +29,26 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x107fff000..0x10ffff000), size: 32768 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10ffff000..0x11ffff000), size: 65536 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
+[DEBUG] - splits level 0
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[]]
+[DEBUG] - free blocks: [[], [1]]
+[DEBUG] - block's index: 1
+[DEBUG] - free blocks: [[], []]
+[DEBUG] - splits level 0
+[DEBUG] - splits level 1
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [1], [1]]
+[DEBUG] - executing process: 0
 [DEBUG] - EXCEPTION: Double Fault
-[DEBUG] - Error code: 0x20CA50
+[DEBUG] - Error code: 0x8020D0D0
 [DEBUG] - Stack Frame: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x18,
+        0x2b,
     ),
     code_segment: 0x202,
-    cpu_flags: 0x18000ae8000,
+    cpu_flags: 0x18080ae9000,
     stack_pointer: VirtAddr(
-        0x20,
+        0x33,
     ),
     stack_segment: 0x0,
 }
