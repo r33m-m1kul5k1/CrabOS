@@ -56,7 +56,7 @@ impl<'a> Mapper<'a> {
     ) -> Result<(), ()> {
         let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref().ok_or(())?);
 
-        // Goes though pml4, pdp, pd, pt and initialize a basic entries.
+        // Goes though pml4, pdp, pd, pt and initialize basic entries.
         for table_level in reverse_all::<PageTableLevel>() {
             let table = as_mut_ref::<Table>(table_linear_address);
             let entry = &mut table.entries[Mapper::entry_index(linear_addr, table_level)];
@@ -66,7 +66,7 @@ impl<'a> Mapper<'a> {
             } else if !entry.is_present() {
                 entry.set_entry(
                     frame_allocator.allocate_frame().unwrap(),
-                    EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::NO_EXECUTE,
+                    flags,
                 );
             }
 

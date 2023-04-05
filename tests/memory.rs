@@ -15,7 +15,11 @@ use CrabOS::{
     hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{self, kmalloc, types::FRAME_SIZE, kfree}, test_panic_handler,
+    memory::{
+        self, as_addr, get_physical_addr, kfree, kmalloc, kmap,
+        paging::EntryFlags, types::FRAME_SIZE, as_ref, get_linear_addr,
+    },
+    test_panic_handler,
 };
 
 entry_point!(main);
@@ -29,6 +33,30 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
     test_main();
     hlt_loop()
+}
+
+#[test_case]
+fn test_mapping() {
+    let first_arr = [1, 2, 3, 4];
+    let arr_address = as_addr(&first_arr);
+
+    let arr_page = (arr_address >> 12) << 12;
+    let arr_page_frame = get_physical_addr(arr_page).unwrap();
+    let arr_page = get_linear_addr(arr_page_frame);
+
+    unsafe {
+        kmap(
+            arr_page,
+            arr_page_frame,
+            EntryFlags::PRESENT | EntryFlags::USER,
+        ).unwrap();
+    }
+
+    let first_arr = *as_ref::<[i32; 4]>(arr_address);
+    let second_arr = *as_ref::<[i32; 4]>(arr_page | (arr_address & 0xFFF));
+
+    info!("first arr: {:?}\nsecond arr: {:?}", first_arr, second_arr);
+    assert!(first_arr == second_arr)
 }
 
 #[test_case]

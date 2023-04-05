@@ -1,8 +1,9 @@
+[INFO] - virtual memory base: 0x80000000
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae9000..0xaeb000), size: 2 }
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaeb000..0xaef000), size: 4 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae6000..0xae7000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae7000..0xaef000), size: 8 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
@@ -15,7 +16,9 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xffdf000..0x1ffdf000), size: 65536 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1ffdf000..0x3ffdf000), size: 131072 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10000f000..0x10001f000), size: 16 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100012000..0x100013000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100013000..0x100017000), size: 4 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100017000..0x10001f000), size: 8 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10001f000..0x10003f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10003f000..0x10007f000), size: 64 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10007f000..0x1000ff000), size: 128 }
@@ -29,30 +32,12 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x107fff000..0x10ffff000), size: 32768 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10ffff000..0x11ffff000), size: 65536 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
-[DEBUG] - splits level 0
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
+[DEBUG] - current stack top: 0x10000201df0
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1]]
-[DEBUG] - block's index: 1
-[DEBUG] - free blocks: [[], []]
-[DEBUG] - splits level 0
-[DEBUG] - splits level 1
-[DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1]]
+[DEBUG] - free blocks: [[]]
+[DEBUG] - process entry point at 0x20e120
+[WARN] - Given linear address 0x20e000 is below virtual memory base at 0x80000000
+[DEBUG] - process page frame at 0x40d000
+[DEBUG] - process code page: 0x8040d000 -> 0x40d000
 [DEBUG] - executing process: 0
-[DEBUG] - EXCEPTION: Double Fault
-[DEBUG] - Error code: 0x8020D0D0
-[DEBUG] - Stack Frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x2b,
-    ),
-    code_segment: 0x202,
-    cpu_flags: 0x18080ae9000,
-    stack_pointer: VirtAddr(
-        0x33,
-    ),
-    stack_segment: 0x0,
-}
-[failed]
-
-Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
-

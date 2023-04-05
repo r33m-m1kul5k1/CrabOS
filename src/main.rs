@@ -17,7 +17,7 @@ use CrabOS::{
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
     memory::{frame_distributer::FrameDistributer, heap, paging, self},
-    panic::PanicInfo,
+    panic::PanicInfo, graphic_println,
 };
 
 entry_point!(kmain);
@@ -37,6 +37,7 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
 
     memory::init(boot_info);
     info!("finished initializing memory related structures");
+
     
     hlt_loop()
 }

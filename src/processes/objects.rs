@@ -4,11 +4,12 @@ use core::arch::asm;
 use log::debug;
 
 use crate::{
-    interrupts::get_userland_selectors,
-    memory::{get_virutal_memory_base, kmalloc, kmap, paging::EntryFlags, types::FRAME_SIZE},
+    interrupts::get_kernel_selectors,
+    memory::{
+        get_linear_addr, get_physical_addr, kmalloc, kmap, paging::EntryFlags, types::FRAME_SIZE,
+    },
 };
-const INTERRUPT_ENABLE_FLAG: u64 = 1 << 9;
-const USERLAND_OFFSET: u64 = 1 << 31;
+const PAGE_INDEX: u64 = 0xFFF;
 
 #[derive(Default)]
 pub struct Thread {
@@ -54,7 +55,6 @@ impl Thread {
                 ss: ds as u64,
                 ds: ds as u64,
                 rsp,
-                rflags: INTERRUPT_ENABLE_FLAG,
                 ..Default::default()
             },
         }
@@ -89,33 +89,38 @@ impl Process {
     ///
     /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
     pub unsafe fn new(pid: u64, process_code: u64) -> Self {
-        let (cs, ds) = get_userland_selectors();
-        let stack_top = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap() + get_virutal_memory_base();
-        let code_page_frame = (process_code >> 12) << 12;
+        let (cs, ds) = get_kernel_selectors();
+        let stack_top = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
+        debug!("process entry point at 0x{:x}", process_code);
+        let code_page_frame = get_physical_addr((process_code >> 12) << 12).unwrap();
+        debug!("process page frame at 0x{:x}", code_page_frame);
         unsafe {
             kmap(
-                stack_top + USERLAND_OFFSET,
+                get_linear_addr(stack_top),
                 stack_top,
-                EntryFlags::PRESENT
-                    | EntryFlags::WRITABLE
-                    | EntryFlags::NO_EXECUTE
-                    | EntryFlags::USER,
+                EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER,
             )
             .unwrap();
             kmap(
-                code_page_frame + USERLAND_OFFSET,
+                get_linear_addr(code_page_frame),
                 code_page_frame,
                 EntryFlags::PRESENT | EntryFlags::USER,
             )
             .unwrap();
         };
+
+        debug!(
+            "process code page: 0x{:x} -> 0x{:x}",
+            get_linear_addr(code_page_frame),
+            get_physical_addr(get_linear_addr(code_page_frame)).unwrap()
+        );
         Process {
             pid,
             thread: Thread::new(
-                process_code + USERLAND_OFFSET,
+                get_linear_addr(code_page_frame) | (process_code & PAGE_INDEX),
                 cs,
                 ds,
-                stack_top + USERLAND_OFFSET,
+                get_linear_addr(stack_top),
             ),
         }
     }

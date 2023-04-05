@@ -4,8 +4,8 @@
 //! 3. enables dynamic object use
 
 use bootloader::BootInfo;
-use log::info;
 use lazy_static::lazy_static;
+use log::{info, warn};
 use spin::Mutex;
 
 use crate::memory::{
@@ -24,7 +24,6 @@ pub mod mapper;
 pub mod paging;
 pub mod types;
 
-
 lazy_static! {
     pub static ref KERNEL_ALLOCATOR: Mutex<BuddyManager> = Mutex::new(BuddyManager::empty());
 }
@@ -35,7 +34,11 @@ lazy_static! {
 
 /// Initialize frame distributer and a mapper to eventually initialize the kernel heap.
 pub fn init(boot_info: &'static BootInfo) {
-    
+    info!(
+        "virtual memory base: 0x{:x}",
+        boot_info.physical_memory_offset
+    );
+
     let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
     info!("frame distributer initialized");
 
@@ -50,7 +53,6 @@ pub fn init(boot_info: &'static BootInfo) {
     info!("kernel heap initialized");
 
     KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
-
 }
 
 /// Allocate a kernel physical memory
@@ -65,13 +67,41 @@ pub fn kfree(address: u64, size: usize, alignment: usize) {
 
 /// Maps a kernel page to a page frame
 pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> Result<(), ()> {
-    unsafe { KERNEL_MAPPER.lock().map(linear_addr, physical_addr, &mut *KERNEL_ALLOCATOR.lock(), flags) }
+    unsafe {
+        KERNEL_MAPPER.lock().map(
+            linear_addr,
+            physical_addr,
+            &mut *KERNEL_ALLOCATOR.lock(),
+            flags,
+        )
+    }
 }
 
 /// Gets the start of the mapped physical memory
 pub fn get_virutal_memory_base() -> u64 {
     KERNEL_MAPPER.lock().get_physical_memory_offset()
 }
+
+pub fn get_physical_addr(linear_addr: u64) -> Option<u64> {
+    let virtual_memory_base = get_virutal_memory_base();
+    if linear_addr < virtual_memory_base {
+        warn!(
+            "Given linear address 0x{:x} is below virtual memory base at 0x{:x}",
+            linear_addr, virtual_memory_base
+        );
+    }
+    
+    let physical_addr = KERNEL_MAPPER
+        .lock()
+        .linear_to_physical(linear_addr).ok();
+
+    return physical_addr;
+}
+
+pub fn get_linear_addr(physical_addr: u64) -> u64 {
+    physical_addr + get_virutal_memory_base()
+}
+
 /// Converts an address to a const raw pointer
 const fn as_ptr<T>(address: u64) -> *const T {
     address as *const T
