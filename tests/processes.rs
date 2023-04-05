@@ -10,7 +10,7 @@ use core::{panic::PanicInfo, arch::asm};
 use CrabOS::{
     interrupts::{
         gdt::{self},
-        idt, get_userland_selectors, get_kernel_selectors,
+        idt, get_kernel_selectors,
     },
     log,
     memory::{self, kmap, as_addr},

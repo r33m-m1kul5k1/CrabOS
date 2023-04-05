@@ -68,6 +68,8 @@ impl<'a> Mapper<'a> {
                     frame_allocator.allocate_frame().unwrap(),
                     flags,
                 );
+            } else {
+                entry.set_flags(flags);
             }
 
             table_linear_address = entry.addr() + self.physical_memory_offset;

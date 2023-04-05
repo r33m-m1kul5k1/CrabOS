@@ -36,7 +36,7 @@
 [DEBUG] - current stack top: 0x10000201df0
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[]]
-[DEBUG] - process entry point at 0x20e120
+[DEBUG] - process entry point at 0x20e170
 [WARN] - Given linear address 0x20e000 is below virtual memory base at 0x80000000
 [DEBUG] - process page frame at 0x40d000
 [DEBUG] - process code page: 0x8040d000 -> 0x40d000

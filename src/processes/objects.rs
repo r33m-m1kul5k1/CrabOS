@@ -4,7 +4,7 @@ use core::arch::asm;
 use log::debug;
 
 use crate::{
-    interrupts::get_kernel_selectors,
+    interrupts::get_user_selectors,
     memory::{
         get_linear_addr, get_physical_addr, kmalloc, kmap, paging::EntryFlags, types::FRAME_SIZE,
     },
@@ -89,7 +89,7 @@ impl Process {
     ///
     /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
     pub unsafe fn new(pid: u64, process_code: u64) -> Self {
-        let (cs, ds) = get_kernel_selectors();
+        let (cs, ds) = get_user_selectors();
         let stack_top = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
         debug!("process entry point at 0x{:x}", process_code);
         let code_page_frame = get_physical_addr((process_code >> 12) << 12).unwrap();
