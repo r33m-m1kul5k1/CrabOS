@@ -1,3 +1,67 @@
-[DEBUG] - tests logger 1
-[DEBUG] - tests logger 2
-[DEBUG] - tests logger 3
+[DEBUG] - IA32_STAR: 23001800000000
+[DEBUG] - IA32_LSTAR: 202141
+[DEBUG] - IA32_FMASK: 200
+[DEBUG] - IA32_EFER: d00
+[INFO] - succefully initialized the gdt, idt and syscalls
+[INFO] - virtual memory base: 0x80000000
+[INFO] - frame distributer initialized
+[INFO] - mapper initialized
+[INFO] - kernel heap initialized
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae7000..0xaef000), size: 8 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xbdf000..0xfdf000), size: 1024 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xfdf000..0x1fdf000), size: 4096 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1fdf000..0x3fdf000), size: 8192 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3fdf000..0x7fdf000), size: 16384 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x7fdf000..0xffdf000), size: 32768 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xffdf000..0x1ffdf000), size: 65536 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1ffdf000..0x3ffdf000), size: 131072 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100012000..0x100013000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100013000..0x100017000), size: 4 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100017000..0x10001f000), size: 8 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10001f000..0x10003f000), size: 32 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10003f000..0x10007f000), size: 64 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10007f000..0x1000ff000), size: 128 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1000ff000..0x1001ff000), size: 256 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1001ff000..0x1003ff000), size: 512 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1003ff000..0x1007ff000), size: 1024 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x1007ff000..0x100fff000), size: 2048 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x100fff000..0x101fff000), size: 4096 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x101fff000..0x103fff000), size: 8192 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x103fff000..0x107fff000), size: 16384 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x107fff000..0x10ffff000), size: 32768 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10ffff000..0x11ffff000), size: 65536 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
+[DEBUG] - current stack top: 0x10000201d90
+[DEBUG] - splits level 0
+[DEBUG] - splits level 1
+[DEBUG] - splits level 2
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [1], [1], [1]]
+[DEBUG] - process entry point at 0x216e40
+[WARN] - Given linear address 0x216000 is below virtual memory base at 0x80000000
+[DEBUG] - process page frame at 0x415000
+[DEBUG] - process code page: 0x80415000 -> 0x415000
+[DEBUG] - executing process: 0
+[DEBUG] - EXCEPTION: Double Fault
+[DEBUG] - Error code: 0x0
+[DEBUG] - Stack Frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415e41,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x2,
+    stack_pointer: VirtAddr(
+        0x80ae6ff8,
+    ),
+    stack_segment: 0x2B,
+}
+[failed]
+
+Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
+

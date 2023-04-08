@@ -27,11 +27,13 @@ pub fn init() {
     let star_value = (((ss as u64 - 8) << 16) | cs as u64) << 32 | (rdmsr(IA32_STAR_MSR) & MASK_32_HIGH);
     wrmsr!(IA32_STAR_MSR, star_value);
     wrmsr!(IA32_LSTAR_MSR, as_addr(&syscall_handler));
-    debug!("tests logger 1");
     wrmsr!(IA32_FMASK_MSR, INTERRUPT_ENALBE_FLAG);
-    debug!("tests logger 2");
-    wrmsr!(IA32_EFER_MSR, SYSCALL_ENABLE_EFER);
-    debug!("tests logger 3");
+    // wrmsr!(IA32_EFER_MSR, SYSCALL_ENABLE_EFER);
+
+    debug!("IA32_STAR: {:x}", rdmsr(IA32_STAR_MSR));
+    debug!("IA32_LSTAR: {:x}", rdmsr(IA32_LSTAR_MSR));
+    debug!("IA32_FMASK: {:x}", rdmsr(IA32_FMASK_MSR));
+    debug!("IA32_EFER: {:x}", rdmsr(IA32_EFER_MSR));
 }
 
 #[naked]
