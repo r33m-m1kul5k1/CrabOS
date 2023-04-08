@@ -7,6 +7,7 @@
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
 #![feature(const_mut_refs)]
+#![feature(naked_functions)]
 
 #![test_runner(crate::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
@@ -22,6 +23,8 @@ pub mod processes;
 pub mod userland;
 pub mod panic;
 pub mod tests;
+pub mod syscalls;
+mod hardware;
 
 pub use core::panic::PanicInfo;
 pub use panic::{hlt_loop, test_panic_handler, test_should_panic_handler};

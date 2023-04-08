@@ -16,10 +16,10 @@ use CrabOS::{
     memory::{self, kmap, as_addr},
     processes::objects::{Process, Thread},
     test_panic_handler,
-    userland::{dummy_process, userland_shell, logo_print},
+    userland::{dummy_process, userland_shell, logo_print}, syscalls,
 };
 
-use ::log::{LevelFilter, debug};
+use ::log::{LevelFilter, debug, info};
 use bootloader::BootInfo;
 
 #[no_mangle]
@@ -30,7 +30,8 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     log::init(LevelFilter::Debug);
     gdt::init();
     idt::init();
-
+    syscalls::init();
+    info!("succefully initialized the gdt, idt and syscalls");
     memory::init(boot_info);
     
     unsafe { asm!("mov {}, rsp", out(reg) stack_top)};

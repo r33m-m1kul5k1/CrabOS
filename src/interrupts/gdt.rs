@@ -53,8 +53,8 @@ lazy_static! {
         // save all of these segments to switch between kernel mode and user mode segments
         let kernel_code = gdt.add_entry(Descriptor::kernel_code_segment());
         let kernel_data = gdt.add_entry(Descriptor::kernel_data_segment());
-        let user_code = gdt.add_entry(Descriptor::user_code_segment());
         let user_data = gdt.add_entry(Descriptor::user_data_segment());
+        let user_code = gdt.add_entry(Descriptor::user_code_segment());
 
         (gdt, Selectors { tss, kernel_code, kernel_data, user_code, user_data })
      };

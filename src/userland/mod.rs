@@ -29,6 +29,6 @@ pub fn logo_print() -> ! {
 }
 
 pub fn userland_shell() -> ! {
-    unsafe { asm!("mov rax, 0xBEEF") };
+    unsafe { asm!("syscall") };
     loop {}
 }
