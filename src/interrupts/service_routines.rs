@@ -13,7 +13,7 @@ use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
 pub extern "x86-interrupt" fn page_fault(
     stack_frame: InterruptStackFrame,
     error_code: PageFaultErrorCode,
-) -> ! {
+) {
     debug!("EXCEPTION: page fault");
     debug!("Error code: {:#X?}", error_code);
     debug!("Stack frame: {:#X?}", stack_frame);

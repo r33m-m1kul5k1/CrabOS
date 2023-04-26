@@ -16,10 +16,9 @@ pub const KERNEL_STACK_INDEX: usize = 0;
 const PAGE_SIZE: usize = 4096;
 const STACK_SIZE: usize = PAGE_SIZE;
 
- 
 lazy_static! {
     /// # Task State Segment
-    /// 
+    ///
     /// A Table with stacks for interrupts and for different Privilege Levels
     pub static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
@@ -41,15 +40,13 @@ lazy_static! {
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
             VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
         };
-        
-
         tss
     };
 }
 
 lazy_static! {
     /// # Global Descriptor Table
-    /// 
+    ///
     /// A Table with pointers to all the segments selectors
     pub static ref GDT: (GlobalDescriptorTable, Selectors) = {
         let mut gdt = GlobalDescriptorTable::new();
@@ -66,7 +63,7 @@ lazy_static! {
      };
 }
 
-// `GlobalDescriptorTable` table's is private, that is why we use the Selectors struct 
+// `GlobalDescriptorTable` table's is private, that is why we use the Selectors struct
 pub struct Selectors {
     tss: SegmentSelector,
     pub kernel_code: SegmentSelector,
@@ -82,8 +79,7 @@ pub fn init() {
     debug!("kernel ds: {:x}", GDT.1.kernel_data.0);
     debug!("user ds: {:x}", GDT.1.user_data.0);
     debug!("user cs: {:x}", GDT.1.user_code.0);
-    
-    
+
     unsafe {
         CS::set_reg(GDT.1.kernel_code);
         DS::set_reg(GDT.1.kernel_data);

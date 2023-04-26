@@ -81,7 +81,7 @@ pub struct Writer {
 
 impl Writer {
 
-    /// write one byte to the buffer, if new line go to the next row.
+    /// Write one byte to the buffer, if new line go to the next row.
     fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
@@ -127,14 +127,13 @@ impl Writer {
 }
 
 impl fmt::Write for Writer {
-    
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
         Ok(())
     }
 }
 
-/// private print for macros
+/// Private print for macros
 pub fn _print(args: Arguments) {
     
     use core::fmt::Write;

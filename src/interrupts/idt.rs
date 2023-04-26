@@ -2,9 +2,6 @@
 
 use lazy_static::lazy_static;
 use x86_64::structures::idt::InterruptDescriptorTable;
-use x86_64::VirtAddr;
-
-use crate::memory::as_addr;
 
 use super::gdt::{
     DOUBLE_FAULT_IST_INDEX, GENERAL_PROTECTION_FAULT_IST_INDEX, PAGE_FAULT_IST_INDEX,
@@ -25,7 +22,7 @@ lazy_static! {
                 .set_handler_fn(general_protection_fault)
                 .set_stack_index(GENERAL_PROTECTION_FAULT_IST_INDEX as u16);
             idt.page_fault
-                .set_handler_addr(VirtAddr::new(as_addr(&page_fault)))
+                .set_handler_fn(page_fault)
                 .set_stack_index(PAGE_FAULT_IST_INDEX as u16);
         }
         idt

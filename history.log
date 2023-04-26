@@ -4,7 +4,7 @@
 [DEBUG] - user ds: 2b
 [DEBUG] - user cs: 33
 [DEBUG] - IA32_STAR: 23001800000000
-[DEBUG] - IA32_LSTAR: 201771
+[DEBUG] - IA32_LSTAR: 201791
 [DEBUG] - IA32_FMASK: 200
 [DEBUG] - IA32_EFER: d01
 [INFO] - succefully initialized the gdt, idt and syscalls
@@ -12,8 +12,7 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae0000..0xae1000), size: 1 }
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae1000..0xae3000), size: 2 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae2000..0xae3000), size: 1 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae3000..0xae7000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae7000..0xaef000), size: 8 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
@@ -48,8 +47,25 @@
 [DEBUG] - current stack top: 0x10000201d90
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[]]
-[DEBUG] - process entry point at 0x20e3d0
+[DEBUG] - process entry point at 0x20e440
 [WARN] - Given linear address 0x20e000 is below virtual memory base at 0x80000000
 [DEBUG] - process page frame at 0x40d000
 [DEBUG] - process code page: 0x8040d000 -> 0x40d000
 [DEBUG] - executing process: 0
+[DEBUG] - EXCEPTION: page fault
+[DEBUG] - Error code: PROTECTION_VIOLATION | INSTRUCTION_FETCH
+[DEBUG] - Stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x201791,
+    ),
+    code_segment: 0x18,
+    cpu_flags: 0x2,
+    stack_pointer: VirtAddr(
+        0x80ae1ff8,
+    ),
+    stack_segment: 0x20,
+}
+[failed]
+
+Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:20:5
+
