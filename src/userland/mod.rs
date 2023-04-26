@@ -28,7 +28,7 @@ pub fn logo_print() -> ! {
     loop {}
 }
 
-pub fn userland_shell() -> ! {
+pub fn user_main() -> ! {
     unsafe { asm!("syscall") };
     loop {}
 }

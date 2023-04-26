@@ -1,6 +1,7 @@
 //! This module constructs a Global Descriptor Table, and a Task State Segment
 
 use lazy_static::lazy_static;
+use log::debug;
 use x86_64::instructions::tables::load_tss;
 use x86_64::registers::segmentation::{Segment, CS, DS};
 use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
@@ -9,10 +10,11 @@ use x86_64::VirtAddr;
 
 pub const DOUBLE_FAULT_IST_INDEX: usize = 0;
 pub const GENERAL_PROTECTION_FAULT_IST_INDEX: usize = 1;
+pub const PAGE_FAULT_IST_INDEX: usize = 2;
 pub const USER_STACK_INDEX: usize = 2;
 pub const KERNEL_STACK_INDEX: usize = 0;
 const PAGE_SIZE: usize = 4096;
-const STACK_SIZE: usize = PAGE_SIZE * 4;
+const STACK_SIZE: usize = PAGE_SIZE;
 
  
 lazy_static! {
@@ -27,6 +29,10 @@ lazy_static! {
             VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
         };
         tss.interrupt_stack_table[GENERAL_PROTECTION_FAULT_IST_INDEX] = {
+            static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
+            VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
+        };
+        tss.interrupt_stack_table[PAGE_FAULT_IST_INDEX] = {
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
             VirtAddr::from_ptr(unsafe { &STACK }) + STACK_SIZE
         };
@@ -71,6 +77,13 @@ pub struct Selectors {
 
 pub fn init() {
     GDT.0.load();
+    debug!("GDT Structure: ");
+    debug!("kernel cs: {:x}", GDT.1.kernel_code.0);
+    debug!("kernel ds: {:x}", GDT.1.kernel_data.0);
+    debug!("user ds: {:x}", GDT.1.user_data.0);
+    debug!("user cs: {:x}", GDT.1.user_code.0);
+    
+    
     unsafe {
         CS::set_reg(GDT.1.kernel_code);
         DS::set_reg(GDT.1.kernel_data);

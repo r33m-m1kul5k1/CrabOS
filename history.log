@@ -1,12 +1,20 @@
+[DEBUG] - GDT Structure: 
+[DEBUG] - kernel cs: 18
+[DEBUG] - kernel ds: 20
+[DEBUG] - user ds: 2b
+[DEBUG] - user cs: 33
 [DEBUG] - IA32_STAR: 23001800000000
-[DEBUG] - IA32_LSTAR: 202141
+[DEBUG] - IA32_LSTAR: 201771
 [DEBUG] - IA32_FMASK: 200
-[DEBUG] - IA32_EFER: d00
+[DEBUG] - IA32_EFER: d01
 [INFO] - succefully initialized the gdt, idt and syscalls
 [INFO] - virtual memory base: 0x80000000
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae0000..0xae1000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae1000..0xae3000), size: 2 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae3000..0xae7000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xae7000..0xaef000), size: 8 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaef000..0xaff000), size: 16 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
@@ -38,30 +46,10 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [DEBUG] - current stack top: 0x10000201d90
-[DEBUG] - splits level 0
-[DEBUG] - splits level 1
-[DEBUG] - splits level 2
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1], [1]]
-[DEBUG] - process entry point at 0x216e40
-[WARN] - Given linear address 0x216000 is below virtual memory base at 0x80000000
-[DEBUG] - process page frame at 0x415000
-[DEBUG] - process code page: 0x80415000 -> 0x415000
+[DEBUG] - free blocks: [[]]
+[DEBUG] - process entry point at 0x20e3d0
+[WARN] - Given linear address 0x20e000 is below virtual memory base at 0x80000000
+[DEBUG] - process page frame at 0x40d000
+[DEBUG] - process code page: 0x8040d000 -> 0x40d000
 [DEBUG] - executing process: 0
-[DEBUG] - EXCEPTION: Double Fault
-[DEBUG] - Error code: 0x0
-[DEBUG] - Stack Frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x80415e41,
-    ),
-    code_segment: 0x33,
-    cpu_flags: 0x2,
-    stack_pointer: VirtAddr(
-        0x80ae6ff8,
-    ),
-    stack_segment: 0x2B,
-}
-[failed]
-
-Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:12:5
-

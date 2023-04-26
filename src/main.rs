@@ -38,6 +38,11 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     memory::init(boot_info);
     info!("finished initializing memory related structures");
 
+    #[allow(unconditional_recursion)]
+    fn stack_overflow() {
+        stack_overflow()
+    }
+    stack_overflow();
     
     hlt_loop()
 }

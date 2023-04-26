@@ -1,15 +1,19 @@
-//! Initializing the Interrupt Descriptor Table with the valid interrupts 
+//! Initializing the Interrupt Descriptor Table with the valid interrupts
 
 use lazy_static::lazy_static;
 use x86_64::structures::idt::InterruptDescriptorTable;
+use x86_64::VirtAddr;
 
-use super::gdt::{DOUBLE_FAULT_IST_INDEX, GENERAL_PROTECTION_FAULT_IST_INDEX};
-use super::service_routines::{double_fault, general_protection_fault};
+use crate::memory::as_addr;
 
+use super::gdt::{
+    DOUBLE_FAULT_IST_INDEX, GENERAL_PROTECTION_FAULT_IST_INDEX, PAGE_FAULT_IST_INDEX,
+};
+use super::service_routines::{double_fault, general_protection_fault, page_fault};
 
 lazy_static! {
     /// # Interrupt Descriptor Table
-    /// 
+    ///
     /// A Table with descriptors about the interrupt service routines
     pub static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
@@ -20,6 +24,9 @@ lazy_static! {
             idt.general_protection_fault
                 .set_handler_fn(general_protection_fault)
                 .set_stack_index(GENERAL_PROTECTION_FAULT_IST_INDEX as u16);
+            idt.page_fault
+                .set_handler_addr(VirtAddr::new(as_addr(&page_fault)))
+                .set_stack_index(PAGE_FAULT_IST_INDEX as u16);
         }
         idt
     };
