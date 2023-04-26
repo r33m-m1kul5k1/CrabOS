@@ -1,6 +1,7 @@
 //! Initializing the Interrupt Descriptor Table with the valid interrupts
 
 use lazy_static::lazy_static;
+use log::info;
 use x86_64::structures::idt::InterruptDescriptorTable;
 
 use super::gdt::{
@@ -31,4 +32,5 @@ lazy_static! {
 
 pub fn init() {
     IDT.load();
+    info!("IDT initialized");
 }

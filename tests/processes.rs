@@ -5,25 +5,26 @@
 #![reexport_test_harness_main = "test_main"]
 #![allow(unused)]
 
-use core::{panic::PanicInfo, arch::asm};
+use core::{arch::asm, panic::PanicInfo};
 
 use CrabOS::{
     interrupts::{
-        gdt::{self},
-        idt, get_kernel_selectors,
+        gdt,
+        get_kernel_selectors, idt,
     },
     log,
-    memory::{self, kmap, as_addr},
+    memory::{self, as_addr, kmap},
     processes::objects::{Process, Thread},
+    syscalls::{self, syscall_handler},
     test_panic_handler,
-    userland::{dummy_process, user_main, logo_print}, syscalls::{self, syscall_handler},
+    userland::{dummy_process, logo_print, user_main},
 };
 
-use ::log::{LevelFilter, debug, info};
-use bootloader::BootInfo;
+use ::log::{debug, info, LevelFilter};
+use bootloader::{BootInfo, entry_point};
 
-#[no_mangle]
-pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+entry_point!(main);
+fn main(boot_info: &'static BootInfo) -> ! {
     let (cs, ds) = get_kernel_selectors();
     let mut stack_top: u64;
 
@@ -31,24 +32,17 @@ pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     gdt::init();
     idt::init();
     syscalls::init();
-    info!("succefully initialized the gdt, idt and syscalls");
-    memory::init(boot_info);
     
-    unsafe { asm!("mov {}, rsp", out(reg) stack_top)};
-    debug!("current stack top: 0x{:x}", stack_top);
-    let _dummy_thread = Thread::new(
-        logo_print as *const () as u64,
-        cs,
-        ds,
-        stack_top,
-    );
+    memory::init(boot_info);
+
+    unsafe { asm!("mov {}, rsp", out(reg) stack_top) };
+    let _dummy_thread = Thread::new(logo_print as *const () as u64, cs, ds, stack_top);
 
     // unsafe { _dummy_thread.run() }
 
-    
-    let userland_shell = unsafe { Process::new(0, user_main as *const () as u64) };
+    let userland_process = unsafe { Process::new(0, user_main as *const () as u64) };
 
-    userland_shell.execute();
+    userland_process.execute();
     loop {}
 }
 

@@ -53,6 +53,7 @@ pub fn init(boot_info: &'static BootInfo) {
     info!("kernel heap initialized");
 
     KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
+    info!("finished initializing memory related structures");
 }
 
 /// Allocate a kernel physical memory
@@ -90,10 +91,8 @@ pub fn get_physical_addr(linear_addr: u64) -> Option<u64> {
             linear_addr, virtual_memory_base
         );
     }
-    
-    let physical_addr = KERNEL_MAPPER
-        .lock()
-        .linear_to_physical(linear_addr).ok();
+
+    let physical_addr = KERNEL_MAPPER.lock().linear_to_physical(linear_addr).ok();
 
     return physical_addr;
 }

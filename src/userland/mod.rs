@@ -5,7 +5,6 @@ use log::info;
 
 use crate::graphic_println;
 
-
 // the sign ! `never` means that the func never returns
 pub fn dummy_process() -> ! {
     info!("hello from user land :)");

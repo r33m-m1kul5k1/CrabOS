@@ -10,7 +10,6 @@ use super::{
     paging::{EntryFlags, Table},
 };
 
-
 pub struct Mapper<'a> {
     pml4_table: Option<&'a mut Table>,
     physical_memory_offset: u64,
@@ -26,8 +25,8 @@ impl<'a> Mapper<'a> {
     }
     /// Initialize a new mapper object given a pointer to the page table structures
     pub fn init(&mut self, pml4_table: &'a mut Table, physical_memory_offset: u64) {
-            self.pml4_table = Some(pml4_table);
-            self.physical_memory_offset = physical_memory_offset;
+        self.pml4_table = Some(pml4_table);
+        self.physical_memory_offset = physical_memory_offset;
     }
 
     /// Loads a new page table level 4 pointer to cr3 and flushes the TLB.
@@ -64,10 +63,7 @@ impl<'a> Mapper<'a> {
             if table_level == PageTableLevel::PageTable {
                 entry.set_entry(physical_addr, flags);
             } else if !entry.is_present() {
-                entry.set_entry(
-                    frame_allocator.allocate_frame().unwrap(),
-                    flags,
-                );
+                entry.set_entry(frame_allocator.allocate_frame().unwrap(), flags);
             } else {
                 entry.set_flags(flags);
             }

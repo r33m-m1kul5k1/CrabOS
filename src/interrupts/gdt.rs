@@ -1,7 +1,7 @@
 //! This module constructs a Global Descriptor Table, and a Task State Segment
 
 use lazy_static::lazy_static;
-use log::debug;
+use log::{debug, info};
 use x86_64::instructions::tables::load_tss;
 use x86_64::registers::segmentation::{Segment, CS, DS};
 use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
@@ -85,4 +85,5 @@ pub fn init() {
         DS::set_reg(GDT.1.kernel_data);
         load_tss(GDT.1.tss);
     }
+    info!("GDT initialized");
 }

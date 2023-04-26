@@ -2,8 +2,8 @@
 
 use self::gdt::GDT;
 
-pub mod idt;
 pub mod gdt;
+pub mod idt;
 mod service_routines;
 
 /// Returns the userland code and data selectors

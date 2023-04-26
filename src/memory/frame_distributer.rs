@@ -86,9 +86,7 @@ impl FrameDistributer {
 
     /// Returns the next free frame address
     fn next_frame_number(&self) -> u64 {
-        self.unused_frames()
-            .nth(self.current_frame)
-            .unwrap()
+        self.unused_frames().nth(self.current_frame).unwrap()
     }
 }
 
@@ -99,9 +97,7 @@ unsafe impl FrameAllocator for FrameDistributer {
 
         frame
     }
-    
 }
-
 
 /// A trait for types that can allocate a frame of memory.
 ///

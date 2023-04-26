@@ -1,7 +1,7 @@
 //! This module controls a 4 level table structure.
 
-use crate::memory::{KERNEL_ALLOCATOR, KERNEL_MAPPER};
 use crate::memory::frame_distributer::FrameAllocator;
+use crate::memory::{KERNEL_ALLOCATOR, KERNEL_MAPPER};
 
 use super::types::FRAME_SIZE;
 use bitflags::bitflags;
@@ -17,18 +17,15 @@ const ENTRY_ADDRESS_BITS: u64 = 0x000f_ffff_ffff_f000;
 /// * `linear_addr` - starting linear address
 /// * `length` - the new mapping's size in bytes
 pub fn mmap(linear_addr: u64, length: usize) -> Result<(), ()> {
-
     for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
         let physical_addr = KERNEL_ALLOCATOR.lock().allocate_frame().ok_or(())?;
         unsafe {
-            KERNEL_MAPPER
-                .lock()
-                .map(
-                    page_addr,
-                    physical_addr,
-                    &mut *KERNEL_ALLOCATOR.lock(),
-                    EntryFlags::PRESENT | EntryFlags::WRITABLE,
-                )?;
+            KERNEL_MAPPER.lock().map(
+                page_addr,
+                physical_addr,
+                &mut *KERNEL_ALLOCATOR.lock(),
+                EntryFlags::PRESENT | EntryFlags::WRITABLE,
+            )?;
         };
         trace!("mapping {:x} to {:x}", page_addr, physical_addr);
     }

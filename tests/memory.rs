@@ -16,8 +16,8 @@ use CrabOS::{
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
     memory::{
-        self, as_addr, get_physical_addr, kfree, kmalloc, kmap,
-        paging::EntryFlags, types::FRAME_SIZE, as_ref, get_linear_addr,
+        self, as_addr, as_ref, get_linear_addr, get_physical_addr, kfree, kmalloc, kmap,
+        paging::EntryFlags, types::FRAME_SIZE,
     },
     test_panic_handler,
 };
@@ -28,7 +28,6 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
     gdt::init();
     idt::init();
-
     memory::init(boot_info);
 
     test_main();
@@ -49,7 +48,8 @@ fn test_mapping() {
             arr_page,
             arr_page_frame,
             EntryFlags::PRESENT | EntryFlags::USER,
-        ).unwrap();
+        )
+        .unwrap();
     }
 
     let first_arr = *as_ref::<[i32; 4]>(arr_address);
@@ -61,10 +61,25 @@ fn test_mapping() {
 
 #[test_case]
 fn kernel_allocations() {
-    let address = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
-    info!("allocated {:x} of size {:x}", address, FRAME_SIZE);
-    kfree(address, FRAME_SIZE, FRAME_SIZE);
-    info!("freed {:x} of size {:x}", address, FRAME_SIZE);
+
+    info!("-------------------Allocation-------------------\n");
+    let process_1 = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
+    info!("kernel allocated {:x} of size {:x} to process 1", process_1, FRAME_SIZE);
+    info!("-----------------------------------------------\n");
+    let process_2 = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
+    info!("kernel allocated {:x} of size {:x} to process 2", process_2, FRAME_SIZE);
+    info!("-----------------------------------------------\n");
+
+    info!("------------------Deallocation------------------\n");
+
+    kfree(process_1, FRAME_SIZE, FRAME_SIZE);
+    info!("freed process 1 memory: {:x}", process_1);
+    info!("-----------------------------------------------\n");
+
+    kfree(process_2, FRAME_SIZE, FRAME_SIZE);
+    info!("freed process 2 memory: {:x}", process_2);
+    info!("-----------------------------------------------\n");
+
 }
 #[test_case]
 fn basic_allocation() {

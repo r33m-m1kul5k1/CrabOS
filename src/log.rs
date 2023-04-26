@@ -1,6 +1,6 @@
 //! this logger will help us debug / log our kernel
 
-pub use log::{trace, debug, info, warn, error, LevelFilter};
+pub use log::{debug, error, info, trace, warn, LevelFilter};
 use log::{Level, Metadata, Record};
 
 use crate::serial_println;
