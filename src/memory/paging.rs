@@ -120,11 +120,9 @@ pub fn get_cr3() -> u64 {
     unsafe {
         asm!(
             "mov {}, cr3",
-            "mov cr3, rax",
             out(reg) cr3,
             options(nostack, preserves_flags),
         );
     }
-
     cr3
 }

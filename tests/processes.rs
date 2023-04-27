@@ -34,7 +34,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     syscalls::init();
     
     memory::init(boot_info);
-
+    
     unsafe { asm!("mov {}, rsp", out(reg) stack_top) };
     let _dummy_thread = Thread::new(logo_print as *const () as u64, cs, ds, stack_top);
 
