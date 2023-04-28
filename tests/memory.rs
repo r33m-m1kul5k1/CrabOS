@@ -17,10 +17,12 @@ use CrabOS::{
     log::{self, info, LevelFilter},
     memory::{
         self, as_addr, as_ref, get_linear_addr, get_physical_addr, kfree, kmalloc, kmap,
-        paging::EntryFlags, types::FRAME_SIZE,
+        paging::EntryFlags, types::PAGE_SIZE, update_pages_access_policy,
     },
     test_panic_handler,
 };
+
+const LINEAR_ADDRESS: u64 = 0x201708;
 
 entry_point!(main);
 fn main(boot_info: &'static BootInfo) -> ! {
@@ -63,20 +65,20 @@ fn test_mapping() {
 fn kernel_allocations() {
 
     info!("-------------------Allocation-------------------\n");
-    let process_1 = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
-    info!("kernel allocated {:x} of size {:x} to process 1", process_1, FRAME_SIZE);
+    let process_1 = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
+    info!("kernel allocated {:x} of size {:x} to process 1", process_1, PAGE_SIZE);
     info!("-----------------------------------------------\n");
-    let process_2 = kmalloc(FRAME_SIZE, FRAME_SIZE).unwrap();
-    info!("kernel allocated {:x} of size {:x} to process 2", process_2, FRAME_SIZE);
+    let process_2 = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
+    info!("kernel allocated {:x} of size {:x} to process 2", process_2, PAGE_SIZE);
     info!("-----------------------------------------------\n");
 
     info!("------------------Deallocation------------------\n");
 
-    kfree(process_1, FRAME_SIZE, FRAME_SIZE);
+    kfree(process_1, PAGE_SIZE, PAGE_SIZE);
     info!("freed process 1 memory: {:x}", process_1);
     info!("-----------------------------------------------\n");
 
-    kfree(process_2, FRAME_SIZE, FRAME_SIZE);
+    kfree(process_2, PAGE_SIZE, PAGE_SIZE);
     info!("freed process 2 memory: {:x}", process_2);
     info!("-----------------------------------------------\n");
 
@@ -95,6 +97,13 @@ fn big_allocation() {
     }
 
     info!("{:?}", vec);
+}
+
+#[test_case]
+fn linear_address_translation_check() {
+    info!("linear address 0x{:x} -> physical address 0x{:x}", LINEAR_ADDRESS, get_physical_addr(LINEAR_ADDRESS).unwrap());
+    update_pages_access_policy(LINEAR_ADDRESS, 10, EntryFlags::PRESENT | EntryFlags::WRITABLE);
+    info!("after updating the page of physical address 0x{:x}", get_physical_addr(LINEAR_ADDRESS).unwrap());
 }
 
 #[panic_handler]

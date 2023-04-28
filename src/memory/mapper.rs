@@ -7,7 +7,7 @@ use crate::memory::{as_addr, as_mut_ref};
 
 use super::{
     frame_distributer::FrameAllocator,
-    paging::{EntryFlags, Table},
+    paging::{EntryFlags, Table, Entry},
 };
 
 pub struct Mapper<'a> {
@@ -42,10 +42,15 @@ impl<'a> Mapper<'a> {
     /// Maps a linear 4KiB aligned address to a physical one, and creates more paging tables if needed
     ///
     /// # Arguments
-    /// - `physical_addr`, a linear address of the physical addres
+    /// 
+    /// - `linear_addr`, the linear address 
+    /// - `physical_addr`, the physical address
+    /// - `frame_allocator`, frame allocator to allocate frames for new page tables.
+    /// - `flags`, the linear address flags
+    /// 
     /// # Safty
     ///
-    /// The caller must specify unmapped linear address
+    /// The caller must specify an allocator that allocates only free frames
     pub unsafe fn map(
         &mut self,
         linear_addr: u64,
@@ -75,22 +80,29 @@ impl<'a> Mapper<'a> {
         Ok(())
     }
 
-    /// Gets a physical address from a given linear address.
-    pub fn linear_to_physical(&self, linear_addr: u64) -> Result<u64, ()> {
-        let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref().ok_or(())?);
+    /// Returns the page table entry for the following linear address
+    pub fn get_linear_address_entry(&self, linear_addr: u64) -> Option<&mut Entry> {
+        let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref()?);
+        let mut next_table: Option<&mut Entry> = None;
         // Goes though pml4, pdp, pd if the linear address offset doesn't exsist then return None.
         for table_level in reverse_all::<PageTableLevel>() {
             let table = unsafe { as_mut_ref::<Table>(table_linear_address) };
-            let next_table = &mut table.entries[Mapper::entry_index(linear_addr, table_level)];
+            next_table = Some(&mut table.entries[Mapper::entry_index(linear_addr, table_level)]);
 
-            if !next_table.is_present() {
-                return Err(());
+            if !next_table.as_mut().unwrap().is_present() {
+                return None
             }
 
-            table_linear_address = next_table.addr() + self.physical_memory_offset;
+            table_linear_address = next_table.as_mut().unwrap().addr() + self.physical_memory_offset;
         }
 
-        Ok(table_linear_address - self.physical_memory_offset)
+        next_table
+    }
+    /// Gets a physical address from a given linear address.
+    pub fn linear_to_physical(&self, linear_addr: u64) -> Result<u64, ()> {
+        let entry = self.get_linear_address_entry(linear_addr).ok_or(())?;
+        debug!("{:x?}", entry);
+        Ok(entry.addr())
     }
 
     /// Gets the mapper physical memory offset

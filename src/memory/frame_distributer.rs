@@ -2,7 +2,7 @@
 
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
-use crate::memory::types::{MemoryRegion, FRAME_SIZE};
+use crate::memory::types::{MemoryRegion, PAGE_SIZE};
 
 /// A memory component which distributes page frames to the OS page frame allocators.\
 /// It can distribute physical memory in chunks of 4Kib (frame).\
@@ -36,7 +36,7 @@ impl FrameDistributer {
 
         let unused_regions = unused_regions
             .map(|r| r.range.start_addr()..r.range.end_addr())
-            .map(|r| r.step_by(FRAME_SIZE as usize));
+            .map(|r| r.step_by(PAGE_SIZE as usize));
 
         log::trace!("The machine free regions are: ");
         for mut region in unused_regions.clone() {
@@ -81,7 +81,7 @@ impl FrameDistributer {
 
         unused_regions
             .map(|r| r.range.start_addr()..r.range.end_addr())
-            .flat_map(|r| r.step_by(FRAME_SIZE))
+            .flat_map(|r| r.step_by(PAGE_SIZE))
     }
 
     /// Returns the next free frame address

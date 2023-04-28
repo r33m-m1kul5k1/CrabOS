@@ -29,7 +29,7 @@ pub fn init() {
     wrmsr!(IA32_STAR_MSR, star_value);
     wrmsr!(IA32_LSTAR_MSR, as_addr(&syscall_handler));
     wrmsr!(IA32_FMASK_MSR, INTERRUPT_ENABLE_FLAG);
-    wrmsr!(IA32_EFER_MSR, (rdmsr(IA32_EFER_MSR) | SYSCALL_ENABLE_EFER) & !NX_ENABLE_EFER);
+    wrmsr!(IA32_EFER_MSR, (rdmsr(IA32_EFER_MSR) | SYSCALL_ENABLE_EFER));
     
     debug!("IA32_STAR: {:x}", rdmsr(IA32_STAR_MSR));
     debug!("IA32_LSTAR: {:x}", rdmsr(IA32_LSTAR_MSR));

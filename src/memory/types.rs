@@ -1,7 +1,7 @@
 //! This module defines types for memory components
 use bootloader::bootinfo::FrameRange;
 
-pub const FRAME_SIZE: usize = 4096;
+pub const PAGE_SIZE: usize = 0x1000;
 pub const INTEGER_SIZE: usize = 64;
 pub const INVALID_FRAME_RANGE: FrameRange = FrameRange {
     start_frame_number: 0,
@@ -93,7 +93,7 @@ impl MemoryRegion {
     pub fn contains(&self, addr: u64) -> bool {
         // exclude the final page frame
         return self.range.start_addr() <= addr
-            && addr <= self.range.end_addr() - FRAME_SIZE as u64;
+            && addr <= self.range.end_addr() - PAGE_SIZE as u64;
     }
 }
 

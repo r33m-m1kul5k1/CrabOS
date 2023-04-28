@@ -14,7 +14,7 @@ pub const PAGE_FAULT_IST_INDEX: usize = 2;
 pub const USER_STACK_INDEX: usize = 2;
 pub const KERNEL_STACK_INDEX: usize = 0;
 const PAGE_SIZE: usize = 4096;
-const STACK_SIZE: usize = PAGE_SIZE;
+const STACK_SIZE: usize = 4 * PAGE_SIZE;
 
 lazy_static! {
     /// # Task State Segment

@@ -3,7 +3,7 @@
 use crate::memory::frame_distributer::FrameAllocator;
 use crate::memory::{KERNEL_ALLOCATOR, KERNEL_MAPPER};
 
-use super::types::FRAME_SIZE;
+use super::types::PAGE_SIZE;
 use bitflags::bitflags;
 use core::{arch::asm, fmt};
 use log::trace;
@@ -17,7 +17,7 @@ const ENTRY_ADDRESS_BITS: u64 = 0x000f_ffff_ffff_f000;
 /// * `linear_addr` - starting linear address
 /// * `length` - the new mapping's size in bytes
 pub fn mmap(linear_addr: u64, length: usize) -> Result<(), ()> {
-    for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(FRAME_SIZE) {
+    for page_addr in (linear_addr..(linear_addr + length as u64)).step_by(PAGE_SIZE) {
         let physical_addr = KERNEL_ALLOCATOR.lock().allocate_frame().ok_or(())?;
         unsafe {
             KERNEL_MAPPER.lock().map(

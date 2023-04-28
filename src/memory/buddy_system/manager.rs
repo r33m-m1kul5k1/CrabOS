@@ -1,6 +1,6 @@
 use crate::memory::{
     frame_distributer::{FrameAllocator, FrameDistributer},
-    types::FRAME_SIZE,
+    types::PAGE_SIZE,
 };
 
 use alloc::vec::Vec;
@@ -56,6 +56,6 @@ impl BuddyManager {
 
 unsafe impl FrameAllocator for BuddyManager {
     fn allocate_frame(&mut self) -> Option<u64> {
-        self.allocate(FRAME_SIZE, FRAME_SIZE)
+        self.allocate(PAGE_SIZE, PAGE_SIZE)
     }
 }
