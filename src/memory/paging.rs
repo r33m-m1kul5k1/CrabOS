@@ -51,9 +51,16 @@ impl Entry {
         self.entry & ENTRY_ADDRESS_BITS
     }
 
-    /// Sets entry flags
+    /// Add new flags to the entry
+    #[inline]
+    pub fn add_flags(&mut self, flags: EntryFlags) {
+        self.entry |= flags.bits();
+    }
+    
+    /// Sets flags to the entry
     #[inline]
     pub fn set_flags(&mut self, flags: EntryFlags) {
+        self.entry &= ENTRY_ADDRESS_BITS;
         self.entry |= flags.bits();
     }
 

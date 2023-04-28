@@ -5,15 +5,15 @@
 
 use bootloader::BootInfo;
 use lazy_static::lazy_static;
-use log::info;
+use log::{info, debug};
 use spin::Mutex;
 
-use crate::memory::{
+use crate::{memory::{
     buddy_system::manager::BuddyManager,
     frame_distributer::FrameDistributer,
     mapper::Mapper,
     paging::{get_cr3, Table},
-};
+}, syscalls::syscall_handler};
 
 use self::{paging::EntryFlags, types::PAGE_SIZE};
 
@@ -32,9 +32,16 @@ lazy_static! {
     pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
 }
 
+#[macro_export]
+macro_rules! get_page_aligned_address {
+    ($addr:expr) => {
+        ($addr >> 12) << 12
+    };
+}
+
 /// Initialize frame distributer and a mapper to eventually initialize the kernel heap.
 pub fn init(boot_info: &'static BootInfo) {
-    info!(
+    debug!(
         "virtual memory base: 0x{:x}",
         boot_info.physical_memory_offset
     );
@@ -51,6 +58,8 @@ pub fn init(boot_info: &'static BootInfo) {
 
     heap::init(&mut frame_distributer);
     info!("kernel heap initialized");
+
+    disable_bootloader_xd_bit();
 
     KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
     info!("finished initializing memory related structures");
@@ -91,6 +100,17 @@ pub fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
         KERNEL_MAPPER.lock().get_linear_address_entry(page).unwrap().set_flags(flags);
     }
 
+}
+
+
+fn disable_bootloader_xd_bit() {
+    let syscall_handler_addr = as_addr(&syscall_handler);
+    update_pages_access_policy(get_page_aligned_address!(syscall_handler_addr), 5, EntryFlags::PRESENT | EntryFlags::WRITE_THROUGH | EntryFlags::WRITABLE);
+    
+    get_physical_addr(syscall_handler_addr);
+    get_physical_addr(syscall_handler_addr + PAGE_SIZE as u64);
+    get_physical_addr(syscall_handler_addr + (PAGE_SIZE * 2) as u64);
+    get_physical_addr(syscall_handler_addr + (PAGE_SIZE * 3) as u64);
 }
 /// Gets the start of the mapped physical memory
 pub fn get_virutal_memory_base() -> u64 {

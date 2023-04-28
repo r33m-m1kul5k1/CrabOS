@@ -5,10 +5,21 @@
 [DEBUG] - user cs: 33
 [INFO] - GDT initialized
 [INFO] - IDT initialized
-[INFO] - virtual memory base: 0x80000000
+[DEBUG] - IA32_STAR: 23001800000000
+[DEBUG] - IA32_LSTAR: 201778
+[DEBUG] - IA32_FMASK: 200
+[DEBUG] - IA32_EFER: 110100000001
+[INFO] - syscalls initialized
+[DEBUG] - virtual memory base: 0x80000000
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
+[DEBUG] - Entry { page frame base: 400000, flags: PRESENT | WRITABLE | WRITE_THROUGH }
+[DEBUG] - Entry { page frame base: 401000, flags: PRESENT | WRITABLE | WRITE_THROUGH }
+[DEBUG] - Entry { page frame base: 402000, flags: PRESENT | WRITABLE | WRITE_THROUGH }
+[DEBUG] - Entry { page frame base: 403000, flags: PRESENT | WRITABLE | WRITE_THROUGH | ACCESSED }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf1000..0xaf3000), size: 2 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf3000..0xaf7000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
@@ -39,56 +50,30 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
-Running 5 tests
-memory::basic_allocation...
-[ok]
-memory::big_allocation...
-[INFO] - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
-[ok]
-memory::kernel_allocations...
-[INFO] - -------------------Allocation-------------------
-
 [DEBUG] - splits level 0
-[DEBUG] - splits level 1
-[DEBUG] - splits level 2
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1], [1]]
-[INFO] - kernel allocated af7000 of size 1000 to process 1
-[INFO] - -----------------------------------------------
+[DEBUG] - free blocks: [[], [1]]
+[DEBUG] - process entry point at 0x20e510
+[DEBUG] - Entry { page frame base: 40d000, flags: PRESENT | ACCESSED }
+[DEBUG] - process page frame at 0x40d000
+[DEBUG] - Entry { page frame base: 40d000, flags: PRESENT | USER }
+[DEBUG] - process code page: 0x8040d000 -> 0x40d000
+[DEBUG] - executing process: 0
+[DEBUG] - EXCEPTION: page fault
+[DEBUG] - Error code: (empty)
+[DEBUG] - Stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x201778,
+    ),
+    code_segment: 0x18,
+    cpu_flags: 0x2,
+    stack_pointer: VirtAddr(
+        0x80af0ff8,
+    ),
+    stack_segment: 0x20,
+}
+[DEBUG] - Linear address: 0
+[failed]
 
-[DEBUG] - block's index: 1
-[DEBUG] - free blocks: [[], [1], [1], []]
-[INFO] - kernel allocated af8000 of size 1000 to process 2
-[INFO] - -----------------------------------------------
+Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:25:5
 
-[INFO] - ------------------Deallocation------------------
-
-[DEBUG] - region: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
-addr: af7000
-[DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[], [1], [1], [0]]
-[INFO] - freed process 1 memory: af7000
-[INFO] - -----------------------------------------------
-
-[DEBUG] - region: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
-addr: af8000
-[DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[], [1], [1], [0, 1]]
-[DEBUG] - free_blocks: [[], [1], [1, 0], []]
-[DEBUG] - free_blocks: [[], [1, 0], [], []]
-[DEBUG] - free_blocks: [[0], [], [], []]
-[INFO] - freed process 2 memory: af8000
-[INFO] - -----------------------------------------------
-
-[ok]
-memory::linear_address_translation_check...
-[DEBUG] - Entry { page frame base: 401000, flags: PRESENT | ACCESSED | NO_EXECUTE }
-[INFO] - linear address 0x201708 -> physical address 0x401000
-[DEBUG] - Entry { page frame base: 401000, flags: PRESENT | WRITABLE | ACCESSED | NO_EXECUTE }
-[INFO] - after updating the page of physical address 0x401000
-[ok]
-memory::test_mapping...
-[DEBUG] - Entry { page frame base: 277000, flags: PRESENT | WRITABLE | ACCESSED | DIRTY }
-[INFO] - first arr: [1, 2, 3, 4]
-second arr: [1, 2, 3, 4]
-[ok]

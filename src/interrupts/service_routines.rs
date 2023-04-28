@@ -1,5 +1,7 @@
 //! A list of all interrupt service routines
 
+use core::arch::asm;
+
 use crate::log::debug;
 use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
 
@@ -14,9 +16,12 @@ pub extern "x86-interrupt" fn page_fault(
     stack_frame: InterruptStackFrame,
     error_code: PageFaultErrorCode,
 ) {
+    let linear_addres: u64;
+    unsafe { asm!("mov {}, cr2", out(reg) linear_addres) };
     debug!("EXCEPTION: page fault");
     debug!("Error code: {:#X?}", error_code);
     debug!("Stack frame: {:#X?}", stack_frame);
+    debug!("Linear address: {:X}", linear_addres);
     panic!();
 }
 /// A double fault (#DF) exception can occur

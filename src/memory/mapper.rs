@@ -70,7 +70,7 @@ impl<'a> Mapper<'a> {
             } else if !entry.is_present() {
                 entry.set_entry(frame_allocator.allocate_frame().unwrap(), flags);
             } else {
-                entry.set_flags(flags);
+                entry.add_flags(flags);
             }
 
             table_linear_address = entry.addr() + self.physical_memory_offset;
