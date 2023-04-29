@@ -13,7 +13,7 @@ use CrabOS::{
         get_kernel_selectors, idt,
     },
     log,
-    memory::{self, as_addr, kmap},
+    memory::{self, as_addr, kmap, get_physical_addr},
     processes::objects::{Process, Thread},
     syscalls::{self, syscall_handler},
     test_panic_handler,
@@ -31,13 +31,14 @@ fn main(boot_info: &'static BootInfo) -> ! {
     log::init(LevelFilter::Debug);
     gdt::init();
     idt::init();
-    syscalls::init();
     
     memory::init(boot_info);
+    syscalls::init();
 
 
     
     unsafe { asm!("mov {}, rsp", out(reg) stack_top) };
+    debug!("stack virtual address {:#x}, physical address: {:#x} ", stack_top, get_physical_addr(stack_top).unwrap());
     let _dummy_thread = Thread::new(logo_print as *const () as u64, cs, ds, stack_top);
 
     // unsafe { _dummy_thread.run() }

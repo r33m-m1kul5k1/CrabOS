@@ -5,17 +5,16 @@
 
 use bootloader::BootInfo;
 use lazy_static::lazy_static;
-use log::{info, debug};
+use log::{debug, info};
 use spin::Mutex;
 
-use crate::{memory::{
+use crate::memory::{
     buddy_system::manager::BuddyManager,
     frame_distributer::FrameDistributer,
     mapper::Mapper,
-    paging::{get_cr3, Table},
-}, syscalls::syscall_handler, wrmsr, hardware::rdmsr};
-
-use self::{paging::EntryFlags, types::PAGE_SIZE};
+    paging::{get_cr3, EntryFlags, Table},
+    types::PAGE_SIZE,
+};
 
 pub mod buddy_system;
 pub mod frame_distributer;
@@ -32,9 +31,6 @@ lazy_static! {
     pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
 }
 
-const IA32_EFER_MSR: u64 = 0xC0000080;
-const NX_ENABLE_EFER: u64 = 1 << 11;
-
 #[macro_export]
 macro_rules! get_page_aligned_address {
     ($addr:expr) => {
@@ -45,7 +41,7 @@ macro_rules! get_page_aligned_address {
 /// Initialize frame distributer and a mapper to eventually initialize the kernel heap.
 pub fn init(boot_info: &'static BootInfo) {
     debug!(
-        "virtual memory base: 0x{:x}",
+        "virtual memory offset: 0x{:x}",
         boot_info.physical_memory_offset
     );
 
@@ -53,19 +49,16 @@ pub fn init(boot_info: &'static BootInfo) {
     info!("frame distributer initialized");
 
     KERNEL_MAPPER.lock().init(
-        unsafe { as_mut_ref::<Table>(get_cr3()) },
+        unsafe { as_mut_ref::<Table>(get_cr3() + boot_info.physical_memory_offset) },
         boot_info.physical_memory_offset,
     );
-
     info!("mapper initialized");
 
     heap::init(&mut frame_distributer);
     info!("kernel heap initialized");
 
-    
     KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
-    
-    // disable_bootloader_xd_bit();
+
     info!("finished initializing memory related structures");
 }
 
@@ -92,28 +85,18 @@ pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> R
 }
 
 /// Update pages access policy
-/// 
+///
 /// # Arguments
-/// 
+///
 /// - `start`, the staring page
 /// - `size`, number of pages to update their access policy
 /// - `flags`, the new flags for the updated pages
 pub fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
-    
     for page in (start..start + (size * PAGE_SIZE) as u64).step_by(PAGE_SIZE) {
         KERNEL_MAPPER.lock().get_linear_address_entry(page).unwrap().set_flags(flags);
     }
-
 }
 
-
-fn disable_bootloader_xd_bit() {
-    let syscall_handler_addr = as_addr(&syscall_handler);
-    let syscall_handler_page = get_page_aligned_address!(syscall_handler_addr);
-    debug!("Disabling XD protection for address: {:#x} at page: {:#x}", syscall_handler_addr, syscall_handler_page);
-    update_pages_access_policy(syscall_handler_page, 1, EntryFlags::PRESENT);
-    wrmsr!(IA32_EFER_MSR, rdmsr(IA32_EFER_MSR) & !NX_ENABLE_EFER);
-}
 /// Gets the start of the mapped physical memory
 pub fn get_virutal_memory_base() -> u64 {
     KERNEL_MAPPER.lock().get_physical_memory_offset()

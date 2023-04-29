@@ -5,8 +5,9 @@ use log::{debug, info};
 
 use crate::hardware::rdmsr;
 use crate::interrupts::{get_kernel_selectors, get_user_selectors};
-use crate::memory::as_addr;
-use crate::wrmsr;
+use crate::memory::{as_addr, update_pages_access_policy, get_physical_addr};
+use crate::memory::paging::EntryFlags;
+use crate::{wrmsr, get_page_aligned_address};
 mod services;
 
 const IA32_EFER_MSR: u64 = 0xC0000080;
@@ -30,7 +31,8 @@ pub fn init() {
     wrmsr!(IA32_FMASK_MSR, INTERRUPT_ENABLE_FLAG);
     wrmsr!(IA32_EFER_MSR, rdmsr(IA32_EFER_MSR) | SYSCALL_ENABLE_EFER);
     
-    
+    update_pages_access_policy(get_page_aligned_address!(as_addr(&syscall_handler)), 1, EntryFlags::PRESENT | EntryFlags::USER);
+    get_physical_addr(get_page_aligned_address!(as_addr(&syscall_handler))).unwrap();
     debug!("IA32_STAR: {:#x}", rdmsr(IA32_STAR_MSR));
     debug!("IA32_LSTAR: {:#x}", rdmsr(IA32_LSTAR_MSR));
     debug!("IA32_FMASK: {:#x}", rdmsr(IA32_FMASK_MSR));

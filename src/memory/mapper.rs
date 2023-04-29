@@ -83,20 +83,20 @@ impl<'a> Mapper<'a> {
     /// Returns the page table entry for the following linear address
     pub fn get_linear_address_entry(&self, linear_addr: u64) -> Option<&mut Entry> {
         let mut table_linear_address = as_addr::<Table>(self.pml4_table.as_ref()?);
-        let mut next_table: Option<&mut Entry> = None;
+        let mut entry: Option<&mut Entry> = None;
         // Goes though pml4, pdp, pd if the linear address offset doesn't exsist then return None.
         for table_level in reverse_all::<PageTableLevel>() {
             let table = unsafe { as_mut_ref::<Table>(table_linear_address) };
-            next_table = Some(&mut table.entries[Mapper::entry_index(linear_addr, table_level)]);
+            entry = Some(&mut table.entries[Mapper::entry_index(linear_addr, table_level)]);
 
-            if !next_table.as_mut().unwrap().is_present() {
+            if !entry.as_mut().unwrap().is_present() {
                 return None
             }
 
-            table_linear_address = next_table.as_mut().unwrap().addr() + self.physical_memory_offset;
+            table_linear_address = entry.as_mut().unwrap().addr() + self.physical_memory_offset;
         }
 
-        next_table
+        entry
     }
     /// Gets a physical address from a given linear address.
     pub fn linear_to_physical(&self, linear_addr: u64) -> Result<u64, ()> {

@@ -5,12 +5,7 @@
 [DEBUG] - user cs: 0x33
 [INFO] - GDT initialized
 [INFO] - IDT initialized
-[DEBUG] - IA32_STAR: 0x23001800000000
-[DEBUG] - IA32_LSTAR: 0x2002d8
-[DEBUG] - IA32_FMASK: 0x200
-[DEBUG] - IA32_EFER: 0b110100000001
-[INFO] - syscalls initialized
-[DEBUG] - virtual memory base: 0x80000000
+[DEBUG] - virtual memory offset: 0x80000000
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
@@ -45,12 +40,25 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x10ffff000..0x11ffff000), size: 65536 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
-[DEBUG] - Disabling XD protection for address: 0x2002d8 at page: 0x200000
 [INFO] - finished initializing memory related structures
+[DEBUG] - Entry {
+    page frame base: 0x401000,
+    flags: PRESENT | USER | ACCESSED,
+}
+[DEBUG] - IA32_STAR: 0x23001800000000
+[DEBUG] - IA32_LSTAR: 0x201878
+[DEBUG] - IA32_FMASK: 0x200
+[DEBUG] - IA32_EFER: 0b110100000001
+[INFO] - syscalls initialized
+[DEBUG] - Entry {
+    page frame base: 0x277000,
+    flags: PRESENT | WRITABLE | ACCESSED | DIRTY,
+}
+[DEBUG] - stack virtual address 0x10000201da0, physical address: 0x277000 
 [DEBUG] - splits level 0
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[], [1]]
-[DEBUG] - process entry point at 0x20e6a0
+[DEBUG] - process entry point at 0x20e790
 [DEBUG] - Entry {
     page frame base: 0x40d000,
     flags: PRESENT | ACCESSED,
@@ -63,10 +71,10 @@
 [DEBUG] - process code page: 0x8040d000 -> 0x40d000
 [DEBUG] - executing process: 0
 [DEBUG] - EXCEPTION: page fault
-[DEBUG] - Error code: CAUSED_BY_WRITE
+[DEBUG] - Error code: (empty)
 [DEBUG] - Stack frame: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x2002d8,
+        0x201878,
     ),
     code_segment: 0x18,
     cpu_flags: 0x2,
