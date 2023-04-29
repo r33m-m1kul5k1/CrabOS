@@ -19,10 +19,9 @@ use CrabOS::{
         self, as_addr, as_ref, get_linear_addr, get_physical_addr, kfree, kmalloc, kmap,
         paging::EntryFlags, types::PAGE_SIZE, update_pages_access_policy,
     },
-    test_panic_handler,
+    test_panic_handler, syscalls::syscall_handler,
 };
 
-const LINEAR_ADDRESS: u64 = 0x201708;
 
 entry_point!(main);
 fn main(boot_info: &'static BootInfo) -> ! {
@@ -101,9 +100,10 @@ fn big_allocation() {
 
 #[test_case]
 fn linear_address_translation_check() {
-    info!("linear address 0x{:x} -> physical address 0x{:x}", LINEAR_ADDRESS, get_physical_addr(LINEAR_ADDRESS).unwrap());
-    update_pages_access_policy(LINEAR_ADDRESS, 10, EntryFlags::PRESENT | EntryFlags::WRITABLE);
-    info!("after updating the page of physical address 0x{:x}", get_physical_addr(LINEAR_ADDRESS).unwrap());
+    let addr = as_addr(&syscall_handler);
+    info!("linear address 0x{:x} -> physical address {:#x}", addr, get_physical_addr(addr).unwrap());
+    update_pages_access_policy(addr, 1, EntryFlags::PRESENT | EntryFlags::WRITABLE);
+    info!("after updating the page of physical address {:#x}", get_physical_addr(addr).unwrap());
 }
 
 #[panic_handler]

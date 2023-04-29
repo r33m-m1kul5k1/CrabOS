@@ -75,10 +75,10 @@ pub struct Selectors {
 pub fn init() {
     GDT.0.load();
     debug!("GDT Structure: ");
-    debug!("kernel cs: {:x}", GDT.1.kernel_code.0);
-    debug!("kernel ds: {:x}", GDT.1.kernel_data.0);
-    debug!("user ds: {:x}", GDT.1.user_data.0);
-    debug!("user cs: {:x}", GDT.1.user_code.0);
+    debug!("kernel cs: {:#x}", GDT.1.kernel_code.0);
+    debug!("kernel ds: {:#x}", GDT.1.kernel_data.0);
+    debug!("user ds: {:#x}", GDT.1.user_data.0);
+    debug!("user cs: {:#x}", GDT.1.user_code.0);
 
     unsafe {
         CS::set_reg(GDT.1.kernel_code);

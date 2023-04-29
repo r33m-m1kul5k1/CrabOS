@@ -15,7 +15,6 @@ const IA32_LSTAR_MSR: u64 = 0xC0000082;
 const IA32_FMASK_MSR: u64 = 0xC0000084;
 const INTERRUPT_ENABLE_FLAG: u64 = 1 << 9;
 const SYSCALL_ENABLE_EFER: u64 = 1 << 0;
-// const NX_ENABLE_EFER: u64 = 1 << 11;
 
 const MASK_32_HIGH: u64 = 0xFFFFFFFF;
 
@@ -29,12 +28,13 @@ pub fn init() {
     wrmsr!(IA32_STAR_MSR, star_value);
     wrmsr!(IA32_LSTAR_MSR, as_addr(&syscall_handler));
     wrmsr!(IA32_FMASK_MSR, INTERRUPT_ENABLE_FLAG);
-    wrmsr!(IA32_EFER_MSR, (rdmsr(IA32_EFER_MSR) | SYSCALL_ENABLE_EFER)); //& !NX_ENABLE_EFER
+    wrmsr!(IA32_EFER_MSR, rdmsr(IA32_EFER_MSR) | SYSCALL_ENABLE_EFER);
     
-    debug!("IA32_STAR: {:x}", rdmsr(IA32_STAR_MSR));
-    debug!("IA32_LSTAR: {:x}", rdmsr(IA32_LSTAR_MSR));
-    debug!("IA32_FMASK: {:x}", rdmsr(IA32_FMASK_MSR));
-    debug!("IA32_EFER: {:b}", rdmsr(IA32_EFER_MSR));
+    
+    debug!("IA32_STAR: {:#x}", rdmsr(IA32_STAR_MSR));
+    debug!("IA32_LSTAR: {:#x}", rdmsr(IA32_LSTAR_MSR));
+    debug!("IA32_FMASK: {:#x}", rdmsr(IA32_FMASK_MSR));
+    debug!("IA32_EFER: {:#b}", rdmsr(IA32_EFER_MSR));
     info!("syscalls initialized");
 }
 

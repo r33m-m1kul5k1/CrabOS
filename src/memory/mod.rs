@@ -13,7 +13,7 @@ use crate::{memory::{
     frame_distributer::FrameDistributer,
     mapper::Mapper,
     paging::{get_cr3, Table},
-}, syscalls::syscall_handler};
+}, syscalls::syscall_handler, wrmsr, hardware::rdmsr};
 
 use self::{paging::EntryFlags, types::PAGE_SIZE};
 
@@ -31,6 +31,9 @@ lazy_static! {
 lazy_static! {
     pub static ref KERNEL_MAPPER: Mutex<Mapper<'static>> = Mutex::new(Mapper::empty());
 }
+
+const IA32_EFER_MSR: u64 = 0xC0000080;
+const NX_ENABLE_EFER: u64 = 1 << 11;
 
 #[macro_export]
 macro_rules! get_page_aligned_address {
@@ -59,9 +62,10 @@ pub fn init(boot_info: &'static BootInfo) {
     heap::init(&mut frame_distributer);
     info!("kernel heap initialized");
 
-    disable_bootloader_xd_bit();
-
+    
     KERNEL_ALLOCATOR.lock().init(&mut frame_distributer);
+    
+    // disable_bootloader_xd_bit();
     info!("finished initializing memory related structures");
 }
 
@@ -105,12 +109,10 @@ pub fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
 
 fn disable_bootloader_xd_bit() {
     let syscall_handler_addr = as_addr(&syscall_handler);
-    update_pages_access_policy(get_page_aligned_address!(syscall_handler_addr), 5, EntryFlags::PRESENT | EntryFlags::WRITE_THROUGH | EntryFlags::WRITABLE);
-    
-    get_physical_addr(syscall_handler_addr);
-    get_physical_addr(syscall_handler_addr + PAGE_SIZE as u64);
-    get_physical_addr(syscall_handler_addr + (PAGE_SIZE * 2) as u64);
-    get_physical_addr(syscall_handler_addr + (PAGE_SIZE * 3) as u64);
+    let syscall_handler_page = get_page_aligned_address!(syscall_handler_addr);
+    debug!("Disabling XD protection for address: {:#x} at page: {:#x}", syscall_handler_addr, syscall_handler_page);
+    update_pages_access_policy(syscall_handler_page, 1, EntryFlags::PRESENT);
+    wrmsr!(IA32_EFER_MSR, rdmsr(IA32_EFER_MSR) & !NX_ENABLE_EFER);
 }
 /// Gets the start of the mapped physical memory
 pub fn get_virutal_memory_base() -> u64 {
