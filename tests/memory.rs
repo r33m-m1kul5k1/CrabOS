@@ -19,7 +19,7 @@ use CrabOS::{
         self, as_addr, as_ref, get_linear_addr, get_physical_addr, kfree, kmalloc, kmap,
         paging::EntryFlags, types::PAGE_SIZE, update_pages_access_policy,
     },
-    test_panic_handler, syscalls::syscall_handler,
+    test_panic_handler,
 };
 
 
@@ -100,7 +100,7 @@ fn big_allocation() {
 
 #[test_case]
 fn linear_address_translation_check() {
-    let addr = as_addr(&syscall_handler);
+    let addr = as_addr(&get_linear_addr);
     info!("linear address 0x{:x} -> physical address {:#x}", addr, get_physical_addr(addr).unwrap());
     update_pages_access_policy(addr, 1, EntryFlags::PRESENT | EntryFlags::WRITABLE);
     info!("after updating the page of physical address {:#x}", get_physical_addr(addr).unwrap());

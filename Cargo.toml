@@ -39,7 +39,7 @@ run-command = [
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
     "-display", "none",
-    # "-s", "-S"
+    "-s", "-S"
 ]
 test-success-exit-code = 33 # must be different from the default exit status
 

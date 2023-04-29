@@ -1,6 +1,6 @@
 //! defines hardware instruction interface
 
-
+#![allow(unused)]
 
 /// expends to a asm snippet which writes a value to the given msr
 #[macro_export]

@@ -15,7 +15,6 @@ use CrabOS::{
     log,
     memory::{self, as_addr, kmap, get_physical_addr},
     processes::objects::{Process, Thread},
-    syscalls::{self, syscall_handler},
     test_panic_handler,
     userland::{dummy_process, logo_print, user_main},
 };
@@ -33,7 +32,6 @@ fn main(boot_info: &'static BootInfo) -> ! {
     idt::init();
     
     memory::init(boot_info);
-    syscalls::init();
 
 
     

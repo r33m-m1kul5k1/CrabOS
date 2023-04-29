@@ -4,6 +4,8 @@ use lazy_static::lazy_static;
 use log::info;
 use x86_64::structures::idt::InterruptDescriptorTable;
 
+use crate::syscalls::wrapped_syscall_handler;
+
 use super::gdt::{
     DOUBLE_FAULT_IST_INDEX, GENERAL_PROTECTION_FAULT_IST_INDEX, PAGE_FAULT_IST_INDEX,
 };
@@ -25,6 +27,9 @@ lazy_static! {
             idt.page_fault
                 .set_handler_fn(page_fault)
                 .set_stack_index(PAGE_FAULT_IST_INDEX as u16);
+            idt[0x80]
+                .set_handler_fn(core::mem::transmute(wrapped_syscall_handler as *mut fn()))
+                .set_privilege_level(x86_64::PrivilegeLevel::Ring3);
         }
         idt
     };

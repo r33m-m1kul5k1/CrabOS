@@ -9,6 +9,7 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf0000..0xaf1000), size: 1 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf1000..0xaf3000), size: 2 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf3000..0xaf7000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
@@ -42,23 +43,13 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
 [DEBUG] - Entry {
-    page frame base: 0x401000,
-    flags: PRESENT | USER | ACCESSED,
-}
-[DEBUG] - IA32_STAR: 0x23001800000000
-[DEBUG] - IA32_LSTAR: 0x201878
-[DEBUG] - IA32_FMASK: 0x200
-[DEBUG] - IA32_EFER: 0b110100000001
-[INFO] - syscalls initialized
-[DEBUG] - Entry {
     page frame base: 0x277000,
     flags: PRESENT | WRITABLE | ACCESSED | DIRTY,
 }
 [DEBUG] - stack virtual address 0x10000201da0, physical address: 0x277000 
-[DEBUG] - splits level 0
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1]]
-[DEBUG] - process entry point at 0x20e790
+[DEBUG] - free blocks: [[]]
+[DEBUG] - process entry point at 0x20e560
 [DEBUG] - Entry {
     page frame base: 0x40d000,
     flags: PRESENT | ACCESSED,
@@ -70,21 +61,3 @@
 }
 [DEBUG] - process code page: 0x8040d000 -> 0x40d000
 [DEBUG] - executing process: 0
-[DEBUG] - EXCEPTION: page fault
-[DEBUG] - Error code: (empty)
-[DEBUG] - Stack frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x201878,
-    ),
-    code_segment: 0x18,
-    cpu_flags: 0x2,
-    stack_pointer: VirtAddr(
-        0x80af0ff8,
-    ),
-    stack_segment: 0x20,
-}
-[DEBUG] - Linear address: 0
-[failed]
-
-Error: panicked at 'explicit panic', src/interrupts/service_routines.rs:25:5
-

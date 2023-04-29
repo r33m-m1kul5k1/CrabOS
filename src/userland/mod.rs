@@ -28,6 +28,6 @@ pub fn logo_print() -> ! {
 }
 
 pub fn user_main() -> ! {
-    unsafe { asm!("syscall") };
+    unsafe { asm!("int 0x80; mov rax, 0") };
     loop {}
 }
