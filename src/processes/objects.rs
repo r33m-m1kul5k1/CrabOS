@@ -1,7 +1,7 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
-use log::debug;
+use log::{debug, info};
 
 use crate::{
     interrupts::get_user_selectors,
@@ -114,10 +114,16 @@ impl Process {
                 EntryFlags::PRESENT | EntryFlags::USER,
             )
             .unwrap();
+            kmap(
+                get_linear_addr(code_page_frame) + PAGE_SIZE as u64,
+                code_page_frame + PAGE_SIZE as u64,
+                EntryFlags::PRESENT | EntryFlags::USER,
+            )
+            .unwrap();
         };
 
         debug!(
-            "process code page: {:#x} -> {:#x}",
+            "process code page: {:#x} -> {:#x} and the following other",
             get_linear_addr(code_page_frame),
             get_page_frame(get_linear_addr(code_page_frame)).unwrap()
         );
@@ -140,7 +146,7 @@ impl Process {
 
     /// Executes the process' main thread
     pub fn execute(&self) -> ! {
-        debug!("executing process: {}", self.internal_data.pid);
+        info!("executing process: {}", self.internal_data.pid);
         unsafe { self.thread.run() }
     }
 }

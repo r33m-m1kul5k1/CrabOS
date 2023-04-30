@@ -6,7 +6,7 @@ use core::arch::asm;
 use log::{debug, error};
 use x86_64::structures::idt::InterruptStackFrame;
 
-use crate::{processes::objects::Registers, syscalls::services::display_process_info};
+use crate::{processes::objects::Registers, syscalls::services::{display_process_info, create_process, execute}};
 
 
 macro_rules! wrap_syscall_handler {
@@ -65,10 +65,9 @@ wrap_syscall_handler!(syscall_handler => wrapped_syscall_handler);
 ///
 /// return the syscall result
 extern "sysv64" fn syscall_handler(
-    stack_frame: &mut InterruptStackFrame,
+    _: &mut InterruptStackFrame,
     registers: &mut Registers,
 ) {
-    debug!("userland stack frame: {:#?}", stack_frame);
     registers.rax = dispatcher(
         registers.rax as u64,
         registers.rdi,
@@ -81,7 +80,7 @@ extern "sysv64" fn syscall_handler(
 #[allow(unused_variables)]
 fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
     debug!(
-        "syscall number {}\narg1 {}\narg2 {}\narg3 {}\narg4 {}",
+        "syscall number {:#x}\narg1 {:#x}\narg2 {:#x}\narg3 {:#x}\narg4 {:#x}",
         number, 
         arg1, 
         arg2, 
@@ -92,16 +91,16 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
         number::EXIT => {
             status::SUCCESS
         }
-        number::GET_PID => {
-            status::SUCCESS
-        }
         number::DISPLAY_PROCESS_INFO => {
             display_process_info(arg1 as usize)
         }
-        number::KILL => {
-            status::SUCCESS
-        }
         number::CREATE => {
+            create_process(arg1)
+        }
+        number::EXECUTE => {
+            execute(arg1 as usize)
+        }
+        number::KILL => {
             status::SUCCESS
         }
         _ => {
@@ -113,10 +112,10 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
 
 pub mod number {
     pub const EXIT: u64 = 0;
-    pub const GET_PID: u64 = 1;
-    pub const DISPLAY_PROCESS_INFO: u64 = 2;
-    pub const KILL: u64 = 3;
-    pub const CREATE: u64 = 4;
+    pub const DISPLAY_PROCESS_INFO: u64 = 1;
+    pub const CREATE: u64 = 2;
+    pub const EXECUTE: u64 = 3;
+    pub const KILL: u64 = 4;
 }
 
 pub mod status {

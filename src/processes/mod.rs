@@ -18,8 +18,8 @@ lazy_static! {
 }
 
 
-pub fn create_process(process_code: u64) {
-    KERNEL_SCHEDULER.lock().push_process(process_code);
+pub fn spawn_process(process_code: u64) -> usize {
+    KERNEL_SCHEDULER.lock().push_process(process_code)
 }
 
 

@@ -17,10 +17,10 @@ impl Scheduler {
     }
 
     /// Pushes a new process object to the scheduler's stack
-    pub fn push_process(&mut self, process_code: u64) {
+    pub fn push_process(&mut self, process_code: u64) -> usize {
         let pid = self.current_pid();
         self.processes_stack.push(unsafe { Process::new(pid, process_code) });
-        
+        pid
     }
 
     /// Returns the appropriate process object by a given pid

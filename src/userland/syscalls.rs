@@ -79,3 +79,17 @@ pub fn display_process_info(pid: usize) -> Result<(), ()> {
         Err(())
     }
 }
+
+pub fn create(process_code: u64) -> Result<usize, ()> {
+    let result = unsafe { syscall!(CREATE, process_code) };
+    
+    if result >= 0 {
+        Ok(result as usize)
+    } else {
+        Err(())
+    }
+}
+
+pub fn execute(pid: usize) {
+    unsafe { syscall!(EXECUTE, pid) };
+}
