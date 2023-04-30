@@ -1,10 +1,13 @@
 //! This module defines the syscall inteface and it's dispatcher
-use core::arch::asm;
 
-use log::{debug, error, info};
+mod services;
+
+use core::arch::asm;
+use log::{debug, error};
 use x86_64::structures::idt::InterruptStackFrame;
 
-use crate::{graphic_println, processes::objects::Registers};
+use crate::{processes::objects::Registers, syscalls::services::display_process_info};
+
 
 macro_rules! wrap_syscall_handler {
     ($fn:ident => $wrapper:ident) => {
@@ -86,17 +89,20 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
         arg4
     );
     match number {
-        number::PRINT => {
-            
-            graphic_println!(":)");
-            0
+        number::EXIT => {
+            status::SUCCESS
         }
-        number::LOG => {
-            let message_ptr = arg1 as *mut u8;
-            let len = arg2 as usize;
-            let message = unsafe { core::str::from_utf8_unchecked(core::slice::from_raw_parts(message_ptr, len)) };
-            info!("{}", message);
-            0
+        number::GET_PID => {
+            status::SUCCESS
+        }
+        number::DISPLAY_PROCESS_INFO => {
+            display_process_info(arg1 as usize)
+        }
+        number::KILL => {
+            status::SUCCESS
+        }
+        number::CREATE => {
+            status::SUCCESS
         }
         _ => {
             error!("unimplemented syscall");
@@ -106,6 +112,14 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
 }
 
 pub mod number {
-    pub const PRINT: u64 = 0;
-    pub const LOG: u64 = 1;
+    pub const EXIT: u64 = 0;
+    pub const GET_PID: u64 = 1;
+    pub const DISPLAY_PROCESS_INFO: u64 = 2;
+    pub const KILL: u64 = 3;
+    pub const CREATE: u64 = 4;
+}
+
+pub mod status {
+    pub const SUCCESS: i64 = 0;
+    pub const FAILURE: i64 = -1;
 }

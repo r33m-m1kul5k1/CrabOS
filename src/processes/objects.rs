@@ -4,11 +4,10 @@ use core::arch::asm;
 use log::debug;
 
 use crate::{
-    aligned_to_page_size,
     interrupts::get_user_selectors,
     memory::{
         get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags,
-        types::PAGE_SIZE, update_pages_access_policy,
+        types::PAGE_SIZE,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
@@ -96,16 +95,11 @@ impl Process {
     /// # Safety
     ///
     /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
-    pub unsafe fn new(pid: u64, process_code: u64, process_data: u64) -> Self {
+    pub unsafe fn new(pid: u64, process_code: u64) -> Self {
         let (cs, ds) = get_user_selectors();
         let stack_top = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
 
         let code_page_frame = get_page_frame(process_code).unwrap();
-        update_pages_access_policy(
-            aligned_to_page_size!(process_data),
-            2,
-            EntryFlags::PRESENT | EntryFlags::USER,
-        );
 
         unsafe {
             kmap(
@@ -127,11 +121,7 @@ impl Process {
             get_linear_addr(code_page_frame),
             get_page_frame(get_linear_addr(code_page_frame)).unwrap()
         );
-        debug!(
-            "process data page: {:#x} -> {:#x}",
-            aligned_to_page_size!(process_data),
-            get_page_frame(process_data).unwrap()
-        );
+
         Process {
             pid,
             thread: Thread::new(

@@ -1,5 +1,5 @@
 
-use crate::syscalls::number::LOG;
+use crate::syscalls::number::*;
 
 #[macro_export]
 macro_rules! syscall {
@@ -70,9 +70,8 @@ macro_rules! syscall {
     };
 }
 
-pub fn log(message: &str) -> Result<(), ()> {
-    let msg_address = message.as_ptr() as u64;
-    let result = unsafe { syscall!(LOG, msg_address, message.len()) };
+pub fn display_process_info(pid: usize) -> Result<(), ()> {
+    let result = unsafe { syscall!(DISPLAY_PROCESS_INFO, pid) };
     
     if result >= 0 {
         Ok(())
