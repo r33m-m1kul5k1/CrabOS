@@ -18,6 +18,6 @@ pub fn create_process(process_code: u64) {
     KERNEL_SCHEDULER.lock().push_process(process_code);
 }
 
-pub fn exec(pid: u64) { 
+pub fn execute_process(pid: u64) { 
     KERNEL_SCHEDULER.lock().execute_process(pid).unwrap();
 } 
