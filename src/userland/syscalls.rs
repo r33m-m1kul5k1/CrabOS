@@ -1,4 +1,4 @@
-
+//! This module define a comfortable inteface with the native syscall api of CrabOS.
 use crate::syscalls::number::*;
 
 #[macro_export]

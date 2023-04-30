@@ -14,7 +14,7 @@ use CrabOS::{
     },
     log,
     memory::{self, as_addr, kmap, get_physical_addr},
-    processes::objects::{Process, Thread},
+    processes::{objects::{Process, Thread}, create_process, exec},
     test_panic_handler,
     userland::user_main,
 };
@@ -41,9 +41,8 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
     // unsafe { _dummy_thread.run() }
 
-    let userland_process = unsafe { Process::new(0, user_main as *const () as u64) };
-
-    userland_process.execute();
+    create_process(user_main as *const () as u64);
+    exec(0);
     loop {}
 }
 
