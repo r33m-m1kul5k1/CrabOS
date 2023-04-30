@@ -6,18 +6,17 @@ use log::debug;
 use crate::{
     interrupts::get_user_selectors,
     memory::{
-        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags,
-        types::PAGE_SIZE,
+        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags, types::PAGE_SIZE,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Thread {
     context: Context,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 #[allow(unused)]
 pub struct Registers {
     pub rax: i64,
@@ -37,7 +36,7 @@ pub struct Registers {
     pub r15: u64,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 #[allow(unused)]
 struct Context {
     ds: u64,
@@ -83,8 +82,9 @@ impl Thread {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Process {
-    pid: u64,
+    pub internal_data: ProcessData,
     thread: Thread,
 }
 
@@ -95,7 +95,7 @@ impl Process {
     /// # Safety
     ///
     /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
-    pub unsafe fn new(pid: u64, process_code: u64) -> Self {
+    pub unsafe fn new(pid: usize, process_code: u64) -> Self {
         let (cs, ds) = get_user_selectors();
         let stack_top = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
 
@@ -123,7 +123,12 @@ impl Process {
         );
 
         Process {
-            pid,
+            internal_data: ProcessData {
+                pid,
+                code_page: get_linear_addr(code_page_frame),
+                stack_page: get_linear_addr(stack_top),
+                state: ProcessState::Waiting,
+            },
             thread: Thread::new(
                 get_linear_addr(code_page_frame) | (process_code & PAGE_INDEX),
                 cs,
@@ -135,7 +140,21 @@ impl Process {
 
     /// Executes the process' main thread
     pub fn execute(&self) -> ! {
-        debug!("executing process: {}", self.pid);
+        debug!("executing process: {}", self.internal_data.pid);
         unsafe { self.thread.run() }
     }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ProcessData {
+    pub pid: usize,
+    pub code_page: u64,
+    pub stack_page: u64,
+    pub state: ProcessState,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ProcessState {
+    Active,
+    Waiting,
 }

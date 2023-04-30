@@ -2,7 +2,7 @@
 
 use alloc::vec::Vec;
 
-use super::objects::Process;
+use super::objects::{Process, ProcessData, ProcessState};
 
 /// This object manages processes in CrabOS
 /// The current process is poped out of the stack when it exits.
@@ -18,24 +18,38 @@ impl Scheduler {
 
     /// Pushes a new process object to the scheduler's stack
     pub fn push_process(&mut self, process_code: u64) {
-        let pid = self.current_pid() + 1;
+        let pid = self.current_pid();
         self.processes_stack.push(unsafe { Process::new(pid, process_code) });
         
     }
 
-    /// Executes a process by a given pid
-    pub fn execute_process(&self, pid: u64) -> Result<(), ()> {
-        if pid > self.processes_stack.len() as u64 {
+    /// Returns the appropriate process object by a given pid
+    /// 
+    /// # Safety 
+    /// 
+    /// This function must be followd by and `Process::execute`
+    pub fn get_process(&mut self, pid: usize) -> Result<Process, ()> {
+        if pid > self.processes_stack.len() {
            return Err(())
         }
-        self.processes_stack[pid as usize].execute();
+        self.processes_stack[pid].internal_data.state = ProcessState::Active;
+        Ok(self.processes_stack[pid])
     }
-    
+
     /// Returns the current running process pid 
-    pub fn current_pid(&self) -> u64 {
+    pub fn current_pid(&self) -> usize {
         if self.processes_stack.len() == 0 {
             return 0
         }
-        (self.processes_stack.len() - 1) as u64
+        self.processes_stack.len()
+    }
+
+    /// Returns the process internal data.
+    pub fn get_process_info(&self, pid: usize) -> Result<ProcessData, ()> {
+        if pid > self.processes_stack.len() {
+            return Err(())
+         }
+        Ok(self.processes_stack[pid].internal_data)
     }
 }
+
