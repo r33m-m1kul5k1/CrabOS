@@ -4,9 +4,11 @@ use core::arch::asm;
 use log::debug;
 
 use crate::{
+    aligned_to_page_size,
     interrupts::get_user_selectors,
     memory::{
-        get_linear_addr, get_physical_addr, kmalloc, kmap, paging::EntryFlags, types::PAGE_SIZE,
+        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags,
+        types::PAGE_SIZE, update_pages_access_policy,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
@@ -18,24 +20,30 @@ pub struct Thread {
 
 #[derive(Default)]
 #[allow(unused)]
+pub struct Registers {
+    pub rax: i64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub r8: u64,
+    pub r9: u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+}
+
+#[derive(Default)]
+#[allow(unused)]
 struct Context {
     ds: u64,
     // registers
-    rax: u64,
-    rbx: u64,
-    rcx: u64,
-    rdx: u64,
-    rsi: u64,
-    rdi: u64,
-    rbp: u64,
-    r8: u64,
-    r9: u64,
-    r10: u64,
-    r11: u64,
-    r12: u64,
-    r13: u64,
-    r14: u64,
-    r15: u64,
+    regisetrs: Registers,
     // ireq stack
     rip: u64,
     cs: u64,
@@ -88,12 +96,17 @@ impl Process {
     /// # Safety
     ///
     /// `process_code` must point to the process entry point or else unpredictable behavior may occur.  
-    pub unsafe fn new(pid: u64, process_code: u64) -> Self {
+    pub unsafe fn new(pid: u64, process_code: u64, process_data: u64) -> Self {
         let (cs, ds) = get_user_selectors();
         let stack_top = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
-        debug!("process entry point at 0x{:x}", process_code);
-        let code_page_frame = get_physical_addr((process_code >> 12) << 12).unwrap();
-        debug!("process page frame at 0x{:x}", code_page_frame);
+
+        let code_page_frame = get_page_frame(process_code).unwrap();
+        update_pages_access_policy(
+            aligned_to_page_size!(process_data),
+            2,
+            EntryFlags::PRESENT | EntryFlags::USER,
+        );
+
         unsafe {
             kmap(
                 get_linear_addr(stack_top),
@@ -110,9 +123,14 @@ impl Process {
         };
 
         debug!(
-            "process code page: 0x{:x} -> 0x{:x}",
+            "process code page: {:#x} -> {:#x}",
             get_linear_addr(code_page_frame),
-            get_physical_addr(get_linear_addr(code_page_frame)).unwrap()
+            get_page_frame(get_linear_addr(code_page_frame)).unwrap()
+        );
+        debug!(
+            "process data page: {:#x} -> {:#x}",
+            aligned_to_page_size!(process_data),
+            get_page_frame(process_data).unwrap()
         );
         Process {
             pid,

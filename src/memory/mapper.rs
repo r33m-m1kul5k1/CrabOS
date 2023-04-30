@@ -101,8 +101,7 @@ impl<'a> Mapper<'a> {
     /// Gets a physical address from a given linear address.
     pub fn linear_to_physical(&self, linear_addr: u64) -> Result<u64, ()> {
         let entry = self.get_linear_address_entry(linear_addr).ok_or(())?;
-        debug!("{:#x?}", entry);
-        Ok(entry.addr())
+        Ok(entry.addr() | (linear_addr & 0xFFF))
     }
 
     /// Gets the mapper physical memory offset

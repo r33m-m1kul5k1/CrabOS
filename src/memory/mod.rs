@@ -32,7 +32,7 @@ lazy_static! {
 }
 
 #[macro_export]
-macro_rules! get_page_aligned_address {
+macro_rules! aligned_to_page_size {
     ($addr:expr) => {
         ($addr >> 12) << 12
     };
@@ -88,7 +88,7 @@ pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> R
 ///
 /// # Arguments
 ///
-/// - `start`, the staring page
+/// - `start`, the staring page, must be align to page size
 /// - `size`, number of pages to update their access policy
 /// - `flags`, the new flags for the updated pages
 pub fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
@@ -104,6 +104,13 @@ pub fn get_virutal_memory_base() -> u64 {
 
 pub fn get_physical_addr(linear_addr: u64) -> Option<u64> {
     KERNEL_MAPPER.lock().linear_to_physical(linear_addr).ok()
+}
+
+pub fn get_page_frame(linear_addr: u64) -> Option<u64> {
+    match KERNEL_MAPPER.lock().linear_to_physical(linear_addr) {
+        Ok(linear_addr) => Some(aligned_to_page_size!(linear_addr)),
+        Err(()) => None,
+    }
 }
 
 pub fn get_linear_addr(physical_addr: u64) -> u64 {

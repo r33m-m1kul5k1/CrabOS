@@ -16,7 +16,7 @@ use CrabOS::{
     memory::{self, as_addr, kmap, get_physical_addr},
     processes::objects::{Process, Thread},
     test_panic_handler,
-    userland::{dummy_process, logo_print, user_main},
+    userland::{user_main, LOGO},
 };
 
 use ::log::{debug, info, LevelFilter};
@@ -37,11 +37,11 @@ fn main(boot_info: &'static BootInfo) -> ! {
     
     unsafe { asm!("mov {}, rsp", out(reg) stack_top) };
     debug!("stack virtual address {:#x}, physical address: {:#x} ", stack_top, get_physical_addr(stack_top).unwrap());
-    let _dummy_thread = Thread::new(logo_print as *const () as u64, cs, ds, stack_top);
+    let _dummy_thread = Thread::new(user_main as *const () as u64, cs, ds, stack_top);
 
     // unsafe { _dummy_thread.run() }
 
-    let userland_process = unsafe { Process::new(0, user_main as *const () as u64) };
+    let userland_process = unsafe { Process::new(0, user_main as *const () as u64, LOGO.as_ptr() as u64) };
 
     userland_process.execute();
     loop {}

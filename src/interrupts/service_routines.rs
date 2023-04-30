@@ -21,7 +21,7 @@ pub extern "x86-interrupt" fn page_fault(
     debug!("EXCEPTION: page fault");
     debug!("Error code: {:#X?}", error_code);
     debug!("Stack frame: {:#X?}", stack_frame);
-    debug!("Linear address: {:X}", linear_addres);
+    debug!("Linear address: {:#X}", linear_addres);
     panic!();
 }
 /// A double fault (#DF) exception can occur

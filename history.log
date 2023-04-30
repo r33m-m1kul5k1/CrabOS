@@ -42,22 +42,9 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x11ffff000..0x13ffff000), size: 131072 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
-[DEBUG] - Entry {
-    page frame base: 0x277000,
-    flags: PRESENT | WRITABLE | ACCESSED | DIRTY,
-}
-[DEBUG] - stack virtual address 0x10000201da0, physical address: 0x277000 
+[DEBUG] - stack virtual address 0x10000201d90, physical address: 0x277d90 
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[]]
-[DEBUG] - process entry point at 0x20e560
-[DEBUG] - Entry {
-    page frame base: 0x40d000,
-    flags: PRESENT | ACCESSED,
-}
-[DEBUG] - process page frame at 0x40d000
-[DEBUG] - Entry {
-    page frame base: 0x40d000,
-    flags: PRESENT | USER,
-}
 [DEBUG] - process code page: 0x8040d000 -> 0x40d000
+[DEBUG] - process data page: 0x200000 -> 0x400000
 [DEBUG] - executing process: 0
