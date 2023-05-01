@@ -9,7 +9,7 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafe000..0xaff000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafb000..0xaff000), size: 4 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
@@ -40,21 +40,18 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
 [DEBUG] - stack virtual address 0x10000201e60, physical address: 0x277e60 
+[DEBUG] - splits level 0
+[DEBUG] - splits level 1
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[]]
+[DEBUG] - free blocks: [[], [1], [1]]
 [INFO] - executing process: 0
 [DEBUG] - syscall number 0x2
-arg1 0x80411ab0
+arg1 0x80411240
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - splits level 0
-[DEBUG] - splits level 1
-[DEBUG] - splits level 2
-[DEBUG] - splits level 3
-[DEBUG] - splits level 4
-[DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1], [1], [1], [1]]
+[DEBUG] - block's index: 1
+[DEBUG] - free blocks: [[], [1], []]
 [INFO] - spawned a process with pid 1
 [DEBUG] - syscall number 0x1
 arg1 0x1
@@ -70,8 +67,8 @@ arg4 0x0
             size: 0x1,
         },
         stack_region: Vritual Memory Region: {
-            first page: 0x80aff000,
-            first frame: 0xaff000,
+            first page: 0x80afc000,
+            first frame: 0xafc000,
             size: 0x1,
         },
         state: Waiting,
@@ -82,31 +79,6 @@ arg1 0x1
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - new context: Context {
-    ds: 0x2b,
-    regisetrs: Registers {
-        rax: 0x100012920,
-        rbx: 0x256b60,
-        rcx: 0x0,
-        rdx: 0x2,
-        rsi: 0x100012920,
-        rdi: 0x1000129c8,
-        rbp: 0x0,
-        r8: 0x0,
-        r9: 0x1,
-        r10: 0x201d48,
-        r11: 0x22e810,
-        r12: 0x0,
-        r13: 0x0,
-        r14: 0x0,
-        r15: 0x0,
-    },
-    rip: 0x2113d3,
-    cs: 0x18,
-    rflags: 0x2,
-    rsp: 0x256520,
-    ss: 0x0,
-}
 [INFO] - executing process: 1
 [DEBUG] - syscall number 0x1
 arg1 0x1
@@ -122,8 +94,8 @@ arg4 0x0
             size: 0x1,
         },
         stack_region: Vritual Memory Region: {
-            first page: 0x80aff000,
-            first frame: 0xaff000,
+            first page: 0x80afc000,
+            first frame: 0xafc000,
             size: 0x1,
         },
         state: Active,
@@ -135,7 +107,7 @@ arg2 0x0
 arg3 0x0
 arg4 0x0
 [DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
-addr: 80aff000
+addr: 80afc000
 [DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264992]]
+[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264989]]
 [INFO] - succesfully killed process: 0x1

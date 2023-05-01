@@ -1,7 +1,7 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
-use log::{info, debug};
+use log::info;
 
 use crate::{
     interrupts::get_user_selectors,
@@ -111,16 +111,8 @@ impl Thread {
     /// # Safety
     /// 
     /// This function must be called only from `Process::save_state`, otherwise it may lead to unpredictable behavior.
-    pub unsafe fn save_context(&mut self) {
-        // second time the kernel will jump to here it will save corrupted context, but it doesn't matter :)
-        self.context.regisetrs.load_cpu_registers();
-        asm!("mov {}, ss", out(reg) self.context.ss);
-        asm!("mov {}, rsp", out(reg) self.context.rsp);
-        asm!("pushf; pop rax; mov {}, rax", out(reg) self.context.rflags);
-        asm!("mov {}, cs", out(reg) self.context.cs);
-        asm!("lea {}, [rip+0]", out(reg) self.context.rip);
-        asm!("mov {}, ds", out(reg) self.context.ds);
-        debug!("saved context: {:#x?}", self.context);
+    pub unsafe fn save_context(&mut self, rip: u64) {
+        self.context.rip = rip;
     }
 }
 
@@ -182,7 +174,7 @@ impl Process {
     pub fn release_resources(&self) {
         kfree(
             self.internal_data.stack_region.first_page(),
-            self.internal_data.stack_region.size,
+            self.internal_data.stack_region.size * PAGE_SIZE,
             PAGE_SIZE,
         );
         // unmaps the process virtual memory so that other processes wouldn't be able to access other processes data
@@ -193,8 +185,8 @@ impl Process {
     }
 
     /// Saves the current state of the process' thread.
-    pub fn save_state(&mut self) {
-        unsafe { self.thread.save_context() };
+    pub fn save_state(&mut self, rip: u64) {
+        unsafe { self.thread.save_context(rip) };
     }
 }
 

@@ -14,6 +14,7 @@ pub fn user_main() -> ! {
     let child_pid = create(proc1_address).unwrap();
     display_process_info(child_pid).unwrap();
     execute(child_pid);
+    display_process_info(0).unwrap();
     loop {}
 }
 

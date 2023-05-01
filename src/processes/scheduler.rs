@@ -39,8 +39,8 @@ impl Scheduler {
         // pauses the previous process
         if pid > 0 {
             self.processes_stack[pid - 1].internal_data.state = ProcessState::Paused;
-            self.processes_stack[pid - 1].save_state();
-        
+            // TODO: send the next instruction to be executed using the syscall exec
+            self.processes_stack[pid - 1].save_state(0);
         }
         
         self.processes_stack[pid].internal_data.state = ProcessState::Active;

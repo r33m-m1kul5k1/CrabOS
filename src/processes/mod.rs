@@ -17,13 +17,12 @@ lazy_static! {
     pub static ref KERNEL_SCHEDULER: Mutex<Scheduler> = Mutex::new(Scheduler::empty());
 }
 
-
 pub fn spawn_process(process_code: u64) -> usize {
     KERNEL_SCHEDULER.lock().push_process(process_code)
 }
 
-
 pub fn execute_process(pid: usize) {
+
     // To release the scheduler lock we must end it's lifetime with {}.
     let process = { KERNEL_SCHEDULER.lock().get_process(pid) };
     match process {
@@ -39,8 +38,11 @@ pub fn get_process_info(pid: usize) -> Option<ProcessData> {
 }
 
 pub fn kill_process(pid: usize) -> ! {
-    match KERNEL_SCHEDULER.try_lock().unwrap().terminate_process(pid) {
-        Ok(()) => info!("succesfully killed process: {:#x}", pid),
+    let process = { KERNEL_SCHEDULER.try_lock().unwrap().terminate_process(pid) };
+    match process {
+        Ok(()) => {
+            info!("succesfully killed process: {:#x}", pid);
+        }
         Err(()) => error!("failed to kill process: {:#x}", pid),
     }
     loop {}
