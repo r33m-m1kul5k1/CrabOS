@@ -4,7 +4,6 @@ mod services;
 
 use core::arch::asm;
 use log::{debug, error};
-use x86_64::structures::idt::InterruptStackFrame;
 
 use crate::{processes::objects::Registers, syscalls::services::{display_process_info, create_process, execute}};
 
@@ -12,7 +11,7 @@ use crate::{processes::objects::Registers, syscalls::services::{display_process_
 macro_rules! wrap_syscall_handler {
     ($fn:ident => $wrapper:ident) => {
         #[naked]
-        pub unsafe extern "C" fn $wrapper() {
+        pub unsafe extern "sysv64" fn $wrapper() {
             asm!(
                 "push r15",
                 "push r14",
@@ -29,9 +28,7 @@ macro_rules! wrap_syscall_handler {
                 "push rcx",
                 "push rbx",
                 "push rax",
-                "mov rsi, rsp", // Arg #2: register list
-                "mov rdi, rsp", // Arg #1: interrupt frame
-                "add rdi, 9 * 8",
+                "mov rdi, rsp", // Arg #1: register list
                 "call {}",
                 "pop rax",
                 "pop rbx",
@@ -60,12 +57,13 @@ wrap_syscall_handler!(syscall_handler => wrapped_syscall_handler);
 /// Save the user process context and call the syscall dispatcher
 ///
 /// # Arguments
-///  - ``
+///  - `registers`, the current userland registers
+/// 
 /// # Return Value
-///
-/// return the syscall result
+/// 
+/// A 64 bit integer that if above or equal to zero the syscall was handled successfully,
+/// otherwise while handling a failure occurred.
 extern "sysv64" fn syscall_handler(
-    _: &mut InterruptStackFrame,
     registers: &mut Registers,
 ) {
     registers.rax = dispatcher(

@@ -8,7 +8,11 @@ macro_rules! syscall {
             let result: i64;
             core::arch::asm!(
                 "int 0x80", 
-                in("rax") $number, 
+                in("rax") $number,
+                in("rdi") 0, 
+                in("rsi") 0, 
+                in("rdx") 0, 
+                in("r8") 0,
                 lateout("rax") result
             );
             result
@@ -21,6 +25,9 @@ macro_rules! syscall {
                 "int 0x80", 
                 in("rax") $number, 
                 in("rdi") $arg1, 
+                in("rsi") 0, 
+                in("rdx") 0, 
+                in("r8") 0,  
                 lateout("rax") result
             );
             result
@@ -34,6 +41,8 @@ macro_rules! syscall {
                 in("rax") $number, 
                 in("rdi") $arg1, 
                 in("rsi") $arg2, 
+                in("rdx") 0, 
+                in("r8") 0, 
                 lateout("rax") result
             );
             result
@@ -48,6 +57,7 @@ macro_rules! syscall {
                 in("rdi") $arg1, 
                 in("rsi") $arg2, 
                 in("rdx") $arg3, 
+                in("r8") 0, 
                 lateout("rax") result
             );
             result

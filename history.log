@@ -58,8 +58,8 @@ arg4 0x0
 [INFO] - spawned a process with pid 1
 [DEBUG] - syscall number 0x1
 arg1 0x1
-arg2 0x1
-arg3 0x8043a118
+arg2 0x0
+arg3 0x0
 arg4 0x0
 [INFO] - process information: Some(
     ProcessData {
@@ -71,8 +71,8 @@ arg4 0x0
 )
 [DEBUG] - syscall number 0x3
 arg1 0x1
-arg2 0x8043a130
-arg3 0x8043a118
+arg2 0x0
+arg3 0x0
 arg4 0x0
 [INFO] - executing process: 1
 [DEBUG] - syscall number 0x1

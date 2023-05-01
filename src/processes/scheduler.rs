@@ -33,6 +33,7 @@ impl Scheduler {
            return Err(())
         }
         self.processes_stack[pid].internal_data.state = ProcessState::Active;
+        
         Ok(self.processes_stack[pid])
     }
 
