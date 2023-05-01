@@ -1,7 +1,7 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
-use log::info;
+use log::{info, debug};
 
 use crate::{
     interrupts::get_user_selectors,
@@ -19,7 +19,7 @@ pub struct Thread {
     context: Context,
 }
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, Debug)]
 #[allow(unused)]
 pub struct Registers {
     pub rax: i64,
@@ -39,7 +39,28 @@ pub struct Registers {
     pub r15: u64,
 }
 
-#[derive(Default, Clone, Copy)]
+impl Registers {
+    /// Loads the cpu registers to the struct
+    pub fn load_cpu_registers(&mut self) {
+        unsafe { asm!("mov {}, rax", out(reg) self.rax) };
+        unsafe { asm!("mov {}, rbx", out(reg) self.rbx) };
+        unsafe { asm!("mov {}, rcx", out(reg) self.rcx) };
+        unsafe { asm!("mov {}, rdx", out(reg) self.rdx) };
+        unsafe { asm!("mov {}, rsi", out(reg) self.rsi) };
+        unsafe { asm!("mov {}, rdi", out(reg) self.rdi) };
+        unsafe { asm!("mov {}, rbp", out(reg) self.rbp) };
+        unsafe { asm!("mov {}, r8", out(reg) self.r8) };
+        unsafe { asm!("mov {}, r9", out(reg) self.r9) };
+        unsafe { asm!("mov {}, r10", out(reg) self.r10) };
+        unsafe { asm!("mov {}, r11", out(reg) self.r11) };
+        unsafe { asm!("mov {}, r12", out(reg) self.r12) };
+        unsafe { asm!("mov {}, r13", out(reg) self.r13) };
+        unsafe { asm!("mov {}, r14", out(reg) self.r14) };
+        unsafe { asm!("mov {}, r15", out(reg) self.r15) };
+    }
+}
+
+#[derive(Default, Clone, Copy, Debug)]
 #[allow(unused)]
 struct Context {
     ds: u64,
@@ -82,6 +103,24 @@ impl Thread {
          pop r8; pop r9; pop r10; pop r11; pop r12; pop r13; pop r14; pop r15;",
         "iretq",
         in(reg) &self.context, options(noreturn));
+    }
+
+    /// Saves the current cpu `Context` to the thread's.
+    /// Next time calling `Thread::run` will cause the thread to return from this function.
+    /// 
+    /// # Safety
+    /// 
+    /// This function must be called only from `Process::save_state`, otherwise it may lead to unpredictable behavior.
+    pub unsafe fn save_context(&mut self) {
+        // second time the kernel will jump to here it will save corrupted context, but it doesn't matter :)
+        self.context.regisetrs.load_cpu_registers();
+        asm!("mov {}, ss", out(reg) self.context.ss);
+        asm!("mov {}, rsp", out(reg) self.context.rsp);
+        asm!("pushf; pop rax; mov {}, rax", out(reg) self.context.rflags);
+        asm!("mov {}, cs", out(reg) self.context.cs);
+        asm!("lea {}, [rip+0]", out(reg) self.context.rip);
+        asm!("mov {}, ds", out(reg) self.context.ds);
+        debug!("saved context: {:#x?}", self.context);
     }
 }
 
@@ -152,6 +191,11 @@ impl Process {
             update_pages_access_policy(self.internal_data.code_region.clone(), EntryFlags::empty());
         }
     }
+
+    /// Saves the current state of the process' thread.
+    pub fn save_state(&mut self) {
+        unsafe { self.thread.save_context() };
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -166,4 +210,5 @@ pub struct ProcessData {
 pub enum ProcessState {
     Active,
     Waiting,
+    Paused,
 }

@@ -23,7 +23,10 @@ impl Scheduler {
         pid
     }
 
-    /// Returns the appropriate process object by a given pid
+    /// Prepares the top process to start executing.
+    /// 1. pauses the previous process & saves its state
+    /// 2. activate the top process
+    /// 3. returns a clone of the top process to run with
     /// 
     /// # Safety 
     /// 
@@ -32,6 +35,14 @@ impl Scheduler {
         if pid > self.processes_stack.len() {
            return Err(())
         }
+
+        // pauses the previous process
+        if pid > 0 {
+            self.processes_stack[pid - 1].internal_data.state = ProcessState::Paused;
+            self.processes_stack[pid - 1].save_state();
+        
+        }
+        
         self.processes_stack[pid].internal_data.state = ProcessState::Active;
         
         Ok(self.processes_stack[pid].clone())
@@ -62,5 +73,7 @@ impl Scheduler {
         self.processes_stack.remove(pid);
         Ok(())
     }
+
+    
 }
 
