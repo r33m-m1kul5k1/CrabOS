@@ -1,5 +1,10 @@
 //! This module defines types for memory components
+use core::{iter::StepBy, ops::Range, fmt};
+
+use alloc::vec::Vec;
 use bootloader::bootinfo::FrameRange;
+
+use crate::pages_iterator;
 
 pub const PAGE_SIZE: usize = 0x1000;
 pub const INTEGER_SIZE: usize = 64;
@@ -92,8 +97,7 @@ impl MemoryRegion {
 
     pub fn contains(&self, addr: u64) -> bool {
         // exclude the final page frame
-        return self.range.start_addr() <= addr
-            && addr <= self.range.end_addr() - PAGE_SIZE as u64;
+        return self.range.start_addr() <= addr && addr <= self.range.end_addr() - PAGE_SIZE as u64;
     }
 }
 
@@ -102,3 +106,41 @@ impl core::default::Default for MemoryRegion {
         MemoryRegion::empty()
     }
 }
+
+/// This stuct descibe a continuous virtual memory region
+#[derive(Clone)]
+pub struct VirtualMemoryRegion {
+    pub pages_range: StepBy<Range<u64>>,
+    pub frames_range: StepBy<Range<u64>>,
+    pub size: usize,
+}
+
+impl VirtualMemoryRegion {
+    /// Creates a new virtual memory region and save its phyiscal frames
+    pub fn new(first_page: u64, first_frame: u64, size: usize) -> Self {
+        VirtualMemoryRegion {
+            pages_range: pages_iterator!(first_page, size),
+            frames_range: pages_iterator!(first_frame, size),
+            size,
+        }
+    }
+
+    pub fn first_page(&self) -> u64 {
+        *self.pages_range.clone().collect::<Vec<u64>>().first().unwrap()
+    }
+
+    pub fn first_frame(&self) -> u64 {
+        *self.frames_range.clone().collect::<Vec<u64>>().first().unwrap()
+    }
+}
+
+impl fmt::Debug for VirtualMemoryRegion {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Vritual Memory Region:")
+            .field("first page", &self.first_page())
+            .field("first frame", &self.first_frame())
+            .field("size", &self.size)
+            .finish()
+    }
+}
+

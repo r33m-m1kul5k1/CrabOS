@@ -9,7 +9,8 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafc000..0xafd000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
@@ -40,19 +41,17 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
 [DEBUG] - stack virtual address 0x10000201e60, physical address: 0x277e60 
-[DEBUG] - splits level 0
-[DEBUG] - splits level 1
-[DEBUG] - splits level 2
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1], [1]]
+[DEBUG] - free blocks: [[]]
 [INFO] - executing process: 0
 [DEBUG] - syscall number 0x2
-arg1 0x80410000
+arg1 0x80411130
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - block's index: 1
-[DEBUG] - free blocks: [[], [1], [1], []]
+[DEBUG] - splits level 0
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [1]]
 [INFO] - spawned a process with pid 1
 [DEBUG] - syscall number 0x1
 arg1 0x1
@@ -62,9 +61,16 @@ arg4 0x0
 [INFO] - process information: Some(
     ProcessData {
         pid: 0x1,
-        code_page: 0x80410000,
-        stack_page: 0x80af8000,
-        stack_size: 0x1000,
+        code_region: Vritual Memory Region: {
+            first page: 0x80411000,
+            first frame: 0x411000,
+            size: 0x1,
+        },
+        stack_region: Vritual Memory Region: {
+            first page: 0x80afd000,
+            first frame: 0xafd000,
+            size: 0x1,
+        },
         state: Waiting,
     },
 )
@@ -82,9 +88,16 @@ arg4 0x0
 [INFO] - process information: Some(
     ProcessData {
         pid: 0x1,
-        code_page: 0x80410000,
-        stack_page: 0x80af8000,
-        stack_size: 0x1000,
+        code_region: Vritual Memory Region: {
+            first page: 0x80411000,
+            first frame: 0x411000,
+            size: 0x1,
+        },
+        stack_region: Vritual Memory Region: {
+            first page: 0x80afd000,
+            first frame: 0xafd000,
+            size: 0x1,
+        },
         state: Active,
     },
 )
@@ -93,8 +106,8 @@ arg1 0x1
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - region: MemoryRegion { range: FrameRange(0xaf7000..0xaff000), size: 8 }
-addr: af8000
+[DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
+addr: 80afd000
 [DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[], [1], [1], [1]]
+[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264990]]
 [INFO] - succesfully killed process: 0x1

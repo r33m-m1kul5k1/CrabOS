@@ -34,7 +34,7 @@ impl Scheduler {
         }
         self.processes_stack[pid].internal_data.state = ProcessState::Active;
         
-        Ok(self.processes_stack[pid])
+        Ok(self.processes_stack[pid].clone())
     }
 
     /// Returns the current running process pid 
@@ -50,7 +50,7 @@ impl Scheduler {
         if pid > self.processes_stack.len() {
             return Err(())
          }
-        Ok(self.processes_stack[pid].internal_data)
+        Ok(self.processes_stack[pid].internal_data.clone())
     }
 
     /// Releases the process resources and remove it from the stack

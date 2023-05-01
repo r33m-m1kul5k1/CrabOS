@@ -6,7 +6,10 @@ use log::info;
 use crate::{
     interrupts::get_user_selectors,
     memory::{
-        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags, types::PAGE_SIZE, kfree, update_pages_access_policy,
+        get_linear_addr, get_page_frame, kfree, kmalloc, mmap,
+        paging::EntryFlags,
+        types::{VirtualMemoryRegion, PAGE_SIZE},
+        update_pages_access_policy,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
@@ -82,7 +85,7 @@ impl Thread {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Process {
     pub internal_data: ProcessData,
     thread: Thread,
@@ -101,27 +104,11 @@ impl Process {
 
         let code_page_frame = get_page_frame(process_code).unwrap();
 
-        unsafe {
-            kmap(
-                get_linear_addr(stack_top),
-                stack_top,
-                EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER,
-            )
-            .unwrap();
-            kmap(
-                get_linear_addr(code_page_frame),
-                code_page_frame,
-                EntryFlags::PRESENT | EntryFlags::USER,
-            )
-            .unwrap();
-        };
-
         Process {
             internal_data: ProcessData {
                 pid,
-                code_page: get_linear_addr(code_page_frame),
-                stack_page: get_linear_addr(stack_top),
-                stack_size: PAGE_SIZE,
+                code_region: VirtualMemoryRegion::new(get_linear_addr(code_page_frame), code_page_frame, 1),
+                stack_region: VirtualMemoryRegion::new(get_linear_addr(stack_top), stack_top, 1),
                 state: ProcessState::Waiting,
             },
             thread: Thread::new(
@@ -133,29 +120,45 @@ impl Process {
         }
     }
 
-    /// Executes the process' main thread
+    /// Loads the process virtual address space and executes the process' main thread
     pub fn execute(&self) -> ! {
+        unsafe {
+            mmap(
+                self.internal_data.stack_region.clone(),
+                EntryFlags::PRESENT | EntryFlags::WRITABLE | EntryFlags::USER,
+            )
+            .unwrap();
+            mmap(
+                self.internal_data.code_region.clone(),
+                EntryFlags::PRESENT | EntryFlags::USER,
+            )
+            .unwrap();
+        };
+
         info!("executing process: {}", self.internal_data.pid);
         unsafe { self.thread.run() }
     }
 
-    /// Release the process' and thread' resources. 
+    /// Release the process' and thread' resources.
     pub fn release_resources(&self) {
-        kfree(get_page_frame(self.internal_data.stack_page).unwrap(), self.internal_data.stack_size, PAGE_SIZE);
+        kfree(
+            self.internal_data.stack_region.first_page(),
+            self.internal_data.stack_region.size,
+            PAGE_SIZE,
+        );
         // unmaps the process virtual memory so that other processes wouldn't be able to access other processes data
         unsafe {
-            update_pages_access_policy(self.internal_data.stack_page, self.internal_data.stack_size / PAGE_SIZE, EntryFlags::empty());
-            update_pages_access_policy(self.internal_data.code_page, 1, EntryFlags::empty());
+            update_pages_access_policy(self.internal_data.stack_region.clone(), EntryFlags::empty());
+            update_pages_access_policy(self.internal_data.code_region.clone(), EntryFlags::empty());
         }
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct ProcessData {
     pub pid: usize,
-    pub code_page: u64,
-    pub stack_page: u64,
-    pub stack_size: usize,
+    pub code_region: VirtualMemoryRegion,
+    pub stack_region: VirtualMemoryRegion,
     pub state: ProcessState,
 }
 

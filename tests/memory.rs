@@ -17,7 +17,7 @@ use CrabOS::{
     log::{self, info, LevelFilter},
     memory::{
         self, as_addr, as_ref, get_linear_addr, get_physical_addr, kfree, kmalloc, kmap,
-        paging::EntryFlags, types::PAGE_SIZE, update_pages_access_policy,
+        paging::EntryFlags, types::{PAGE_SIZE, VirtualMemoryRegion}, update_pages_access_policy,
     },
     test_panic_handler,
 };
@@ -100,10 +100,11 @@ fn big_allocation() {
 
 #[test_case]
 fn linear_address_translation_check() {
-    let addr = as_addr(&get_linear_addr);
-    info!("linear address 0x{:x} -> physical address {:#x}", addr, get_physical_addr(addr).unwrap());
-    unsafe { update_pages_access_policy(addr, 1, EntryFlags::PRESENT | EntryFlags::WRITABLE) };
-    info!("after updating the page of physical address {:#x}", get_physical_addr(addr).unwrap());
+    let region =  VirtualMemoryRegion::new(as_addr(&get_linear_addr), 0, 1);
+    
+    info!("linear address 0x{:x} -> physical address {:#x}", region.first_page(), get_physical_addr(region.first_page()).unwrap());
+    unsafe { update_pages_access_policy(region.clone(), EntryFlags::PRESENT | EntryFlags::WRITABLE) };
+    info!("after updating the page of physical address {:#x}", get_physical_addr(region.first_page()).unwrap());
 }
 
 #[panic_handler]

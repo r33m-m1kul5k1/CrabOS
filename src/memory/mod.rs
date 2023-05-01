@@ -5,7 +5,7 @@
 
 use bootloader::BootInfo;
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{debug, info, trace};
 use spin::Mutex;
 
 use crate::memory::{
@@ -13,8 +13,9 @@ use crate::memory::{
     frame_distributer::FrameDistributer,
     mapper::Mapper,
     paging::{get_cr3, EntryFlags, Table},
-    types::PAGE_SIZE,
 };
+
+use self::types::VirtualMemoryRegion;
 
 pub mod buddy_system;
 pub mod frame_distributer;
@@ -35,6 +36,13 @@ lazy_static! {
 macro_rules! aligned_to_page_size {
     ($addr:expr) => {
         ($addr >> 12) << 12
+    };
+}
+
+#[macro_export]
+macro_rules! pages_iterator {
+    ($first_page:expr, $size:expr) => {
+        ($first_page..$first_page + (PAGE_SIZE * ($size)) as u64).step_by(PAGE_SIZE)
     };
 }
 
@@ -84,6 +92,15 @@ pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> R
     }
 }
 
+/// Maps a memory region to a virtual memory region using the given flags
+pub unsafe fn mmap(virtual_memory_region: VirtualMemoryRegion, flags: EntryFlags) -> Result<(), ()> {
+    for (page, frame) in virtual_memory_region.pages_range.zip(virtual_memory_region.frames_range) {
+        trace!("mapping page: {:#x} to frame: {:#x}", page, frame);
+        kmap(page, frame, flags)?
+    }
+
+    Ok(())
+}
 /// Update pages access policy
 ///
 /// # Arguments
@@ -96,8 +113,9 @@ pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> R
 /// 
 /// The given region and the flags not damage the kernel's virtual address space.
 /// Otherwise it can lead to unpredictable behavior
-pub unsafe fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
-    for page in (start..start + (size * PAGE_SIZE) as u64).step_by(PAGE_SIZE) {
+pub unsafe fn update_pages_access_policy(virtual_memory_region: VirtualMemoryRegion, flags: EntryFlags) {
+    for page in virtual_memory_region.pages_range {
+        trace!("updating page {:#x}", page);
         KERNEL_MAPPER.lock().get_linear_address_entry(page).unwrap().set_flags(flags);
     }
 }
