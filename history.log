@@ -45,14 +45,36 @@
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[], [1], [1]]
 [INFO] - executing process: 0
+[DEBUG] - stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415de9,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afafa8,
+    ),
+    stack_segment: 0x2b,
+}
 [DEBUG] - syscall number 0x2
-arg1 0x80411240
+arg1 0x80411290
 arg2 0x0
 arg3 0x0
 arg4 0x0
 [DEBUG] - block's index: 1
 [DEBUG] - free blocks: [[], [1], []]
 [INFO] - spawned a process with pid 1
+[DEBUG] - stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415d99,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afafb8,
+    ),
+    stack_segment: 0x2b,
+}
 [DEBUG] - syscall number 0x1
 arg1 0x1
 arg2 0x0
@@ -74,12 +96,34 @@ arg4 0x0
         state: Waiting,
     },
 )
+[DEBUG] - stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415e49,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afafc8,
+    ),
+    stack_segment: 0x2b,
+}
 [DEBUG] - syscall number 0x3
 arg1 0x1
 arg2 0x0
 arg3 0x0
 arg4 0x0
 [INFO] - executing process: 1
+[DEBUG] - stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415d99,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afbfc8,
+    ),
+    stack_segment: 0x2b,
+}
 [DEBUG] - syscall number 0x1
 arg1 0x1
 arg2 0x0
@@ -101,6 +145,17 @@ arg4 0x0
         state: Active,
     },
 )
+[DEBUG] - stack frame: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80415e79,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afbfd8,
+    ),
+    stack_segment: 0x2b,
+}
 [DEBUG] - syscall number 0x4
 arg1 0x1
 arg2 0x0

@@ -33,6 +33,10 @@ pub fn execute_process(pid: usize) {
     }
 }
 
+pub fn pause_process(pid: u64) {
+    
+}
+
 pub fn get_process_info(pid: usize) -> Option<ProcessData> {
     KERNEL_SCHEDULER.try_lock().unwrap().get_process_info(pid).ok()
 }

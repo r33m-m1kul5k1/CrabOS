@@ -1,6 +1,7 @@
 //! This module defines a minimal schduler that uses a stack to manage it's processes
 
 use alloc::vec::Vec;
+use x86_64::structures::idt::InterruptStackFrame;
 
 use super::objects::{Process, ProcessData, ProcessState};
 
@@ -36,12 +37,7 @@ impl Scheduler {
            return Err(())
         }
 
-        // pauses the previous process
-        if pid > 0 {
-            self.processes_stack[pid - 1].internal_data.state = ProcessState::Paused;
-            // TODO: send the next instruction to be executed using the syscall exec
-            self.processes_stack[pid - 1].save_state(0);
-        }
+        
         
         self.processes_stack[pid].internal_data.state = ProcessState::Active;
         
@@ -74,6 +70,13 @@ impl Scheduler {
         Ok(())
     }
 
+    pub fn pause_process(pid: u64, stack_frame: InterruptStackFrame) {
+        // pauses the previous process
+        if pid > 0 {
+            self.processes_stack[pid - 1].internal_data.state = ProcessState::Paused;
+            self.processes_stack[pid - 1].save_state(0);
+        }
+    }
     
 }
 
