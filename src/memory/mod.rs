@@ -91,7 +91,12 @@ pub unsafe fn kmap(linear_addr: u64, physical_addr: u64, flags: EntryFlags) -> R
 /// - `start`, the staring page, must be align to page size
 /// - `size`, number of pages to update their access policy
 /// - `flags`, the new flags for the updated pages
-pub fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
+/// 
+/// # Safety
+/// 
+/// The given region and the flags not damage the kernel's virtual address space.
+/// Otherwise it can lead to unpredictable behavior
+pub unsafe fn update_pages_access_policy(start: u64, size: usize, flags: EntryFlags) {
     for page in (start..start + (size * PAGE_SIZE) as u64).step_by(PAGE_SIZE) {
         KERNEL_MAPPER.lock().get_linear_address_entry(page).unwrap().set_flags(flags);
     }

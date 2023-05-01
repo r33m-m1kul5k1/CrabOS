@@ -4,6 +4,7 @@ use syscalls::*;
 
 fn proc1() -> ! {
     display_process_info(1).unwrap();
+    kill(1);
     loop {}
 }
 

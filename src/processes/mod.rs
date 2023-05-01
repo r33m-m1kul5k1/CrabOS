@@ -7,7 +7,7 @@ pub mod objects;
 pub mod scheduler;
 
 use lazy_static::lazy_static;
-use log::warn;
+use log::{error, info};
 use scheduler::Scheduler;
 use spin::Mutex;
 
@@ -29,11 +29,19 @@ pub fn execute_process(pid: usize) {
     match process {
         Ok(process) => process.execute(),
         Err(()) => {
-            warn!("cannot execute process with pid {:#x}, it doesn't exists", pid)
+            error!("cannot execute process with pid {:#x}", pid)
         }
     }
 }
 
 pub fn get_process_info(pid: usize) -> Option<ProcessData> {
     KERNEL_SCHEDULER.try_lock().unwrap().get_process_info(pid).ok()
+}
+
+pub fn kill_process(pid: usize) -> ! {
+    match KERNEL_SCHEDULER.try_lock().unwrap().terminate_process(pid) {
+        Ok(()) => info!("succesfully killed process: {:#x}", pid),
+        Err(()) => error!("failed to kill process: {:#x}", pid),
+    }
+    loop {}
 }

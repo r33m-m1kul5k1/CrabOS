@@ -52,5 +52,15 @@ impl Scheduler {
          }
         Ok(self.processes_stack[pid].internal_data)
     }
+
+    /// Releases the process resources and remove it from the stack
+    pub fn terminate_process(&mut self, pid: usize) -> Result<(), ()> {
+        if pid > self.processes_stack.len() {
+            return Err(())
+         }
+        self.processes_stack[pid].release_resources();
+        self.processes_stack.remove(pid);
+        Ok(())
+    }
 }
 

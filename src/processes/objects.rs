@@ -1,12 +1,12 @@
 //! this module defines thread and object structs
 
 use core::arch::asm;
-use log::{debug, info};
+use log::info;
 
 use crate::{
     interrupts::get_user_selectors,
     memory::{
-        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags, types::PAGE_SIZE,
+        get_linear_addr, get_page_frame, kmalloc, kmap, paging::EntryFlags, types::PAGE_SIZE, kfree, update_pages_access_policy,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
@@ -114,25 +114,14 @@ impl Process {
                 EntryFlags::PRESENT | EntryFlags::USER,
             )
             .unwrap();
-            kmap(
-                get_linear_addr(code_page_frame) + PAGE_SIZE as u64,
-                code_page_frame + PAGE_SIZE as u64,
-                EntryFlags::PRESENT | EntryFlags::USER,
-            )
-            .unwrap();
         };
-
-        debug!(
-            "process code page: {:#x} -> {:#x} and the following other",
-            get_linear_addr(code_page_frame),
-            get_page_frame(get_linear_addr(code_page_frame)).unwrap()
-        );
 
         Process {
             internal_data: ProcessData {
                 pid,
                 code_page: get_linear_addr(code_page_frame),
                 stack_page: get_linear_addr(stack_top),
+                stack_size: PAGE_SIZE,
                 state: ProcessState::Waiting,
             },
             thread: Thread::new(
@@ -149,6 +138,16 @@ impl Process {
         info!("executing process: {}", self.internal_data.pid);
         unsafe { self.thread.run() }
     }
+
+    /// Release the process' and thread' resources. 
+    pub fn release_resources(&self) {
+        kfree(get_page_frame(self.internal_data.stack_page).unwrap(), self.internal_data.stack_size, PAGE_SIZE);
+        // unmaps the process virtual memory so that other processes wouldn't be able to access other processes data
+        unsafe {
+            update_pages_access_policy(self.internal_data.stack_page, self.internal_data.stack_size / PAGE_SIZE, EntryFlags::empty());
+            update_pages_access_policy(self.internal_data.code_page, 1, EntryFlags::empty());
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -156,6 +155,7 @@ pub struct ProcessData {
     pub pid: usize,
     pub code_page: u64,
     pub stack_page: u64,
+    pub stack_size: usize,
     pub state: ProcessState,
 }
 

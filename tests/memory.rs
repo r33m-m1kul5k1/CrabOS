@@ -102,7 +102,7 @@ fn big_allocation() {
 fn linear_address_translation_check() {
     let addr = as_addr(&get_linear_addr);
     info!("linear address 0x{:x} -> physical address {:#x}", addr, get_physical_addr(addr).unwrap());
-    update_pages_access_policy(addr, 1, EntryFlags::PRESENT | EntryFlags::WRITABLE);
+    unsafe { update_pages_access_policy(addr, 1, EntryFlags::PRESENT | EntryFlags::WRITABLE) };
     info!("after updating the page of physical address {:#x}", get_physical_addr(addr).unwrap());
 }
 

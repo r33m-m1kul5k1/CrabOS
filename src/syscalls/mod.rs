@@ -5,7 +5,7 @@ mod services;
 use core::arch::asm;
 use log::{debug, error};
 
-use crate::{processes::objects::Registers, syscalls::services::{display_process_info, create_process, execute}};
+use crate::{processes::objects::Registers, syscalls::services::*};
 
 
 macro_rules! wrap_syscall_handler {
@@ -99,7 +99,7 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
             execute(arg1 as usize)
         }
         number::KILL => {
-            status::SUCCESS
+            kill(arg1 as usize)
         }
         _ => {
             error!("unimplemented syscall");

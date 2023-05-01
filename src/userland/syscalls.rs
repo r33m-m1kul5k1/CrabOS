@@ -103,3 +103,7 @@ pub fn create(process_code: u64) -> Result<usize, ()> {
 pub fn execute(pid: usize) {
     unsafe { syscall!(EXECUTE, pid) };
 }
+
+pub fn kill(pid: usize) {
+    unsafe { syscall!(KILL, pid) };
+}
