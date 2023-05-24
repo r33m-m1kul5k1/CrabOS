@@ -7,9 +7,10 @@ pub mod objects;
 pub mod scheduler;
 
 use lazy_static::lazy_static;
-use log::{error, info};
+use log::{error, info, debug};
 use scheduler::Scheduler;
 use spin::Mutex;
+use x86_64::structures::idt::InterruptStackFrame;
 
 use self::objects::ProcessData;
 
@@ -22,7 +23,6 @@ pub fn spawn_process(process_code: u64) -> usize {
 }
 
 pub fn execute_process(pid: usize) {
-
     // To release the scheduler lock we must end it's lifetime with {}.
     let process = { KERNEL_SCHEDULER.lock().get_process(pid) };
     match process {
@@ -33,8 +33,9 @@ pub fn execute_process(pid: usize) {
     }
 }
 
-pub fn pause_process(pid: u64) {
-    
+pub fn pause_process(pid: usize, process_context: &InterruptStackFrame) {
+    debug!("pausing process: {:#x}, with context: {:#x?}", pid, process_context);
+    KERNEL_SCHEDULER.try_lock().unwrap().pause_process(pid, process_context)
 }
 
 pub fn get_process_info(pid: usize) -> Option<ProcessData> {
@@ -46,6 +47,7 @@ pub fn kill_process(pid: usize) -> ! {
     match process {
         Ok(()) => {
             info!("succesfully killed process: {:#x}", pid);
+            execute_process(pid -1)
         }
         Err(()) => error!("failed to kill process: {:#x}", pid),
     }

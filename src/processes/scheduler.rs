@@ -1,6 +1,7 @@
 //! This module defines a minimal schduler that uses a stack to manage it's processes
 
 use alloc::vec::Vec;
+use log::debug;
 use x86_64::structures::idt::InterruptStackFrame;
 
 use super::objects::{Process, ProcessData, ProcessState};
@@ -19,7 +20,7 @@ impl Scheduler {
 
     /// Pushes a new process object to the scheduler's stack
     pub fn push_process(&mut self, process_code: u64) -> usize {
-        let pid = self.current_pid();
+        let pid = self.next_pid();
         self.processes_stack.push(unsafe { Process::new(pid, process_code) });
         pid
     }
@@ -37,15 +38,13 @@ impl Scheduler {
            return Err(())
         }
 
-        
-        
         self.processes_stack[pid].internal_data.state = ProcessState::Active;
         
         Ok(self.processes_stack[pid].clone())
     }
 
-    /// Returns the current running process pid 
-    pub fn current_pid(&self) -> usize {
+    /// Returns the next process id 
+    pub fn next_pid(&self) -> usize {
         if self.processes_stack.len() == 0 {
             return 0
         }
@@ -64,18 +63,19 @@ impl Scheduler {
     pub fn terminate_process(&mut self, pid: usize) -> Result<(), ()> {
         if pid > self.processes_stack.len() {
             return Err(())
-         }
-        self.processes_stack[pid].release_resources();
-        self.processes_stack.remove(pid);
+        }
+        for child_pid in (pid..=self.next_pid() -1).rev() {
+            debug!("poping child: {:#x}", child_pid);
+            self.processes_stack.last().ok_or(())?.release_resources();
+            self.processes_stack.pop();
+        }
         Ok(())
     }
 
-    pub fn pause_process(pid: u64, stack_frame: InterruptStackFrame) {
-        // pauses the previous process
-        if pid > 0 {
-            self.processes_stack[pid - 1].internal_data.state = ProcessState::Paused;
-            self.processes_stack[pid - 1].save_state(0);
-        }
+    /// Pauses the a given process and saves it's state. Used when executing a new process.
+    pub fn pause_process(&mut self, pid: usize, process_context: &InterruptStackFrame) {    
+        self.processes_stack[pid].internal_data.state = ProcessState::Paused;
+        self.processes_stack[pid].save_state(process_context);
     }
     
 }

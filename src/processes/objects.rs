@@ -2,6 +2,7 @@
 
 use core::arch::asm;
 use log::info;
+use x86_64::structures::idt::InterruptStackFrame;
 
 use crate::{
     interrupts::get_user_selectors,
@@ -111,8 +112,12 @@ impl Thread {
     /// # Safety
     /// 
     /// This function must be called only from `Process::save_state`, otherwise it may lead to unpredictable behavior.
-    pub unsafe fn save_context(&mut self, rip: u64) {
-        self.context.rip = rip;
+    pub unsafe fn save_context(&mut self, new_context: &InterruptStackFrame) {
+        self.context.rip = new_context.instruction_pointer.as_u64();
+        self.context.cs = new_context.code_segment;
+        self.context.rsp = new_context.stack_pointer.as_u64();
+        self.context.ss = new_context.stack_segment;
+        self.context.rflags = new_context.cpu_flags;
     }
 }
 
@@ -172,6 +177,7 @@ impl Process {
 
     /// Release the process' and thread' resources.
     pub fn release_resources(&self) {
+        info!("releasing process {} resources", self.internal_data.pid);
         kfree(
             self.internal_data.stack_region.first_page(),
             self.internal_data.stack_region.size * PAGE_SIZE,
@@ -185,11 +191,12 @@ impl Process {
     }
 
     /// Saves the current state of the process' thread.
-    pub fn save_state(&mut self, rip: u64) {
-        unsafe { self.thread.save_context(rip) };
+    pub fn save_state(&mut self, thread_context: &InterruptStackFrame) {
+        unsafe { self.thread.save_context(thread_context) };
     }
 }
 
+/// Process memory and schedualer related information
 #[derive(Clone, Debug)]
 pub struct ProcessData {
     pub pid: usize,
@@ -198,6 +205,19 @@ pub struct ProcessData {
     pub state: ProcessState,
 }
 
+/// Process States
+/// 
+/// # Active
+/// 
+/// when the current process is running he is `Active`
+/// 
+/// # Waiting
+/// 
+/// If a process has never been executed then he is `Waiting` for execution
+/// 
+/// # Paused
+/// 
+/// If a process starts executing another process he becomes `Paused`
 #[derive(Clone, Copy, Debug)]
 pub enum ProcessState {
     Active,

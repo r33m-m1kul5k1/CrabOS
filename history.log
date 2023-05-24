@@ -9,7 +9,8 @@
 [INFO] - frame distributer initialized
 [INFO] - mapper initialized
 [INFO] - kernel heap initialized
-[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafb000..0xaff000), size: 4 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafc000..0xafd000), size: 1 }
+[DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb1f000..0xb5f000), size: 64 }
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0xb5f000..0xbdf000), size: 128 }
@@ -40,41 +41,18 @@
 [DEBUG] - creating a buddy with: MemoryRegion { range: FrameRange(0x13ffff000..0x23ffff000), size: 1048576 }
 [INFO] - finished initializing memory related structures
 [DEBUG] - stack virtual address 0x10000201e60, physical address: 0x277e60 
-[DEBUG] - splits level 0
-[DEBUG] - splits level 1
 [DEBUG] - block's index: 0
-[DEBUG] - free blocks: [[], [1], [1]]
+[DEBUG] - free blocks: [[]]
 [INFO] - executing process: 0
-[DEBUG] - stack frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x80415de9,
-    ),
-    code_segment: 0x33,
-    cpu_flags: 0x46,
-    stack_pointer: VirtAddr(
-        0x80afafa8,
-    ),
-    stack_segment: 0x2b,
-}
 [DEBUG] - syscall number 0x2
-arg1 0x80411290
+arg1 0x804115e0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - block's index: 1
-[DEBUG] - free blocks: [[], [1], []]
+[DEBUG] - splits level 0
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [1]]
 [INFO] - spawned a process with pid 1
-[DEBUG] - stack frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x80415d99,
-    ),
-    code_segment: 0x33,
-    cpu_flags: 0x46,
-    stack_pointer: VirtAddr(
-        0x80afafb8,
-    ),
-    stack_segment: 0x2b,
-}
 [DEBUG] - syscall number 0x1
 arg1 0x1
 arg2 0x0
@@ -89,33 +67,16 @@ arg4 0x0
             size: 0x1,
         },
         stack_region: Vritual Memory Region: {
-            first page: 0x80afc000,
-            first frame: 0xafc000,
+            first page: 0x80afd000,
+            first frame: 0xafd000,
             size: 0x1,
         },
         state: Waiting,
     },
 )
-[DEBUG] - stack frame: InterruptStackFrame {
+[DEBUG] - pausing process: 0x0, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80415e49,
-    ),
-    code_segment: 0x33,
-    cpu_flags: 0x46,
-    stack_pointer: VirtAddr(
-        0x80afafc8,
-    ),
-    stack_segment: 0x2b,
-}
-[DEBUG] - syscall number 0x3
-arg1 0x1
-arg2 0x0
-arg3 0x0
-arg4 0x0
-[INFO] - executing process: 1
-[DEBUG] - stack frame: InterruptStackFrame {
-    instruction_pointer: VirtAddr(
-        0x80415d99,
+        0x804163d9,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -124,6 +85,7 @@ arg4 0x0
     ),
     stack_segment: 0x2b,
 }
+[INFO] - executing process: 1
 [DEBUG] - syscall number 0x1
 arg1 0x1
 arg2 0x0
@@ -138,31 +100,73 @@ arg4 0x0
             size: 0x1,
         },
         stack_region: Vritual Memory Region: {
-            first page: 0x80afc000,
-            first frame: 0xafc000,
+            first page: 0x80afd000,
+            first frame: 0xafd000,
             size: 0x1,
         },
         state: Active,
     },
 )
-[DEBUG] - stack frame: InterruptStackFrame {
+[DEBUG] - syscall number 0x2
+arg1 0x804115b0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - block's index: 1
+[DEBUG] - free blocks: [[], []]
+[INFO] - spawned a process with pid 2
+[DEBUG] - pausing process: 0x1, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80415e79,
+        0x804163d9,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
     stack_pointer: VirtAddr(
-        0x80afbfd8,
+        0x80afcfd8,
     ),
     stack_segment: 0x2b,
 }
+[INFO] - executing process: 2
+[DEBUG] - syscall number 0x1
+arg1 0x2
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[INFO] - process information: Some(
+    ProcessData {
+        pid: 0x2,
+        code_region: Vritual Memory Region: {
+            first page: 0x80411000,
+            first frame: 0x411000,
+            size: 0x1,
+        },
+        stack_region: Vritual Memory Region: {
+            first page: 0x80afe000,
+            first frame: 0xafe000,
+            size: 0x1,
+        },
+        state: Active,
+    },
+)
 [DEBUG] - syscall number 0x4
 arg1 0x1
 arg2 0x0
 arg3 0x0
 arg4 0x0
+[DEBUG] - poping child: 0x2
+[INFO] - releasing process 2 resources
 [DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
-addr: 80afc000
+addr: 80afe000
 [DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264989]]
-[INFO] - succesfully killed process: 0x1
+[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264991]]
+[DEBUG] - poping child: 0x1
+[INFO] - releasing process 1 resources
+[DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
+addr: 80afd000
+[DEBUG] - deallocation size: 0x1000
+[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264991, 264990]]
+[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [132495], []]
+[failed]
+
+Error: panicked at 'called `Option::unwrap()` on a `None` value', src/memory/mod.rs:119:61
+
