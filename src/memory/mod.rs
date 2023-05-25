@@ -171,3 +171,10 @@ pub const unsafe fn as_mut_ref<'a, T>(address: u64) -> &'a mut T {
 pub fn as_addr<T>(object: &T) -> u64 {
     object as *const T as u64
 }
+
+#[macro_export]
+macro_rules! code_addr {
+    ($func_name:ident) => {
+        $func_name as *const () as u64
+    };
+}
