@@ -17,7 +17,6 @@ macro_rules! graphic_println {
     };
 }
 
-
 #[macro_export]
 macro_rules! serial_print {
     // tt -> token tree (() / [] / {})
@@ -28,7 +27,6 @@ macro_rules! serial_print {
 
 #[macro_export]
 macro_rules! serial_println {
-    
     () => {
         use crate::print;
         $crate::print!("\n");
@@ -40,8 +38,6 @@ macro_rules! serial_println {
         $crate::serial_print!(concat!($fmt, "\n"), $($arg)+);
     }
 }
-
-
 
 pub mod serial;
 pub mod vga;

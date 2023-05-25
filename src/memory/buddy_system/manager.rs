@@ -1,4 +1,7 @@
-use crate::memory::{frame_distributer::{FrameAllocator, FrameDistributer}, types::FRAME_SIZE};
+use crate::memory::{
+    frame_distributer::{FrameAllocator, FrameDistributer},
+    types::PAGE_SIZE,
+};
 
 use alloc::vec::Vec;
 use log::debug;
@@ -43,7 +46,7 @@ impl BuddyManager {
             .iter_mut()
             .find(|buddy| buddy.region.contains(address))
         {
-            debug!("region: {:?}\naddr: {:?}", buddy.region, address);
+            debug!("region: {:?}\naddr: {:x}", buddy.region, address);
             buddy.deallocate(address, size, alignment);
         } else {
             debug!("No buddy manages this memory :(");
@@ -53,6 +56,6 @@ impl BuddyManager {
 
 unsafe impl FrameAllocator for BuddyManager {
     fn allocate_frame(&mut self) -> Option<u64> {
-        self.allocate(FRAME_SIZE, FRAME_SIZE)
+        self.allocate(PAGE_SIZE, PAGE_SIZE)
     }
 }

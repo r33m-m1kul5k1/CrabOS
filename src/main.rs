@@ -4,7 +4,6 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
-
 #![allow(unused)]
 
 use bootloader::{entry_point, BootInfo};
@@ -13,11 +12,11 @@ use x86_64::VirtAddr;
 use CrabOS::panic::kernel_panic;
 
 use CrabOS::{
-    hlt_loop,
+    graphic_println, hlt_loop,
     interrupts::{gdt, idt},
     log::{self, info, LevelFilter},
-    memory::{frame_distributer::FrameDistributer, heap, paging, self},
-    panic::PanicInfo,
+    memory::{self, frame_distributer::FrameDistributer, heap, paging},
+    panic::PanicInfo, processes::{spawn_process, execute_process}, userland::user_main, code_addr,
 };
 
 entry_point!(kmain);
@@ -25,20 +24,33 @@ entry_point!(kmain);
 fn kmain(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
-
+    
     log::init(LevelFilter::Debug);
+    display_logo();
 
     info!("CrabOS starts initialization sequence");
     gdt::init();
-    info!("GDT initialized");
-
     idt::init();
-    info!("IDT initialized");
-
     memory::init(boot_info);
-    info!("finished initializing memory related structures");
-    
+    execute_process(spawn_process(code_addr!(user_main)));
     hlt_loop()
+}
+
+fn display_logo() {
+    graphic_println!(
+        r"
+  $$$$$$\                     $$\        $$$$$$\   $$$$$$\  
+ $$  __$$\                    $$ |      $$  __$$\ $$  __$$\ 
+ $$ /  \__| $$$$$$\  $$$$$$\  $$$$$$$\  $$ /  $$ |$$ /  \__|
+ $$ |      $$  __$$\ \____$$\ $$  __$$\ $$ |  $$ |\$$$$$$\  
+ $$ |      $$ |  \__|$$$$$$$ |$$ |  $$ |$$ |  $$ | \____$$\ 
+ $$ |  $$\ $$ |     $$  __$$ |$$ |  $$ |$$ |  $$ |$$\   $$ |
+ \$$$$$$  |$$ |     \$$$$$$$ |$$$$$$$  | $$$$$$  |\$$$$$$  |
+  \______/ \__|      \_______|\_______/  \______/  \______/ 
+                     (\/) (°,,,,°) (\/)                                     
+    "
+    );
+
 }
 
 #[cfg(not(test))]

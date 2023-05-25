@@ -1,6 +1,12 @@
 //! Defines a heap algorithm and initiate the heap virutal memory.
-use super::{frame_distributer::{FrameAllocator, FrameDistributer}, types::FRAME_SIZE};
-use crate::{panic::{exit_qemu, hlt_loop, QemuExitCode}, memory::{paging::EntryFlags, KERNEL_MAPPER}};
+use super::{
+    frame_distributer::{FrameAllocator, FrameDistributer},
+    types::PAGE_SIZE,
+};
+use crate::{
+    memory::{paging::EntryFlags, KERNEL_MAPPER},
+    panic::{exit_qemu, hlt_loop, QemuExitCode},
+};
 use alloc::alloc::Layout;
 use linked_list_allocator::LockedHeap;
 use log::trace;
@@ -31,8 +37,7 @@ static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 /// Create a virtual address space for the heap (must be above the already mapped physical memory)
 pub fn init(frame_distributer: &mut FrameDistributer) {
-
-    for page_addr in (HEAP_BOTTOM..(HEAP_BOTTOM + HEAP_SIZE as u64)).step_by(FRAME_SIZE) {
+    for page_addr in (HEAP_BOTTOM..(HEAP_BOTTOM + HEAP_SIZE as u64)).step_by(PAGE_SIZE) {
         let physical_addr = frame_distributer.allocate_frame().unwrap();
         unsafe {
             KERNEL_MAPPER
