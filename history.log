@@ -76,7 +76,7 @@ arg4 0x0
 )
 [DEBUG] - pausing process: 0x0, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80416019,
+        0x80416029,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -86,6 +86,11 @@ arg4 0x0
     stack_segment: 0x2b,
 }
 [INFO] - executing process: 1
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
 [DEBUG] - syscall number 0x1
 arg1 0x1
 arg2 0x0
@@ -117,7 +122,7 @@ arg4 0x0
 [INFO] - spawned a process with pid 2
 [DEBUG] - pausing process: 0x1, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80416019,
+        0x80416029,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -127,6 +132,11 @@ arg4 0x0
     stack_segment: 0x2b,
 }
 [INFO] - executing process: 2
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
 [DEBUG] - syscall number 0x1
 arg1 0x2
 arg2 0x0
@@ -168,6 +178,11 @@ addr: afd000
 [DEBUG] - free_blocks: [[0], []]
 [INFO] - succesfully killed process: 0x1
 [INFO] - executing process: 0
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
 [DEBUG] - syscall number 0x1
 arg1 0x0
 arg2 0x0

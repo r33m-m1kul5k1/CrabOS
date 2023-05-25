@@ -2,7 +2,7 @@
 
 use log::info;
 
-use crate::{syscalls::status, processes::{get_process_info, spawn_process, execute_process, kill_process}};
+use crate::{syscalls::status, processes::{get_process_info, spawn_process, execute_process, kill_process, self}};
 
 pub fn display_process_info(pid: usize) -> i64 {
     info!("process information: {:#x?}", get_process_info(pid));
@@ -27,4 +27,8 @@ pub fn execute(pid: usize) -> i64 {
 
 pub fn kill(pid: usize) -> i64 {
     kill_process(pid);
+}
+
+pub fn get_current_pid() -> i64 {
+    processes::get_current_pid() as i64
 }

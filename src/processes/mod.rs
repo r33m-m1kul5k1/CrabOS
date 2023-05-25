@@ -53,3 +53,7 @@ pub fn kill_process(pid: usize) -> ! {
     }
     loop {}
 }
+
+pub fn get_current_pid() -> usize {
+    KERNEL_SCHEDULER.try_lock().unwrap().next_pid() -1
+}

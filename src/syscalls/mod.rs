@@ -111,6 +111,9 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
         number::KILL => {
             kill(arg1 as usize)
         }
+        number::GET_PID => {
+            get_current_pid()
+        }
         _ => {
             error!("unimplemented syscall");
             unimplemented!();
@@ -125,6 +128,7 @@ pub mod number {
     pub const CREATE: u64 = 2;
     pub const EXECUTE: u64 = 3;
     pub const KILL: u64 = 4;
+    pub const GET_PID: u64 = 5;
 }
 
 /// Syscalls exit statuses
