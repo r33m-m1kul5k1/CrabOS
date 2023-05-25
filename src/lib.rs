@@ -1,88 +1,41 @@
-//! this library goal is to expose the OS api to the test directory for integration tests
-//! moreover this library implements basic functionalities for testing
+//! This library goal is to expose the OS api to the test directory for integration tests
 #![no_std]
-#![cfg_attr(test, no_main)]
-#![feature(custom_test_frameworks)]
-#![test_runner(test_runner)]
-#![reexport_test_harness_main = "test_main"]
+#![no_main]
+#![allow(non_snake_case)]
+#![feature(alloc_error_handler)]
 #![feature(abi_x86_interrupt)]
-#![allow(nonstandard_style)] 
+#![feature(custom_test_frameworks)]
+#![feature(const_mut_refs)]
+#![feature(naked_functions)]
+#![test_runner(crate::tests::runner)]
+#![reexport_test_harness_main = "test_main"]
 
-use core::panic::PanicInfo;
+pub extern crate alloc;
+
+pub mod drivers;
+mod hardware;
 /// note that `pub` keyword makes the modules declaration accessible to external crates
 pub mod interrupts;
 pub mod log;
-pub mod drivers;
 pub mod memory;
+pub mod panic;
+pub mod processes;
+pub mod syscalls;
+pub mod tests;
+pub mod userland;
 
-const ISA_DEBUG_EXIT_PORT: u16 = 0xf4;
-pub enum QemuExitCode {
-    Success = 0x10,
-    Failed = 0x11,
-}
-
-pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
-    unsafe {
-        let mut port = Port::new(ISA_DEBUG_EXIT_PORT);
-        port.write(exit_code as u32);
-    }
-}
-
-pub fn hlt_loop() -> ! {
-    loop {
-        x86_64::instructions::hlt();
-    }
-}
-pub trait Testable {
-    fn run(&self) -> ();
-}
-
-impl<T> Testable for T
-where
-    T: Fn(),
-{
-    fn run(&self) {
-        print!("{}...\t", core::any::type_name::<T>());
-        self();
-        println!("[ok]");
-    }
-}
-
-pub fn test_runner(tests: &[&dyn Testable]) {
-    println!("Running {} tests", tests.len());
-
-    for test in tests {
-        test.run();
-    }
-    exit_qemu(QemuExitCode::Success);
-}
-
-pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    println!("[failed]\n");
-    println!("Error: {}\n", info);
-    exit_qemu(QemuExitCode::Failed);
-    hlt_loop();
-}
-
-pub fn test_should_panic_handler(info: &PanicInfo) -> ! {
-    println!("[Success]\n");
-    println!("Panic info: {}\n", info);
-    exit_qemu(QemuExitCode::Success);
-    hlt_loop();
-}
+pub use core::panic::PanicInfo;
+pub use panic::{hlt_loop, test_panic_handler, test_should_panic_handler};
 
 #[no_mangle]
-#[cfg(test)]
 pub extern "C" fn _start() -> ! {
+    #[cfg(test)]
     test_main();
-
     hlt_loop()
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
+    panic::test_panic_handler(info)
 }

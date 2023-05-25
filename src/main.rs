@@ -1,32 +1,42 @@
 #![no_std]
 #![no_main]
-#![allow(nonstandard_style)]
-#![feature(abi_x86_interrupt)]
-#![feature(stmt_expr_attributes)]
+#![allow(non_snake_case)]
 #![feature(custom_test_frameworks)]
-#![test_runner(CrabOS::test_runner)]
+#![test_runner(CrabOS::tests::runner)]
 #![reexport_test_harness_main = "test_main"]
+#![allow(unused)]
 
 use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
+use x86_64::VirtAddr;
+#[allow(unused_imports)]
+use CrabOS::panic::kernel_panic;
+
 use CrabOS::{
-    drivers::vga::{Color, WRITER},
     graphic_println, hlt_loop,
     interrupts::{gdt, idt},
-    log::logger,
-    memory::pmm::FrameDistributer,
+    log::{self, info, LevelFilter},
+    memory::{self, frame_distributer::FrameDistributer, heap, paging},
+    panic::PanicInfo, processes::{spawn_process, execute_process}, userland::user_main, code_addr,
 };
 
 entry_point!(kmain);
 
-pub fn kmain(boot_info: &'static BootInfo) -> ! {
+fn kmain(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
+    
+    log::init(LevelFilter::Debug);
+    display_logo();
 
-    WRITER
-        .lock()
-        .set_writer_theme(Color::LightRed, Color::Black);
+    info!("CrabOS starts initialization sequence");
+    gdt::init();
+    idt::init();
+    memory::init(boot_info);
+    execute_process(spawn_process(code_addr!(user_main)));
+    hlt_loop()
+}
 
+fn display_logo() {
     graphic_println!(
         r"
   $$$$$$\                     $$\        $$$$$$\   $$$$$$\  
@@ -41,31 +51,16 @@ pub fn kmain(boot_info: &'static BootInfo) -> ! {
     "
     );
 
-
-    logger::init(log::LevelFilter::Debug);
-
-    logger::info!("Starts the initialization sequence");
-
-    logger::info!("---Global Descriptor Table and the kernel's Segments");
-    gdt::init();
-    logger::info!("---Interrupt Descriptor Table");
-    idt::IDT.load();
-
-    let mut frame_distributer = FrameDistributer::new(&boot_info.memory_map);
-    
-    frame_distributer.get_region();
-
-    hlt_loop()
 }
 
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    hlt_loop()
+fn panic(info: &PanicInfo) -> ! {
+    kernel_panic(info)
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    CrabOS::test_panic_handler(info)
+    CrabOS::panic::test_panic_handler(info)
 }

@@ -30,11 +30,11 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 - [x] UART for exceptions and unit testing
 - [x] VGA buffer
 - [x] interrupts & exceptions
-- [ ] physical memory manager
-- [ ] virtual memory manager
-- [ ] kernel heap management
-- [ ] processes and scheduling
-- [ ] syscall structure & userland
+- [x] physical memory manager
+- [x] virtual memory manager
+- [x] kernel heap management
+- [x] processes
+- [x] syscall structure & userland
 - [ ] file system
 - [ ] shell and some commands
 - [ ] maybe security stuff...
