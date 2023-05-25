@@ -45,7 +45,7 @@
 [DEBUG] - free blocks: [[]]
 [INFO] - executing process: 0
 [DEBUG] - syscall number 0x2
-arg1 0x80411220
+arg1 0x80411270
 arg2 0x0
 arg3 0x0
 arg4 0x0
@@ -76,7 +76,7 @@ arg4 0x0
 )
 [DEBUG] - pausing process: 0x0, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80416029,
+        0x80416069,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -113,7 +113,7 @@ arg4 0x0
     },
 )
 [DEBUG] - syscall number 0x2
-arg1 0x804111f0
+arg1 0x80411220
 arg2 0x0
 arg3 0x0
 arg4 0x0
@@ -122,7 +122,7 @@ arg4 0x0
 [INFO] - spawned a process with pid 2
 [DEBUG] - pausing process: 0x1, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x80416029,
+        0x80416069,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -158,17 +158,91 @@ arg4 0x0
         state: Active,
     },
 )
-[DEBUG] - syscall number 0x4
-arg1 0x1
+[DEBUG] - syscall number 0x2
+arg1 0x804111f0
 arg2 0x0
 arg3 0x0
 arg4 0x0
+[DEBUG] - splits level 0
+[DEBUG] - splits level 1
+[DEBUG] - splits level 2
+[DEBUG] - splits level 3
+[DEBUG] - splits level 4
+[DEBUG] - block's index: 0
+[DEBUG] - free blocks: [[], [1], [1], [1], [1], [1]]
+[INFO] - spawned a process with pid 3
+[DEBUG] - pausing process: 0x2, with context: InterruptStackFrame {
+    instruction_pointer: VirtAddr(
+        0x80416069,
+    ),
+    code_segment: 0x33,
+    cpu_flags: 0x46,
+    stack_pointer: VirtAddr(
+        0x80afdfd8,
+    ),
+    stack_segment: 0x2b,
+}
+[INFO] - executing process: 3
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - syscall number 0x1
+arg1 0x3
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[INFO] - process information: Some(
+    ProcessData {
+        pid: 0x3,
+        code_region: Vritual Memory Region: {
+            first page: 0x80411000,
+            first frame: 0x411000,
+            size: 0x1,
+        },
+        stack_region: Vritual Memory Region: {
+            first page: 0x80aff000,
+            first frame: 0xaff000,
+            size: 0x1,
+        },
+        state: Active,
+    },
+)
+[DEBUG] - syscall number 0x4
+arg1 0x2
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - poping child: 0x3
+[INFO] - releasing process 3 resources
+[DEBUG] - region: MemoryRegion { range: FrameRange(0xaff000..0xb1f000), size: 32 }
+addr: aff000
+[DEBUG] - deallocation size: 0x1000
+[DEBUG] - free_blocks: [[], [1], [1], [1], [1], [1, 0]]
+[DEBUG] - free_blocks: [[], [1], [1], [1], [1, 0], []]
+[DEBUG] - free_blocks: [[], [1], [1], [1, 0], [], []]
+[DEBUG] - free_blocks: [[], [1], [1, 0], [], [], []]
+[DEBUG] - free_blocks: [[], [1, 0], [], [], [], []]
+[DEBUG] - free_blocks: [[0], [], [], [], [], []]
 [DEBUG] - poping child: 0x2
 [INFO] - releasing process 2 resources
 [DEBUG] - region: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
 addr: afe000
 [DEBUG] - deallocation size: 0x1000
 [DEBUG] - free_blocks: [[], [1]]
+[INFO] - succesfully killed process: 0x2
+[INFO] - executing process: 1
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - syscall number 0x4
+arg1 0x1
+arg2 0x0
+arg3 0x0
+arg4 0x0
 [DEBUG] - poping child: 0x1
 [INFO] - releasing process 1 resources
 [DEBUG] - region: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
@@ -204,3 +278,20 @@ arg4 0x0
         state: Active,
     },
 )
+[DEBUG] - syscall number 0x5
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - syscall number 0x4
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[DEBUG] - poping child: 0x0
+[INFO] - releasing process 0 resources
+[DEBUG] - region: MemoryRegion { range: FrameRange(0xafc000..0xafd000), size: 1 }
+addr: afc000
+[DEBUG] - deallocation size: 0x1000
+[DEBUG] - free_blocks: [[0]]
+[INFO] - succesfully killed process: 0x0

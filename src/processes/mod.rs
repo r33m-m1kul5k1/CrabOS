@@ -12,6 +12,8 @@ use scheduler::Scheduler;
 use spin::Mutex;
 use x86_64::structures::idt::InterruptStackFrame;
 
+use crate::panic::exit_qemu;
+
 use self::objects::ProcessData;
 
 lazy_static! {
@@ -47,7 +49,12 @@ pub fn kill_process(pid: usize) -> ! {
     match process {
         Ok(()) => {
             info!("succesfully killed process: {:#x}", pid);
-            execute_process(pid -1)
+            if pid == 0 {
+                // Shutdown
+                exit_qemu(crate::panic::QemuExitCode::Success);
+            } else {
+                execute_process(pid -1)
+            }
         }
         Err(()) => error!("failed to kill process: {:#x}", pid),
     }

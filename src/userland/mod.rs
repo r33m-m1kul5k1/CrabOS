@@ -2,17 +2,26 @@
 mod syscalls;
 use syscalls::*;
 
+fn proc3() -> ! {
+    display_process_info(get_pid()).unwrap();
+    kill(2);
+    loop {}
+}
+
 fn proc2() -> ! {
     display_process_info(get_pid()).unwrap();
-    kill(1);
+    execute(
+        create(proc3 as *const () as u64).unwrap()
+        );
     loop {}
 }
 
 fn proc1() -> ! {
     display_process_info(get_pid()).unwrap();
-    let child_pid = create(proc2 as *const () as u64).unwrap();
-    execute(child_pid);
-    loop {}
+    execute(
+    create(proc2 as *const () as u64).unwrap()
+    );
+    exit()
 }
 
 pub fn user_main() -> ! {
@@ -20,6 +29,6 @@ pub fn user_main() -> ! {
     display_process_info(child_pid).unwrap();
     execute(child_pid);
     display_process_info(get_pid()).unwrap();
-    loop {}
+    exit()
 }
 

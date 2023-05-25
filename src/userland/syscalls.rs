@@ -111,3 +111,8 @@ pub fn kill(pid: usize) {
 pub fn get_pid() -> usize {
     unsafe { syscall!(GET_PID) as usize }
 }
+
+pub fn exit() -> ! {
+    kill(get_pid());
+    loop {}
+}
