@@ -44,7 +44,7 @@
 [DEBUG] - block's index: 0
 [DEBUG] - free blocks: [[], [1]]
 [INFO] - executing process: 0
-[DEBUG] - syscall number 0x2
+[DEBUG] - syscall number 0x1
 arg1 0x804115a0
 arg2 0x0
 arg3 0x0
@@ -52,7 +52,7 @@ arg4 0x0
 [DEBUG] - block's index: 1
 [DEBUG] - free blocks: [[], []]
 [INFO] - spawned a process with pid 1
-[DEBUG] - syscall number 0x1
+[DEBUG] - syscall number 0x0
 arg1 0x1
 arg2 0x0
 arg3 0x0
@@ -85,12 +85,12 @@ arg4 0x0
     stack_segment: 0x2b,
 }
 [INFO] - executing process: 1
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x1
+[DEBUG] - syscall number 0x0
 arg1 0x1
 arg2 0x0
 arg3 0x0
@@ -111,7 +111,7 @@ arg4 0x0
         state: Active,
     },
 )
-[DEBUG] - syscall number 0x2
+[DEBUG] - syscall number 0x1
 arg1 0x80411550
 arg2 0x0
 arg3 0x0
@@ -136,12 +136,12 @@ arg4 0x0
     stack_segment: 0x2b,
 }
 [INFO] - executing process: 2
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x1
+[DEBUG] - syscall number 0x0
 arg1 0x2
 arg2 0x0
 arg3 0x0
@@ -162,7 +162,7 @@ arg4 0x0
         state: Active,
     },
 )
-[DEBUG] - syscall number 0x2
+[DEBUG] - syscall number 0x1
 arg1 0x80411520
 arg2 0x0
 arg3 0x0
@@ -182,12 +182,12 @@ arg4 0x0
     stack_segment: 0x2b,
 }
 [INFO] - executing process: 3
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x1
+[DEBUG] - syscall number 0x0
 arg1 0x3
 arg2 0x0
 arg3 0x0
@@ -208,7 +208,7 @@ arg4 0x0
         state: Active,
     },
 )
-[DEBUG] - syscall number 0x4
+[DEBUG] - syscall number 0x3
 arg1 0x2
 arg2 0x0
 arg3 0x0
@@ -232,12 +232,12 @@ addr: aff000
 [DEBUG] - free_blocks: [[0], [], [], [], [], []]
 [INFO] - succesfully killed process: 0x2
 [INFO] - executing process: 1
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x4
+[DEBUG] - syscall number 0x3
 arg1 0x1
 arg2 0x0
 arg3 0x0
@@ -250,12 +250,12 @@ addr: afe000
 [DEBUG] - free_blocks: [[], [1]]
 [INFO] - succesfully killed process: 0x1
 [INFO] - executing process: 0
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x1
+[DEBUG] - syscall number 0x0
 arg1 0x0
 arg2 0x0
 arg3 0x0
@@ -276,12 +276,12 @@ arg4 0x0
         state: Active,
     },
 )
-[DEBUG] - syscall number 0x5
+[DEBUG] - syscall number 0x4
 arg1 0x0
 arg2 0x0
 arg3 0x0
 arg4 0x0
-[DEBUG] - syscall number 0x4
+[DEBUG] - syscall number 0x3
 arg1 0x0
 arg2 0x0
 arg3 0x0

@@ -98,10 +98,6 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
         arg4
     );
     match number {
-        number::EXIT => {
-            // TODO: add kill with the current pid
-            status::SUCCESS
-        }
         number::DISPLAY_PROCESS_INFO => {
             display_process_info(arg1 as usize)
         }
@@ -123,12 +119,11 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
 
 /// Syscalls numbers
 pub mod number {
-    pub const EXIT: u64 = 0;
-    pub const DISPLAY_PROCESS_INFO: u64 = 1;
-    pub const CREATE: u64 = 2;
-    pub const EXECUTE: u64 = 3;
-    pub const KILL: u64 = 4;
-    pub const GET_PID: u64 = 5;
+    pub const DISPLAY_PROCESS_INFO: u64 = 0;
+    pub const CREATE: u64 = 1;
+    pub const EXECUTE: u64 = 2;
+    pub const KILL: u64 = 3;
+    pub const GET_PID: u64 = 4;
 }
 
 /// Syscalls exit statuses
