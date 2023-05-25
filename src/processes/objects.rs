@@ -10,7 +10,6 @@ use crate::{
         get_linear_addr, get_page_frame, kfree, kmalloc, mmap,
         paging::EntryFlags,
         types::{VirtualMemoryRegion, PAGE_SIZE},
-        update_pages_access_policy,
     },
 };
 const PAGE_INDEX: u64 = 0xFFF;
@@ -176,18 +175,14 @@ impl Process {
     }
 
     /// Release the process' and thread' resources.
+    /// Note that the code page is not released because it can be shared
     pub fn release_resources(&self) {
         info!("releasing process {} resources", self.internal_data.pid);
         kfree(
-            self.internal_data.stack_region.first_page(),
+            self.internal_data.stack_region.first_frame(),
             self.internal_data.stack_region.size * PAGE_SIZE,
             PAGE_SIZE,
         );
-        // unmaps the process virtual memory so that other processes wouldn't be able to access other processes data
-        unsafe {
-            update_pages_access_policy(self.internal_data.stack_region.clone(), EntryFlags::empty());
-            update_pages_access_policy(self.internal_data.code_region.clone(), EntryFlags::empty());
-        }
     }
 
     /// Saves the current state of the process' thread.

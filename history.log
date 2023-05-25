@@ -45,7 +45,7 @@
 [DEBUG] - free blocks: [[]]
 [INFO] - executing process: 0
 [DEBUG] - syscall number 0x2
-arg1 0x804115e0
+arg1 0x80411220
 arg2 0x0
 arg3 0x0
 arg4 0x0
@@ -76,7 +76,7 @@ arg4 0x0
 )
 [DEBUG] - pausing process: 0x0, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x804163d9,
+        0x80416019,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -108,7 +108,7 @@ arg4 0x0
     },
 )
 [DEBUG] - syscall number 0x2
-arg1 0x804115b0
+arg1 0x804111f0
 arg2 0x0
 arg3 0x0
 arg4 0x0
@@ -117,7 +117,7 @@ arg4 0x0
 [INFO] - spawned a process with pid 2
 [DEBUG] - pausing process: 0x1, with context: InterruptStackFrame {
     instruction_pointer: VirtAddr(
-        0x804163d9,
+        0x80416019,
     ),
     code_segment: 0x33,
     cpu_flags: 0x46,
@@ -155,18 +155,37 @@ arg3 0x0
 arg4 0x0
 [DEBUG] - poping child: 0x2
 [INFO] - releasing process 2 resources
-[DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
-addr: 80afe000
+[DEBUG] - region: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
+addr: afe000
 [DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264991]]
+[DEBUG] - free_blocks: [[], [1]]
 [DEBUG] - poping child: 0x1
 [INFO] - releasing process 1 resources
-[DEBUG] - region: MemoryRegion { range: FrameRange(0x3ffdf000..0xbffdf000), size: 524288 }
-addr: 80afd000
+[DEBUG] - region: MemoryRegion { range: FrameRange(0xafd000..0xaff000), size: 2 }
+addr: afd000
 [DEBUG] - deallocation size: 0x1000
-[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [264991, 264990]]
-[DEBUG] - free_blocks: [[0], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [132495], []]
-[failed]
-
-Error: panicked at 'called `Option::unwrap()` on a `None` value', src/memory/mod.rs:119:61
-
+[DEBUG] - free_blocks: [[], [1, 0]]
+[DEBUG] - free_blocks: [[0], []]
+[INFO] - succesfully killed process: 0x1
+[INFO] - executing process: 0
+[DEBUG] - syscall number 0x1
+arg1 0x0
+arg2 0x0
+arg3 0x0
+arg4 0x0
+[INFO] - process information: Some(
+    ProcessData {
+        pid: 0x0,
+        code_region: Vritual Memory Region: {
+            first page: 0x80411000,
+            first frame: 0x411000,
+            size: 0x1,
+        },
+        stack_region: Vritual Memory Region: {
+            first page: 0x80afc000,
+            first frame: 0xafc000,
+            size: 0x1,
+        },
+        state: Active,
+    },
+)

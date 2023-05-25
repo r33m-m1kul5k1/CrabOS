@@ -65,20 +65,20 @@ fn kernel_allocations() {
 
     info!("-------------------Allocation-------------------\n");
     let process_1 = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
-    info!("kernel allocated {:x} of size {:x} to process 1", process_1, PAGE_SIZE);
+    info!("kernel allocated {:#x} of size {:#x} to process 1", process_1, PAGE_SIZE);
     info!("-----------------------------------------------\n");
     let process_2 = kmalloc(PAGE_SIZE, PAGE_SIZE).unwrap();
-    info!("kernel allocated {:x} of size {:x} to process 2", process_2, PAGE_SIZE);
+    info!("kernel allocated {:#x} of size {:#x} to process 2", process_2, PAGE_SIZE);
     info!("-----------------------------------------------\n");
 
     info!("------------------Deallocation------------------\n");
 
     kfree(process_1, PAGE_SIZE, PAGE_SIZE);
-    info!("freed process 1 memory: {:x}", process_1);
+    info!("freed process 1 memory: {:#x}", process_1);
     info!("-----------------------------------------------\n");
 
     kfree(process_2, PAGE_SIZE, PAGE_SIZE);
-    info!("freed process 2 memory: {:x}", process_2);
+    info!("freed process 2 memory: {:#x}", process_2);
     info!("-----------------------------------------------\n");
 
 }
