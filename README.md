@@ -12,9 +12,17 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
    rustup default nightly-x86_64-unknown-linux-gnu
    ```
    to check your `rustc` details run `rustc --version --verbose`
-3. cargo install `bootimage`, `modules` (optional)
-4. add `rustc` component `llvm-tools-preview`
-5. `./run.sh`
+3. cargo install `bootimage`
+   ```bash
+   cargo install bootimage
+   ```
+
+4. add `rustc` component `llvm-tools-preview` and `rust-src`
+   ```bash
+   rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+   rustup component add llvm-tools-preview
+   ```
+5. `cargo run`
 
 
 ## Debug the kernel
@@ -22,7 +30,6 @@ a monolithic kernel written in rust to x86 architecture, with a userland shell.
 1. add the `-s -S` options to the qemu command.
 2. load the binary with gdb `gdb /path/to/CrabOS`
 3. run in gdb `target remote localhost:1234`
-5. `tui enable`
 4. start debugging :)
 
 ## Feature
