@@ -78,6 +78,7 @@ extern "sysv64" fn syscall_handler(
     let arg4 = registers.r8;
     
     if number == number::EXECUTE {
+        debug!("EXECUTE");
         pause_process(arg1 as usize - 1, stack_frame);
         execute(arg1 as usize);
     } else {
@@ -99,15 +100,19 @@ fn dispatcher(number: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64) -> i64 {
     );
     match number {
         number::DISPLAY_PROCESS_INFO => {
+            debug!("DISPLAY_PROCESS_INFO");
             display_process_info(arg1 as usize)
         }
         number::CREATE => {
+            debug!("CREATE");
             create_process(arg1)
         }
         number::KILL => {
+            debug!("KILL");
             kill(arg1 as usize)
         }
         number::GET_PID => {
+            debug!("GET_PID");
             get_current_pid()
         }
         _ => {

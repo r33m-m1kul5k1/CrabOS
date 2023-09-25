@@ -34,7 +34,7 @@ run-command = [
     "-mon", "chardev=char0",
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
     "-drive", "format=raw,file={}",
-    "-m", "8G",
+    "-m", "4G",
     ]
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",

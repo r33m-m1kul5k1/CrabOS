@@ -25,7 +25,7 @@ fn kmain(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
     
-    log::init(LevelFilter::Debug);
+    log::init(LevelFilter::Info);
     display_logo();
     
     info!("CrabOS starts initialization sequence");
